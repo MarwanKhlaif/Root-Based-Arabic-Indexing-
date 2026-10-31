@@ -26,6 +26,8 @@ dependencies = [
     "pandas>=2.2.0",
     "pyarrow>=17.0.0",
     "tqdm>=4.66.0",
+    "fastapi>=0.162.0",
+    "uvicorn>=0.54.0",
 ]
 
 [project.optional-dependencies]
@@ -46,4 +48,9 @@ addopts = "-v --strict-markers"
 markers = [
     "db: tests requiring a running PostgreSQL database",
     "unit: standalone unit tests",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
 ]

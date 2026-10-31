@@ -22,5 +22,27 @@ services:
       retries: 10
       start_period: 5s
 
+  arabic_ir_web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arabic_ir_web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PGHOST=arabic_ir_db
+      - PGPORT=5432
+      - PGDATABASE=arabic_ir
+      - PGUSER=postgres
+      - PGPASSWORD=postgres_password
+      - PORT=8000
+    depends_on:
+      arabic_ir_db:
+        condition: service_healthy
+    volumes:
+      - ./results:/app/results:ro
+      - ./queries:/app/queries:ro
+
 volumes:
   pgdata:

@@ -1,0 +1,14 @@
+# Docker ignore rules for Arabic IR
+.git
+.venv
+__pycache__
+*.py[cod]
+*$py.class
+.pytest_cache
+.coverage
+htmlcov
+.DS_Store
+data/corpus/
+pgdata/
+.agents/
+*.log

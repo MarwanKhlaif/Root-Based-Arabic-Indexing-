@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منظومة الفهرسة النصية والبحث الدلالي للغة العربية | PostgreSQL 16</title>
+  
+  <!-- Modern Fonts & Styles -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  
+  <!-- Chart.js for interactive visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation & Header -->
+  <header>
+    <div class="container header-content">
+      <div class="brand-section">
+        <h1>
+          <span>📚</span>
+          <span>منظومة الفهرسة النصية للغة العربية في PostgreSQL 16</span>
+        </h1>
+        <div class="subtitle">
+          مقارنة تجريبية شاملة بين 6 استراتيجيات للفهرسة النصية والاشتقاق الصرفي (S0 – S5)
+        </div>
+        <div class="meta-authors">
+          <span>إعداد الطالب: <strong>مروان محمد خليف</strong></span>
+          <span style="margin: 0 0.5rem;">|</span>
+          <span>إشراف: <strong>د. ريا محمد محمود</strong></span>
+        </div>
+      </div>
+      
+      <!-- Live DB Status -->
+      <div class="status-indicator" id="db-status-pill" title="حالة الاتصال بقاعدة البيانات">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">جاري فحص الاتصال...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sticky Sub-Navigation Tabs -->
+  <nav class="nav-tabs">
+    <div class="container tabs-wrapper">
+      <button class="tab-btn active" data-tab="tab-search">
+        <span>🔍</span>
+        <span>البحث والمقارنة الحية</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-playground">
+        <span>🔬</span>
+        <span>محاكي التحويل الصرفي</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-golden">
+        <span>📋</span>
+        <span>الاستعلامات الذهبية (20)</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-benchmarks">
+        <span>📊</span>
+        <span>لوحة مؤشرات التقييم والأداء</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-overstemming">
+        <span>⚠️</span>
+        <span>تحليل الإفراط في الاشتقاق</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="container">
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: LIVE SEARCH & COMPARISON                                   -->
+    <!-- ================================================================= -->
+    <section id="tab-search" class="tab-pane active">
+      <div class="search-box-card">
+        <div class="search-header">
+          <h2>محرك مقارنة أنظمة البحث الستة (S0 – S5)</h2>
+          <p>اكتب أي كلمة أو عبارة باللغة العربية، أو اختر من الاستعلامات الذهبية المعتمدة لرؤية كيفية استرجاع النتائج لكل نظام جنباً إلى جنب.</p>
+        </div>
+
+        <div class="search-inputs-group">
+          <!-- Quick Selector for Golden Queries -->
+          <div class="search-presets">
+            <label for="golden-select">⚡ استعلامات ذهبية جاهزة:</label>
+            <select id="golden-select">
+              <option value="">-- اختر استعلاماً من الـ 20 الذهبية --</option>
+            </select>
+          </div>
+
+          <!-- Main Search Input -->
+          <form id="search-form" class="input-with-button" onsubmit="event.preventDefault(); triggerSearch();">
+            <input 
+              type="text" 
+              id="search-input" 
+              class="main-input" 
+              placeholder="مثال: يكتبون في المكتبة، استخراج المعادن، أطباء العيون..." 
+              value="كتب" 
+              autocomplete="off"
+            >
+            <button type="submit" class="btn-primary" id="search-btn">
+              <span>🔍</span>
+              <span>تنفيذ البحث</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Controls: View Mode & Filters -->
+        <div class="search-controls-bar">
+          <div class="view-mode-buttons">
+            <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); align-self:center; margin-left:0.5rem;">طريقة العرض:</span>
+            <button class="view-btn active" id="view-mode-side" onclick="setViewMode('side')">📑 عرض متجاور</button>
+            <button class="view-btn" id="view-mode-tabs" onclick="setViewMode('tabs')">🗂️ عرض التبويبات</button>
+          </div>
+
+          <div id="demo-mode-badge" style="display:none; font-size:0.82rem; background:#fef3c7; color:#b45309; padding:0.3rem 0.75rem; border-radius:var(--radius-sm); border:1px solid #fde68a;">
+            ℹ️ وضع المعاينة التوضيحية (البيانات مسترجعة من عينة ويكيبيديا المقيمة)
+          </div>
+        </div>
+
+        <!-- Query Transformation Strip -->
+        <div class="transformation-strip" id="search-transform-strip">
+          <h3>
+            <span>🔄</span>
+            <span>التمثيل الصرفي للاستعلام الحالي عبر الأنظمة الستة:</span>
+          </h3>
+          <div class="transformation-grid" id="transform-badges-grid">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Search Results Container -->
+      <div id="results-wrapper">
+        <!-- Rendered by app.js -->
+        <div id="results-side-by-side" class="results-grid"></div>
+        <div id="results-tabbed-container" style="display:none;"></div>
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- TAB 2: MORPHOLOGICAL PLAYGROUND                                   -->
+    <!-- ================================================================= -->
+    <section id="tab-playground" class="tab-pane">
+      <div class="playground-input-card">
+        <h2>🔬 مختبر ومحاكي التحويل الصرفي الفوري</h2>
+        <p style="color:var(--text-muted); margin-bottom:1.25rem;">
+          شاهد بالزمن الفعلي كيف يتم تنظيف النص وتفكيكه واستخراج أصوله ومقاطعه عبر كل خوارزمية بمجرد كتابة أي نص عربي.
+        </p>
+
+        <textarea 
+          id="playground-input" 
+          class="main-input" 
+          rows="2" 
+          style="width:100%; resize:vertical;" 
+          placeholder="اكتب هنا أي نص عربي مشكول أو غير مشكول، مثلاً: «الْمُعَلِّمُونَ يَشْرَحُونَ الدُّرُوسَ فِي الْمَدَارِسِ الْحَدِيثَةِ»"
+        >الْمُعَلِّمُونَ يَشْرَحُونَ الدُّرُوسَ فِي الْمَدَارِسِ الْحَدِيثَةِ</textarea>
+      </div>
+
+      <div class="playground-grid" id="playground-cards-grid">
+        <!-- Populated via JavaScript -->
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: 20 GOLDEN QUERIES                                          -->
+    <!-- ================================================================= -->
+    <section id="tab-golden" class="tab-pane">
+      <div class="search-box-card">
+        <h2>📋 الاستعلامات الذهبية الـ 20 المعتمدة في التقييم</h2>
+        <p style="color:var(--text-muted); margin-bottom:1rem;">
+          مجموعة استعلامات اختبارية صُممت بعناية لتغطي خمس فئات لغوية وصرفية رئيسية، مع معايير حكم الدقة وتحديد أشكال المطابقة المتوقعة.
+        </p>
+
+        <!-- Category Filters -->
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;" id="category-filter-buttons">
+          <button class="view-btn active" onclick="filterGoldenTable('all', this)">جميع الفئات (20)</button>
+        </div>
+
+        <div class="golden-table-container">
+          <table class="golden-table" id="golden-queries-table">
+            <thead>
+              <tr>
+                <th>المعرف</th>
+                <th>الاستعلام</th>
+                <th>الجذر</th>
+                <th>نوع الجذر</th>
+                <th>الفئة اللغوية</th>
+                <th>الأوزان الصرفية المتوقعة</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="golden-table-body">
+              <!-- Populated via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- TAB 4: BENCHMARK DASHBOARD & METRICS                             -->
+    <!-- ================================================================= -->
+    <section id="tab-benchmarks" class="tab-pane">
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">أعلى دقة استرجاع عند 10 (P@10)</div>
+          <div class="kpi-value" style="color:var(--s2-color);">0.3900</div>
+          <div class="kpi-subtitle">النظام: <strong>S2 (Larkey Light10)</strong></div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">أعلى نسبة استرجاع عند 100 (Recall)</div>
+          <div class="kpi-value" style="color:var(--s4-color);">0.8878</div>
+          <div class="kpi-subtitle">النظام: <strong>S4 (Khoja Root)</strong></div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">أصغر حجم فهرس وتوفير التخزين</div>
+          <div class="kpi-value" style="color:var(--s4-color);">96 MB</div>
+          <div class="kpi-subtitle">النظام S4 يوفر <strong>62.4%</strong> مقارنة بالنظام S0</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">أسرع استجابة دافئة (Warm Latency)</div>
+          <div class="kpi-value" style="color:var(--s4-color);">12.8 ms</div>
+          <div class="kpi-subtitle">أسرع بـ 10 أضعاف مقارنة بـ S0 (127.1 ms)</div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>مقارنة الدقة (P@10) ونسبة الاسترجاع (Recall@100)</h3>
+            <p>يوضح التفوق الصرفي لـ S2 في الدقة بينما تتفوق الجذور S4 في الشمولية</p>
+          </div>
+          <div style="height: 280px;">
+            <canvas id="chart-precision-recall"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>حجم فهارس GIN في PostgreSQL (بالميجابايت)</h3>
+            <p>تقليص حجم الفهرس بفضل تكثيف المعجم والجذور في S3 و S4</p>
+          </div>
+          <div style="height: 280px;">
+            <canvas id="chart-index-sizes"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>زمن تنفيذ الاستعلامات: البارد مقابل الدافئ (ms)</h3>
+            <p>Cold Cache (أول تنفيذ) مقابل Warm Cache (متوسط التكرار اللاحق)</p>
+          </div>
+          <div style="height: 280px;">
+            <canvas id="chart-latencies"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>مقياس nDCG@10 ومتوسط الدقة (MAP)</h3>
+            <p>التقييم التراكمي المخصوم لجودة ترتيب النتائج الأولى</p>
+          </div>
+          <div style="height: 280px;">
+            <canvas id="chart-map-ndcg"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comprehensive Benchmarks Table -->
+      <div class="search-box-card">
+        <h3>جدول المقارنة المعيارية الشاملة للأنظمة الستة</h3>
+        <div class="golden-table-container">
+          <table class="golden-table" id="macro-metrics-table">
+            <thead>
+              <tr>
+                <th>النظام</th>
+                <th>المستوى الصرفي</th>
+                <th>P@10</th>
+                <th>MAP</th>
+                <th>nDCG@10</th>
+                <th>Recall@100</th>
+                <th>حجم الفهرس (MB)</th>
+                <th>النسبة من S0</th>
+                <th>الزمن البارد (ms)</th>
+                <th>الزمن الدافئ (ms)</th>
+              </tr>
+            </thead>
+            <tbody id="macro-metrics-body">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- TAB 5: OVER-STEMMING ANALYSIS                                     -->
+    <!-- ================================================================= -->
+    <section id="tab-overstemming" class="tab-pane">
+      <div class="search-box-card">
+        <h2>⚠️ ظاهرة الإفراط في الاشتقاق والانهيار الدلالي (Over-Stemming Fallout)</h2>
+        <p style="color:var(--text-muted); margin-bottom:1.25rem;">
+          واحدة من أهم النتائج العلمية في هذا البحث: لماذا لا يُعد استخراج الجذور الصرفية دائماً الخيار الأفضل؟
+          عند إرجاع الكلمات لجذورها الثلاثية، تلتقي مفردات متباعدة دلالياً في جذر مشترك، مما يؤدي إلى خفض دقة النتائج الأولى.
+        </p>
+
+        <!-- Formula Callout -->
+        <div style="background:#eff6ff; border-right:4px solid #3b82f6; padding:1rem; border-radius:var(--radius-sm); margin-bottom:1.5rem;">
+          <h4 style="color:#1e40af; font-weight:800; margin-bottom:0.3rem;">معادلة ضريبة الإفراط في الاشتقاق (Over-stemming Penalty):</h4>
+          <p style="font-family:monospace; font-size:1.05rem; direction:ltr; text-align:right;">
+            &Delta;P<sub>over</sub>(S<sub>light</sub>, S<sub>root</sub>) = P@10(S<sub>light</sub>) - P@10(S<sub>root</sub>)
+          </p>
+          <p style="font-size:0.88rem; color:#475569; margin-top:0.3rem;">
+            تُظهر النتائج أن النظام S2 (Larkey) يحقق تفوقاً قدره <strong>+0.070</strong> في P@10 على S3، و <strong>+0.055</strong> على S4 بسبب تجنب الاصطدامات الدلالية.
+          </p>
+        </div>
+
+        <!-- Case Studies -->
+        <h3 style="margin-bottom:1rem;">أبرز حالات الانهيار والاصطدام الدلالي المسجلة:</h3>
+
+        <!-- Case 1: Bahrain / Sea -->
+        <div class="case-study-card">
+          <div class="case-study-title">1. استعلام Q20: «البحرين» (مملكة البحرين) مقابل «بحر»</div>
+          <div class="case-study-desc">
+            مستخرج الجذور (S3 و S4) يختزل علم الدولة «البحرين» إلى الجذر (ب-ح-ر). نتيجة لذلك، اختلطت المقالات السياسية والجغرافية المتعلقة بمملكة البحرين بمقالات علوم المحيطات، وعلم الأحياء البحرية، ومضيق جبل طارق!
+          </div>
+          <div class="comparison-box">
+            <strong>مقارنة السلوك:</strong><br>
+            • النظام S2 (Larkey): يحتفظ بلفظ «بحرين» فيسترجع فقط مقالات الدولة (الدقة P@10 = 0.90).<br>
+            • النظام S4 (Khoja): يحوله إلى «بحر» فيجلب مقالات عن الأسماك والبحار (الدقة P@10 = 0.20) بانخفاض قدره 70%!
+          </div>
+        </div>
+
+        <!-- Case 2: Battalion / Writing -->
+        <div class="case-study-card">
+          <div class="case-study-title">2. استعلام Q01: «كتب» مقابل «كتيبة عسكرية»</div>
+          <div class="case-study-desc">
+            الجذر المشترك (ك-ت-ب) يربط لغوياً بين «الكتابة، المكتبات، الكتب» وبين الوحدة العسكرية المسماة «كتيبة».
+            في مستخرجات الجذور، المقالات عن الكتائب والجيوش تظهر ضمن نتائج البحث عن الكتب والمؤلفات!
+          </div>
+          <div class="comparison-box">
+            <strong>مقارنة السلوك:</strong><br>
+            • النظام S0 و S1: يفصل تماماً بين «كتاب» و«كتيبة» لعدم وجود مطابقة سطحية.<br>
+            • النظام S3 و S4: يجمعهما في سلة واحدة، ما يرفع نسبة الاسترجاع العام (Recall) لكن يشوش على المراتب الأولى.
+          </div>
+        </div>
+
+        <!-- Case 3: Eyes / Employment -->
+        <div class="case-study-card">
+          <div class="case-study-title">3. استعلام Q18: «عين» (المشترك اللفظي والتشعب الدلالي)</div>
+          <div class="case-study-desc">
+            كلمة «عين» في العربية لها معانٍ متعددة (العين الباصرة، عين الماء، الجاسوس، التعيين والتوظيف).
+            الجذر (ع-ي-ن) يجمع مقالات طب وجراحة العيون، مع مقالات الجيولوجيا والينابيع المائية، مع قرارات التعيين الإداري في الحكومات.
+          </div>
+          <div class="comparison-box">
+            <strong>مقارنة السلوك:</strong><br>
+            • يوضح ضرورة الدمج بين قص الزوائد الخفيف (S2) للبحث الدقيق، واستخراج الجذور (S4) عندما تكون الأولوية للشمولية القصوى.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>مشروع الفهرسة النصية للغة العربية في PostgreSQL 16 &copy; 2026</p>
+      <p style="margin-top:0.3rem;">جامعة الموصل | كلية علوم الحاسوب والرياضيات | قسم علوم الحاسوب</p>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
