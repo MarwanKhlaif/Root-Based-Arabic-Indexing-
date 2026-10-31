@@ -104,5 +104,6 @@ docs/
 *.docx
 *.txt
 !data/khoja_roots.txt
+!requirements.txt
 واجبات المشرف عن المشروع*/
 واجبات المشرف عن المشروع/

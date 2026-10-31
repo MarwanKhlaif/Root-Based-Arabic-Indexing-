@@ -241,3 +241,35 @@ class TestFastAPIEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert "overall_summary" in data or "metadata" in data
+
+    def test_post_search_subset_systems(self, client):
+        """Verify selective system search only runs requested systems (e.g. S2 and S4)."""
+        response = client.post(
+            "/api/search",
+            json={"query": "حاسوب", "systems": ["S2", "S4"], "limit": 3},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "systems" in data
+        assert "S2" in data["systems"]
+        assert "S4" in data["systems"]
+        assert "S0" not in data["systems"]
+        assert "S5" not in data["systems"]
+        assert len(data["systems"]["S2"]["results"]) > 0
+
+    def test_requirements_file_exists_and_not_gitignored(self):
+        """Verify requirements.txt is present and tracked for container builds."""
+        import os
+        import subprocess
+
+        assert os.path.exists("requirements.txt"), "requirements.txt must exist on disk"
+        res = subprocess.run(["git", "check-ignore", "requirements.txt"], capture_output=True)
+        assert res.returncode != 0, "requirements.txt must NOT be ignored by git"
+
+    def test_metadata_accuracy_with_ir_benchmarks(self):
+        """Verify fallback metadata reflects empirical IR benchmark numbers."""
+        from src.web.search_service import SYSTEM_METADATA
+        assert SYSTEM_METADATA["S2"]["p_at_10"] == 0.460
+        assert SYSTEM_METADATA["S5"]["p_at_10"] == 0.050
+        assert SYSTEM_METADATA["S4"]["recall_at_100"] == 0.7042
+

@@ -26,12 +26,24 @@ document.addEventListener('DOMContentLoaded', () => {
   loadBenchmarkData();
   initPlayground();
 
-  // Trigger default search on startup
+  // Populate morphological strip on initial load without heavy DB scan
   const initialInput = document.getElementById('search-input');
   if (initialInput && initialInput.value.trim()) {
-    triggerSearch();
+    fetchTransformation(initialInput.value.trim());
   }
 });
+
+function getSelectedSystems() {
+  const checkboxes = document.querySelectorAll('input[name="sys-toggle"]:checked');
+  const selected = Array.from(checkboxes).map(cb => cb.value);
+  return selected.length > 0 ? selected : ['S0', 'S1', 'S2', 'S3', 'S4', 'S5'];
+}
+
+function handleSystemToggle() {
+  if (lastSearchResults) {
+    renderSearchResults(lastSearchResults);
+  }
+}
 
 // =============================================================================
 // 1. TABS MANAGEMENT
@@ -117,11 +129,12 @@ async function triggerSearch() {
     // 1. Fetch transformation
     fetchTransformation(query);
 
-    // 2. Fetch search results across all S0-S5
+    // 2. Fetch search results across selected systems
+    const selectedSystems = getSelectedSystems();
     const res = await fetch('/api/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: query, limit: 10 }),
+      body: JSON.stringify({ query: query, systems: selectedSystems, limit: 10 }),
     });
 
     const data = await res.json();
@@ -220,9 +233,17 @@ function renderSearchResults(data) {
 
 function renderSideBySideResults(data, container) {
   let html = '';
-  const systems = ['S0', 'S1', 'S2', 'S3', 'S4', 'S5'];
+  const activeSystems = getSelectedSystems();
+  const systems = activeSystems.filter(s => data.systems && data.systems[s]);
+  const systemsToRender = systems.length > 0 ? systems : Object.keys(data.systems || {});
 
-  systems.forEach(sysId => {
+  if (systemsToRender.length === 6) {
+    container.classList.add('six-columns');
+  } else {
+    container.classList.remove('six-columns');
+  }
+
+  systemsToRender.forEach(sysId => {
     const sysData = data.systems[sysId] || { results: [], total_found: 0, latency_ms: 0 };
     const meta = data.transformation?.systems?.[sysId] || {};
     const results = sysData.results || [];
@@ -240,7 +261,7 @@ function renderSideBySideResults(data, container) {
           </div>
         </div>
         <div class="system-body">
-          ${renderArticlesList(results, sysId)}
+          ${renderArticlesList(results, sysId, sysData.error)}
         </div>
       </div>
     `;
@@ -250,11 +271,13 @@ function renderSideBySideResults(data, container) {
 }
 
 function renderTabbedResults(data, container) {
-  const systems = ['S0', 'S1', 'S2', 'S3', 'S4', 'S5'];
+  const activeSystems = getSelectedSystems();
+  const systems = activeSystems.filter(s => data.systems && data.systems[s]);
+  const systemsToRender = systems.length > 0 ? systems : Object.keys(data.systems || {});
   let navHtml = '<div class="result-tabs-nav">';
   let contentHtml = '';
 
-  systems.forEach((sysId, index) => {
+  systemsToRender.forEach((sysId, index) => {
     const isActive = index === 0 ? 'active' : '';
     const sysData = data.systems[sysId] || { results: [], total_found: 0, latency_ms: 0 };
     const meta = data.transformation?.systems?.[sysId] || {};
@@ -272,7 +295,7 @@ function renderTabbedResults(data, container) {
           <p style="font-size:0.85rem; color:#64748b;">${meta.description || ''}</p>
         </div>
         <div style="display:flex; flex-direction:column; gap:0.75rem;">
-          ${renderArticlesList(sysData.results || [], sysId)}
+          ${renderArticlesList(sysData.results || [], sysId, sysData.error)}
         </div>
       </div>
     `;
@@ -299,7 +322,16 @@ function switchResultTab(sysId, btn) {
   }
 }
 
-function renderArticlesList(results, sysId) {
+function renderArticlesList(results, sysId, error) {
+  if (error) {
+    return `
+      <div class="system-error-card">
+        <div style="font-weight:700; margin-bottom:0.25rem;">⚠️ ملاحظة في المعالجة:</div>
+        <div>${escapeHtml(error)}</div>
+      </div>
+    `;
+  }
+
   if (!results || results.length === 0) {
     let emptyTip = 'لم يتم العثور على وثائق مطابقة';
     if (sysId === 'S0') {

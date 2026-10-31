@@ -108,8 +108,18 @@
         <div class="search-controls-bar">
           <div class="view-mode-buttons">
             <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); align-self:center; margin-left:0.5rem;">طريقة العرض:</span>
-            <button class="view-btn active" id="view-mode-side" onclick="setViewMode('side')">📑 عرض متجاور</button>
-            <button class="view-btn" id="view-mode-tabs" onclick="setViewMode('tabs')">🗂️ عرض التبويبات</button>
+            <button type="button" class="view-btn active" id="view-mode-side" onclick="setViewMode('side')">📑 عرض متجاور</button>
+            <button type="button" class="view-btn" id="view-mode-tabs" onclick="setViewMode('tabs')">🗂️ عرض التبويبات</button>
+          </div>
+
+          <div class="system-filter-group">
+            <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); align-self:center;">الأنظمة المقارنة:</span>
+            <label class="sys-checkbox-label" title="سطحي بسيط"><input type="checkbox" name="sys-toggle" value="S0" checked onchange="handleSystemToggle()"> S0 (بسيط)</label>
+            <label class="sys-checkbox-label" title="سطحي مع كلمات توقف"><input type="checkbox" name="sys-toggle" value="S1" checked onchange="handleSystemToggle()"> S1 (توقف)</label>
+            <label class="sys-checkbox-label" title="لاركي لقص الزوائد"><input type="checkbox" name="sys-toggle" value="S2" checked onchange="handleSystemToggle()"> S2 (لاركي)</label>
+            <label class="sys-checkbox-label" title="ISRI لجذور الأوزان"><input type="checkbox" name="sys-toggle" value="S3" checked onchange="handleSystemToggle()"> S3 (ISRI)</label>
+            <label class="sys-checkbox-label" title="خوجة للجذور المعجمية"><input type="checkbox" name="sys-toggle" value="S4" checked onchange="handleSystemToggle()"> S4 (خوجة)</label>
+            <label class="sys-checkbox-label" title="مقاطع ثلاثية حرفية"><input type="checkbox" name="sys-toggle" value="S5" checked onchange="handleSystemToggle()"> S5 (trgm)</label>
           </div>
 
           <div id="demo-mode-badge" style="display:none; font-size:0.82rem; background:#fef3c7; color:#b45309; padding:0.3rem 0.75rem; border-radius:var(--radius-sm); border:1px solid #fde68a;">

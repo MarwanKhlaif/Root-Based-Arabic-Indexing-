@@ -10,6 +10,10 @@ import html
 import json
 import time
 from typing import Dict, Any, List, Set, Optional, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import psycopg
+from psycopg.errors import QueryCanceled
 
 from src.db.connection import get_connection, get_db_config
 from src.preprocessing.normalize import normalize_arabic
@@ -108,7 +112,7 @@ SYSTEM_METADATA = {
         "index_size_pretty": "178 MB",
         "relative_size": "69.9%",
         "p_at_10": 0.265,
-        "recall_at_100": 0.385,
+        "recall_at_100": 0.3851,
     },
     "S2": {
         "id": "S2",
@@ -121,8 +125,8 @@ SYSTEM_METADATA = {
         "index_size_mb": 142.7,
         "index_size_pretty": "143 MB",
         "relative_size": "56.0%",
-        "p_at_10": 0.390,
-        "recall_at_100": 0.771,
+        "p_at_10": 0.460,
+        "recall_at_100": 0.6743,
     },
     "S3": {
         "id": "S3",
@@ -135,8 +139,8 @@ SYSTEM_METADATA = {
         "index_size_mb": 96.8,
         "index_size_pretty": "97 MB",
         "relative_size": "38.0%",
-        "p_at_10": 0.320,
-        "recall_at_100": 0.887,
+        "p_at_10": 0.445,
+        "recall_at_100": 0.7042,
     },
     "S4": {
         "id": "S4",
@@ -149,8 +153,8 @@ SYSTEM_METADATA = {
         "index_size_mb": 96.0,
         "index_size_pretty": "96 MB",
         "relative_size": "37.6%",
-        "p_at_10": 0.335,
-        "recall_at_100": 0.888,
+        "p_at_10": 0.455,
+        "recall_at_100": 0.7042,
     },
     "S5": {
         "id": "S5",
@@ -163,8 +167,8 @@ SYSTEM_METADATA = {
         "index_size_mb": 207.1,
         "index_size_pretty": "207 MB",
         "relative_size": "81.2%",
-        "p_at_10": 0.345,
-        "recall_at_100": 0.704,
+        "p_at_10": 0.050,
+        "recall_at_100": 0.1129,
     },
 }
 
@@ -441,11 +445,43 @@ def execute_system_search(
     params = (transformed_query, transformed_query, limit)
 
     t0 = time.perf_counter()
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SET random_page_cost = 1.5;")
-            cur.execute(sql, params)
-            rows = cur.fetchall()
+    rows = []
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SET random_page_cost = 1.5;")
+                cur.execute("SET statement_timeout = '12000';")  # 12s timeout ceiling
+                cur.execute(sql, params)
+                rows = cur.fetchall()
+    except (QueryCanceled, psycopg.OperationalError) as exc:
+        latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+        err_text = str(exc)
+        if "statement timeout" in err_text.lower() or isinstance(exc, QueryCanceled):
+            if system_id == "S5":
+                user_msg = "تجاوز استعلام المقاطع الثلاثية الحد الأقصى للمهلة (12 ثانية) نظراً لكثافة المقاطع الحرفية في 100,000 مقال."
+            else:
+                user_msg = f"تجاوز استعلام {sys_name} مهلة المعالجة (12 ثانية) لكثافة تكرار الجذر في 100,000 مقال."
+        else:
+            user_msg = f"خطأ أثناء الاستعلام: {err_text}"
+        return {
+            "system_id": system_id,
+            "system_name": sys_name,
+            "results": [],
+            "total_found": 0,
+            "latency_ms": latency_ms,
+            "error": user_msg,
+        }
+    except Exception as exc:
+        latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+        return {
+            "system_id": system_id,
+            "system_name": sys_name,
+            "results": [],
+            "total_found": 0,
+            "latency_ms": latency_ms,
+            "error": f"خطأ في قاعدة البيانات: {exc}",
+        }
+
     latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
 
     # Highlight terms
@@ -655,13 +691,10 @@ def search_all_systems(
     db_health = check_db_health()
     use_live_db = db_health["connected"] and db_health["total_documents"] > 0
 
-    systems_results: Dict[str, Any] = {}
-    for sys_id in selected_systems:
-        if sys_id not in SYSTEM_METADATA:
-            continue
+    valid_systems = [s for s in selected_systems if s in SYSTEM_METADATA]
 
+    def _execute_for_system(sys_id: str) -> Tuple[str, Dict[str, Any]]:
         trans_query = transformation["systems"][sys_id]["transformed_query"]
-
         if use_live_db:
             try:
                 res = execute_system_search(
@@ -671,21 +704,32 @@ def search_all_systems(
                     limit=limit,
                 )
                 res["is_demo"] = False
-                systems_results[sys_id] = res
+                return sys_id, res
             except Exception as e:
                 # If error, fallback to demo mode for this system
                 res = get_demo_search_results(raw_query, sys_id, limit=limit)
                 res["warning"] = f"تعذر البحث الحي: {e} - تم تفعيل وضع المعاينة"
-                systems_results[sys_id] = res
+                return sys_id, res
         else:
             # PostgreSQL offline or no docs: return high quality demo results
             res = get_demo_search_results(raw_query, sys_id, limit=limit)
-            systems_results[sys_id] = res
+            return sys_id, res
+
+    systems_results: Dict[str, Any] = {}
+    if valid_systems:
+        with ThreadPoolExecutor(max_workers=min(len(valid_systems), 6)) as executor:
+            future_to_sys = {executor.submit(_execute_for_system, s): s for s in valid_systems}
+            for future in as_completed(future_to_sys):
+                sys_id, res = future.result()
+                systems_results[sys_id] = res
+
+    # Preserve the requested systems order in output dictionary
+    ordered_results = {s: systems_results[s] for s in valid_systems if s in systems_results}
 
     return {
         "query": raw_query,
         "transformation": transformation,
         "db_connected": db_health["connected"],
         "is_demo_mode": not use_live_db,
-        "systems": systems_results,
+        "systems": ordered_results,
     }
