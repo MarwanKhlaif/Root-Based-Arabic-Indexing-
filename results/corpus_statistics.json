@@ -1,0 +1,397 @@
+{
+  "timestamp_utc": "2026-10-28T20:07:47.788309+00:00",
+  "database": "arabic_ir",
+  "table": "docs",
+  "doc_length_metrics": {
+    "total_documents": 100000,
+    "total_words": 49070554,
+    "total_characters": 296360815,
+    "min_words": 100,
+    "max_words": 21677,
+    "avg_words_per_doc": 490.71,
+    "stddev_words": 888.44,
+    "p25_words": 147.0,
+    "p50_median_words": 245.0,
+    "p75_words": 547.0,
+    "iqr_words": 400.0,
+    "p90_words": 995.0,
+    "p95_words": 1445.0,
+    "p99_words": 3889.0099999999993,
+    "avg_chars_per_word": 6.05
+  },
+  "vocabulary_metrics": {
+    "total_unique_lexemes": 1055546,
+    "total_indexed_tokens": 48896359,
+    "avg_lexeme_length_chars": 6.85,
+    "hapax_legomena_count": 554466,
+    "hapax_legomena_percentage": 52.53
+  },
+  "top_50_terms": [
+    {
+      "rank": 1,
+      "term": "في",
+      "collection_frequency": 1952303,
+      "document_frequency": 99306,
+      "doc_frequency_percentage": 99.31
+    },
+    {
+      "rank": 2,
+      "term": "من",
+      "collection_frequency": 1287462,
+      "document_frequency": 96305,
+      "doc_frequency_percentage": 96.31
+    },
+    {
+      "rank": 3,
+      "term": "علي",
+      "collection_frequency": 575271,
+      "document_frequency": 76526,
+      "doc_frequency_percentage": 76.53
+    },
+    {
+      "rank": 4,
+      "term": "الي",
+      "collection_frequency": 401748,
+      "document_frequency": 62543,
+      "doc_frequency_percentage": 62.54
+    },
+    {
+      "rank": 5,
+      "term": "ان",
+      "collection_frequency": 283563,
+      "document_frequency": 44815,
+      "doc_frequency_percentage": 44.82
+    },
+    {
+      "rank": 6,
+      "term": "عام",
+      "collection_frequency": 258226,
+      "document_frequency": 52926,
+      "doc_frequency_percentage": 52.93
+    },
+    {
+      "rank": 7,
+      "term": "لاعبو",
+      "collection_frequency": 215936,
+      "document_frequency": 14825,
+      "doc_frequency_percentage": 14.83
+    },
+    {
+      "rank": 8,
+      "term": "عن",
+      "collection_frequency": 193443,
+      "document_frequency": 51221,
+      "doc_frequency_percentage": 51.22
+    },
+    {
+      "rank": 9,
+      "term": "او",
+      "collection_frequency": 185988,
+      "document_frequency": 38222,
+      "doc_frequency_percentage": 38.22
+    },
+    {
+      "rank": 10,
+      "term": "مع",
+      "collection_frequency": 183891,
+      "document_frequency": 53989,
+      "doc_frequency_percentage": 53.99
+    },
+    {
+      "rank": 11,
+      "term": "التي",
+      "collection_frequency": 177703,
+      "document_frequency": 43580,
+      "doc_frequency_percentage": 43.58
+    },
+    {
+      "rank": 12,
+      "term": "كره",
+      "collection_frequency": 149730,
+      "document_frequency": 17968,
+      "doc_frequency_percentage": 17.97
+    },
+    {
+      "rank": 13,
+      "term": "كان",
+      "collection_frequency": 141077,
+      "document_frequency": 40342,
+      "doc_frequency_percentage": 40.34
+    },
+    {
+      "rank": 14,
+      "term": "ما",
+      "collection_frequency": 125882,
+      "document_frequency": 35998,
+      "doc_frequency_percentage": 36.0
+    },
+    {
+      "rank": 15,
+      "term": "بين",
+      "collection_frequency": 124916,
+      "document_frequency": 40212,
+      "doc_frequency_percentage": 40.21
+    },
+    {
+      "rank": 16,
+      "term": "قدم",
+      "collection_frequency": 122277,
+      "document_frequency": 18767,
+      "doc_frequency_percentage": 18.77
+    },
+    {
+      "rank": 17,
+      "term": "كانت",
+      "collection_frequency": 120895,
+      "document_frequency": 30552,
+      "doc_frequency_percentage": 30.55
+    },
+    {
+      "rank": 18,
+      "term": "بعد",
+      "collection_frequency": 114926,
+      "document_frequency": 36586,
+      "doc_frequency_percentage": 36.59
+    },
+    {
+      "rank": 19,
+      "term": "هو",
+      "collection_frequency": 109434,
+      "document_frequency": 58470,
+      "doc_frequency_percentage": 58.47
+    },
+    {
+      "rank": 20,
+      "term": "هذه",
+      "collection_frequency": 102923,
+      "document_frequency": 34358,
+      "doc_frequency_percentage": 34.36
+    },
+    {
+      "rank": 21,
+      "term": "الذي",
+      "collection_frequency": 102663,
+      "document_frequency": 34465,
+      "doc_frequency_percentage": 34.47
+    },
+    {
+      "rank": 22,
+      "term": "ذلك",
+      "collection_frequency": 101847,
+      "document_frequency": 31448,
+      "doc_frequency_percentage": 31.45
+    },
+    {
+      "rank": 23,
+      "term": "هذا",
+      "collection_frequency": 97037,
+      "document_frequency": 32608,
+      "doc_frequency_percentage": 32.61
+    },
+    {
+      "rank": 24,
+      "term": "المتحده",
+      "collection_frequency": 96451,
+      "document_frequency": 31919,
+      "doc_frequency_percentage": 31.92
+    },
+    {
+      "rank": 25,
+      "term": "ايضا",
+      "collection_frequency": 89694,
+      "document_frequency": 43296,
+      "doc_frequency_percentage": 43.3
+    },
+    {
+      "rank": 26,
+      "term": "1",
+      "collection_frequency": 89112,
+      "document_frequency": 25779,
+      "doc_frequency_percentage": 25.78
+    },
+    {
+      "rank": 27,
+      "term": "2",
+      "collection_frequency": 88422,
+      "document_frequency": 23939,
+      "doc_frequency_percentage": 23.94
+    },
+    {
+      "rank": 28,
+      "term": "بن",
+      "collection_frequency": 88155,
+      "document_frequency": 9752,
+      "doc_frequency_percentage": 9.75
+    },
+    {
+      "rank": 29,
+      "term": "القرن",
+      "collection_frequency": 87957,
+      "document_frequency": 28672,
+      "doc_frequency_percentage": 28.67
+    },
+    {
+      "rank": 30,
+      "term": "تم",
+      "collection_frequency": 87584,
+      "document_frequency": 26872,
+      "doc_frequency_percentage": 26.87
+    },
+    {
+      "rank": 31,
+      "term": "حيث",
+      "collection_frequency": 87041,
+      "document_frequency": 34901,
+      "doc_frequency_percentage": 34.9
+    },
+    {
+      "rank": 32,
+      "term": "و",
+      "collection_frequency": 82122,
+      "document_frequency": 27118,
+      "doc_frequency_percentage": 27.12
+    },
+    {
+      "rank": 33,
+      "term": "قبل",
+      "collection_frequency": 79119,
+      "document_frequency": 30332,
+      "doc_frequency_percentage": 30.33
+    },
+    {
+      "rank": 34,
+      "term": "لا",
+      "collection_frequency": 75198,
+      "document_frequency": 25052,
+      "doc_frequency_percentage": 25.05
+    },
+    {
+      "rank": 35,
+      "term": "خلال",
+      "collection_frequency": 75040,
+      "document_frequency": 29189,
+      "doc_frequency_percentage": 29.19
+    },
+    {
+      "rank": 36,
+      "term": "هي",
+      "collection_frequency": 74279,
+      "document_frequency": 38702,
+      "doc_frequency_percentage": 38.7
+    },
+    {
+      "rank": 37,
+      "term": "نسبه",
+      "collection_frequency": 70725,
+      "document_frequency": 9718,
+      "doc_frequency_percentage": 9.72
+    },
+    {
+      "rank": 38,
+      "term": "غير",
+      "collection_frequency": 70004,
+      "document_frequency": 28348,
+      "doc_frequency_percentage": 28.35
+    },
+    {
+      "rank": 39,
+      "term": "عدد",
+      "collection_frequency": 69648,
+      "document_frequency": 20135,
+      "doc_frequency_percentage": 20.14
+    },
+    {
+      "rank": 40,
+      "term": "سنه",
+      "collection_frequency": 68759,
+      "document_frequency": 29052,
+      "doc_frequency_percentage": 29.05
+    },
+    {
+      "rank": 41,
+      "term": "مغتربون",
+      "collection_frequency": 68323,
+      "document_frequency": 10461,
+      "doc_frequency_percentage": 10.46
+    },
+    {
+      "rank": 42,
+      "term": "مواليد",
+      "collection_frequency": 67204,
+      "document_frequency": 36533,
+      "doc_frequency_percentage": 36.53
+    },
+    {
+      "rank": 43,
+      "term": "كما",
+      "collection_frequency": 67172,
+      "document_frequency": 27438,
+      "doc_frequency_percentage": 27.44
+    },
+    {
+      "rank": 44,
+      "term": "3",
+      "collection_frequency": 67067,
+      "document_frequency": 22861,
+      "doc_frequency_percentage": 22.86
+    },
+    {
+      "rank": 45,
+      "term": "اي",
+      "collection_frequency": 64671,
+      "document_frequency": 26692,
+      "doc_frequency_percentage": 26.69
+    },
+    {
+      "rank": 46,
+      "term": "عشر",
+      "collection_frequency": 62380,
+      "document_frequency": 17474,
+      "doc_frequency_percentage": 17.47
+    },
+    {
+      "rank": 47,
+      "term": "الولايات",
+      "collection_frequency": 62273,
+      "document_frequency": 23801,
+      "doc_frequency_percentage": 23.8
+    },
+    {
+      "rank": 48,
+      "term": "افلام",
+      "collection_frequency": 61762,
+      "document_frequency": 7143,
+      "doc_frequency_percentage": 7.14
+    },
+    {
+      "rank": 49,
+      "term": "وقد",
+      "collection_frequency": 61534,
+      "document_frequency": 26194,
+      "doc_frequency_percentage": 26.19
+    },
+    {
+      "rank": 50,
+      "term": "تحت",
+      "collection_frequency": 60633,
+      "document_frequency": 23938,
+      "doc_frequency_percentage": 23.94
+    }
+  ],
+  "storage_footprints": {
+    "total_relation_bytes": 1499758592,
+    "total_relation_pretty": "1430 MB",
+    "heap_data_bytes": 268861440,
+    "heap_data_pretty": "256 MB",
+    "total_indexes_bytes": 186433536,
+    "total_indexes_pretty": "178 MB",
+    "indexes_bytes": 186433536,
+    "indexes_pretty": "178 MB",
+    "s0_gin_index_bytes": 177487872,
+    "s0_gin_index_pretty": "169 MB",
+    "doc_id_btree_bytes": 4366336,
+    "doc_id_btree_pretty": "4264 kB",
+    "uq_doc_id_bytes": 4366336,
+    "uq_doc_id_pretty": "4264 kB"
+  }
+}

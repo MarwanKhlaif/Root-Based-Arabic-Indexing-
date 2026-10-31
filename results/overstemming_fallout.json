@@ -1,0 +1,1299 @@
+{
+  "metadata": {
+    "benchmark": "Arabic Morphological Over-Stemming & Semantic Fallout Benchmark",
+    "timestamp_utc": "2026-10-29T01:35:10.737551+00:00",
+    "database": "arabic_ir",
+    "corpus": "Arabic Wikipedia 100,000 Articles (Seed 42)",
+    "systems_evaluated": [
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "total_queries": 20,
+    "top_k": 10
+  },
+  "overall_summary": {
+    "mean_p10_s2": 0.39,
+    "mean_p10_s3": 0.32,
+    "mean_p10_s4": 0.335,
+    "mean_delta_p_over_s2_vs_s3": 0.07,
+    "mean_delta_p_over_s2_vs_s4": 0.055,
+    "mean_sfi10_s2": 0.39,
+    "mean_sfi10_s3": 0.475,
+    "mean_sfi10_s4": 0.455,
+    "total_collisions_s2": 25,
+    "total_collisions_s3": 36,
+    "total_collisions_s4": 34
+  },
+  "category_breakdown": [
+    {
+      "category_id": 1,
+      "name_en": "Sound Triliteral Verbs & Regular Derivations",
+      "name_ar": "الفعل السالم ومشتقاته القياسية",
+      "query_count": 5,
+      "mean_p10_s2": 0.32,
+      "mean_p10_s3": 0.3,
+      "mean_p10_s4": 0.32,
+      "mean_delta_p_s3": 0.02,
+      "mean_delta_p_s4": -0.0,
+      "mean_sfi10_s2": 0.38,
+      "mean_sfi10_s3": 0.3,
+      "mean_sfi10_s4": 0.3,
+      "total_collisions_s3": 3,
+      "total_collisions_s4": 4
+    },
+    {
+      "category_id": 2,
+      "name_en": "Complex Clitic Concatenation & Infixation",
+      "name_ar": "السوابق واللواحق المركبة والزوائد الداخلية",
+      "query_count": 4,
+      "mean_p10_s2": 0.4,
+      "mean_p10_s3": 0.15,
+      "mean_p10_s4": 0.175,
+      "mean_delta_p_s3": 0.25,
+      "mean_delta_p_s4": 0.225,
+      "mean_sfi10_s2": 0.4,
+      "mean_sfi10_s3": 0.675,
+      "mean_sfi10_s4": 0.625,
+      "total_collisions_s3": 13,
+      "total_collisions_s4": 13
+    },
+    {
+      "category_id": 3,
+      "name_en": "Broken Plurals & Templatic Nouns",
+      "name_ar": "جموع التكسير والأوزان الجمعية",
+      "query_count": 4,
+      "mean_p10_s2": 0.55,
+      "mean_p10_s3": 0.575,
+      "mean_p10_s4": 0.575,
+      "mean_delta_p_s3": -0.025,
+      "mean_delta_p_s4": -0.025,
+      "mean_sfi10_s2": 0.25,
+      "mean_sfi10_s3": 0.2,
+      "mean_sfi10_s4": 0.2,
+      "total_collisions_s3": 0,
+      "total_collisions_s4": 0
+    },
+    {
+      "category_id": 4,
+      "name_en": "Weak, Assimilated, Hollow, & Defective Roots",
+      "name_ar": "الأفعال المعتلة: مثال وأجوف وناقص ولفيف",
+      "query_count": 4,
+      "mean_p10_s2": 0.2,
+      "mean_p10_s3": 0.125,
+      "mean_p10_s4": 0.15,
+      "mean_delta_p_s3": 0.075,
+      "mean_delta_p_s4": 0.05,
+      "mean_sfi10_s2": 0.625,
+      "mean_sfi10_s3": 0.85,
+      "mean_sfi10_s4": 0.8,
+      "total_collisions_s3": 11,
+      "total_collisions_s4": 8
+    },
+    {
+      "category_id": 5,
+      "name_en": "Semantic Drift, Homonymy, & Proper Nouns",
+      "name_ar": "التشعب الدلالي والمشترك اللفظي والأعلام",
+      "query_count": 3,
+      "mean_p10_s2": 0.5333,
+      "mean_p10_s3": 0.5,
+      "mean_p10_s4": 0.5,
+      "mean_delta_p_s3": 0.0333,
+      "mean_delta_p_s4": 0.0333,
+      "mean_sfi10_s2": 0.2667,
+      "mean_sfi10_s3": 0.3667,
+      "mean_sfi10_s4": 0.3667,
+      "total_collisions_s3": 9,
+      "total_collisions_s4": 9
+    }
+  ],
+  "query_evaluations": [
+    {
+      "query_id": "Q01",
+      "query_term": "كتب",
+      "category_id": 1,
+      "p10_s2": 0.6,
+      "p10_s3": 0.3,
+      "p10_s4": 0.3,
+      "delta_p_over_s3": 0.3,
+      "delta_p_over_s4": 0.3,
+      "sfi10_s2": 0.3,
+      "sfi10_s3": 0.1,
+      "sfi10_s4": 0.1,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "إتلاف كتب المكتبات العامة",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'مكتب ': Conflation of books/literature with military battalions (كتيبة) and offices (مكتب)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q02",
+      "query_term": "درس",
+      "category_id": 1,
+      "p10_s2": 0.3,
+      "p10_s3": 0.5,
+      "p10_s4": 0.5,
+      "delta_p_over_s3": -0.2,
+      "delta_p_over_s4": -0.2,
+      "sfi10_s2": 0.4,
+      "sfi10_s3": 0.1,
+      "sfi10_s4": 0.1,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q03",
+      "query_term": "حكم",
+      "category_id": 1,
+      "p10_s2": 0.3,
+      "p10_s3": 0.4,
+      "p10_s4": 0.4,
+      "delta_p_over_s3": -0.1,
+      "delta_p_over_s4": -0.1,
+      "sfi10_s2": 0.2,
+      "sfi10_s3": 0.1,
+      "sfi10_s4": 0.1,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q04",
+      "query_term": "خرج",
+      "category_id": 1,
+      "p10_s2": 0.0,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 1.0,
+      "sfi10_s3": 0.8,
+      "sfi10_s4": 0.8,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q05",
+      "query_term": "علم",
+      "category_id": 1,
+      "p10_s2": 0.4,
+      "p10_s3": 0.3,
+      "p10_s4": 0.4,
+      "delta_p_over_s3": 0.1,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 0.0,
+      "sfi10_s3": 0.4,
+      "sfi10_s4": 0.4,
+      "collisions_detected": [
+        {
+          "system": "S3",
+          "title": "كأس العالم",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'عالم ': Conflation of scientific knowledge with cosmological universe (عالم) and journalism media (إعلام)"
+        },
+        {
+          "system": "S3",
+          "title": "العالم المسيحي",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'عالم ': Conflation of scientific knowledge with cosmological universe (عالم) and journalism media (إعلام)"
+        },
+        {
+          "system": "S3",
+          "title": "استجابة الأمم المتحدة لجائحة كوفيد-19",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Body dominated by collision terms (4 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "كأس العالم",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'عالم ': Conflation of scientific knowledge with cosmological universe (عالم) and journalism media (إعلام)"
+        },
+        {
+          "system": "S4",
+          "title": "استجابة الأمم المتحدة لجائحة كوفيد-19",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Body dominated by collision terms (4 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "أبطال الديجيتال (الجزء الأول)",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Body dominated by collision terms (2 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "العالم المسيحي",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'عالم ': Conflation of scientific knowledge with cosmological universe (عالم) and journalism media (إعلام)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q06",
+      "query_term": "سفر",
+      "category_id": 2,
+      "p10_s2": 0.8,
+      "p10_s3": 0.4,
+      "p10_s4": 0.5,
+      "delta_p_over_s3": 0.4,
+      "delta_p_over_s4": 0.3,
+      "sfi10_s2": 0.2,
+      "sfi10_s3": 0.6,
+      "sfi10_s4": 0.5,
+      "collisions_detected": [
+        {
+          "system": "S3",
+          "title": "قائمة البعثات الدبلوماسية النرويجية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "قائمة البعثات الدبلوماسية الماليزية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "قائمة البعثات الدبلوماسية النرويجية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "قائمة البعثات الدبلوماسية الماليزية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q07",
+      "query_term": "نصر",
+      "category_id": 2,
+      "p10_s2": 0.4,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_over_s3": 0.4,
+      "delta_p_over_s4": 0.4,
+      "sfi10_s2": 0.3,
+      "sfi10_s3": 0.9,
+      "sfi10_s4": 0.8,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "مدينة نصر",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'مدينة نصر': Conflation of military victory with Gamal Abdel Nasser, the city of Nazareth, and Christianity"
+        },
+        {
+          "system": "S3",
+          "title": "جمال عبد الناصر",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'عبد الناصر': Conflation of military victory with Gamal Abdel Nasser, the city of Nazareth, and Christianity"
+        },
+        {
+          "system": "S3",
+          "title": "الناصرة",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'الناصرة': Conflation of military victory with Gamal Abdel Nasser, the city of Nazareth, and Christianity"
+        },
+        {
+          "system": "S4",
+          "title": "جمال عبد الناصر",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'عبد الناصر': Conflation of military victory with Gamal Abdel Nasser, the city of Nazareth, and Christianity"
+        },
+        {
+          "system": "S4",
+          "title": "الناصرة",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'الناصرة': Conflation of military victory with Gamal Abdel Nasser, the city of Nazareth, and Christianity"
+        }
+      ]
+    },
+    {
+      "query_id": "Q08",
+      "query_term": "عمل",
+      "category_id": 2,
+      "p10_s2": 0.4,
+      "p10_s3": 0.2,
+      "p10_s4": 0.2,
+      "delta_p_over_s3": 0.2,
+      "delta_p_over_s4": 0.2,
+      "sfi10_s2": 0.1,
+      "sfi10_s3": 0.2,
+      "sfi10_s4": 0.2,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q09",
+      "query_term": "سلم",
+      "category_id": 2,
+      "p10_s2": 0.0,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 1.0,
+      "sfi10_s3": 1.0,
+      "sfi10_s4": 1.0,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "محمد بن سلمان آل سعود",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سلمان': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S2",
+          "title": "مفارقة السلم",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سُلَّم': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S2",
+          "title": "أمراض وطفيليات الأسماك",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S2",
+          "title": "سلمون قوس قزح",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سُلَّم': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S2",
+          "title": "عيسى بن علي آل خليفة",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (2 vs 0)"
+        },
+        {
+          "system": "S2",
+          "title": "السلمية (سوريا)",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سُلَّم': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S2",
+          "title": "سلمان بن حمد آل خليفة",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سلمان': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S2",
+          "title": "سلمون الباسيفيك",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سُلَّم': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S2",
+          "title": "الأمراض والطفيليات في سمك السالمون",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "الإسلام في تايوان",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S3",
+          "title": "الفتح الإسلامي للشام",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S3",
+          "title": "الفتح الإسلامي للمغرب",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S3",
+          "title": "محمد بن سلمان آل سعود",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سلمان': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S3",
+          "title": "حصار عين العرب",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (4 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "مملكة غرناطة",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (4 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "الأندلس",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (5 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "الخط الزمني للأحداث المتعلقة بداعش (2016)",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (4 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "أبو بكر الصديق",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (3 vs 1)"
+        },
+        {
+          "system": "S4",
+          "title": "الإسلام في تايوان",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S4",
+          "title": "الفتح الإسلامي للشام",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S4",
+          "title": "الفتح الإسلامي للمغرب",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S4",
+          "title": "محمد بن سلمان آل سعود",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سلمان': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S4",
+          "title": "حصار عين العرب",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (4 vs 1)"
+        },
+        {
+          "system": "S4",
+          "title": "مملكة غرناطة",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (4 vs 1)"
+        },
+        {
+          "system": "S4",
+          "title": "الأندلس",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (5 vs 1)"
+        },
+        {
+          "system": "S4",
+          "title": "أبو بكر الصديق",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (3 vs 1)"
+        },
+        {
+          "system": "S4",
+          "title": "الخط الزمني للأحداث المتعلقة بداعش (2016)",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (4 vs 1)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q10",
+      "query_term": "شجر",
+      "category_id": 3,
+      "p10_s2": 0.9,
+      "p10_s3": 0.9,
+      "p10_s4": 0.9,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 0.1,
+      "sfi10_s3": 0.1,
+      "sfi10_s4": 0.1,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q11",
+      "query_term": "قلب",
+      "category_id": 3,
+      "p10_s2": 1.0,
+      "p10_s3": 1.0,
+      "p10_s4": 1.0,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 0.0,
+      "sfi10_s3": 0.0,
+      "sfi10_s4": 0.0,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q12",
+      "query_term": "طرق",
+      "category_id": 3,
+      "p10_s2": 0.3,
+      "p10_s3": 0.4,
+      "p10_s4": 0.4,
+      "delta_p_over_s3": -0.1,
+      "delta_p_over_s4": -0.1,
+      "sfi10_s2": 0.1,
+      "sfi10_s3": 0.1,
+      "sfi10_s4": 0.1,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q13",
+      "query_term": "صحب",
+      "category_id": 3,
+      "p10_s2": 0.0,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 0.8,
+      "sfi10_s3": 0.6,
+      "sfi10_s4": 0.6,
+      "collisions_detected": []
+    },
+    {
+      "query_id": "Q14",
+      "query_term": "قال",
+      "category_id": 4,
+      "p10_s2": 0.0,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 1.0,
+      "sfi10_s3": 1.0,
+      "sfi10_s4": 0.9,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "سلمة بن الأكوع",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 0)"
+        },
+        {
+          "system": "S2",
+          "title": "علامات الساعة الصغرى",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S2",
+          "title": "حد الرجم في الإسلام",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S2",
+          "title": "يوشع بن نون في الإسلام",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 0)"
+        },
+        {
+          "system": "S2",
+          "title": "شيخية",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 1)"
+        },
+        {
+          "system": "S2",
+          "title": "صوفية",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "سلمة بن الأكوع",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "علامات الساعة الصغرى",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "حد الرجم في الإسلام",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "يوشع بن نون في الإسلام",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "شيخية",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "صوفية",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "سلمة بن الأكوع",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "صوفية",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "حد الرجم في الإسلام",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "علامات الساعة الصغرى",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "شيخية",
+          "type": "NARRATIVE_FREQUENCY_NOISE",
+          "explanation": "Body dominated by collision terms (2 vs 1)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q15",
+      "query_term": "وقف",
+      "category_id": 4,
+      "p10_s2": 0.7,
+      "p10_s3": 0.4,
+      "p10_s4": 0.4,
+      "delta_p_over_s3": 0.3,
+      "delta_p_over_s4": 0.3,
+      "sfi10_s2": 0.1,
+      "sfi10_s3": 0.5,
+      "sfi10_s4": 0.5,
+      "collisions_detected": [
+        {
+          "system": "S3",
+          "title": "المواقف في علم الكلام (كتاب)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'المواقف في علم الكلام': Conflation of Islamic endowment trusts (أوقاف) with vehicle parking and theological texts"
+        },
+        {
+          "system": "S3",
+          "title": "موقف سيارات",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'موقف سيارات': Conflation of Islamic endowment trusts (أوقاف) with vehicle parking and theological texts"
+        },
+        {
+          "system": "S4",
+          "title": "المواقف في علم الكلام (كتاب)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'المواقف في علم الكلام': Conflation of Islamic endowment trusts (أوقاف) with vehicle parking and theological texts"
+        },
+        {
+          "system": "S4",
+          "title": "موقف سيارات",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'موقف سيارات': Conflation of Islamic endowment trusts (أوقاف) with vehicle parking and theological texts"
+        }
+      ]
+    },
+    {
+      "query_id": "Q16",
+      "query_term": "رمى",
+      "category_id": 4,
+      "p10_s2": 0.1,
+      "p10_s3": 0.1,
+      "p10_s4": 0.2,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": -0.1,
+      "sfi10_s2": 0.4,
+      "sfi10_s3": 0.9,
+      "sfi10_s4": 0.8,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "موتياه موراليثاران",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "عماد هاشم",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "أوليفر كان",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Body dominated by collision terms (2 vs 1)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q17",
+      "query_term": "وفى",
+      "category_id": 4,
+      "p10_s2": 0.0,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 1.0,
+      "sfi10_s3": 1.0,
+      "sfi10_s4": 1.0,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "جائحة فيروس كورونا في أفغانستان",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S3",
+          "title": "جائحة فيروس كورونا في أفغانستان",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "الدفنات الآدمية في بلاد الشام خلال عصور ما قبل التاريخ",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q18",
+      "query_term": "عين",
+      "category_id": 5,
+      "p10_s2": 0.5,
+      "p10_s3": 0.6,
+      "p10_s4": 0.5,
+      "delta_p_over_s3": -0.1,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 0.2,
+      "sfi10_s3": 0.3,
+      "sfi10_s4": 0.4,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "حصار عين العرب",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين العرب': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S2",
+          "title": "عين غزال (الأردن)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين غزال': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S3",
+          "title": "حصار عين العرب",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين العرب': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S3",
+          "title": "عين غزال (الأردن)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين غزال': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S4",
+          "title": "حصار عين العرب",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين العرب': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S4",
+          "title": "عين غزال (الأردن)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين غزال': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S4",
+          "title": "الخط الزمني للأحداث المتعلقة بداعش (2015)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        }
+      ]
+    },
+    {
+      "query_id": "Q19",
+      "query_term": "شعر",
+      "category_id": 5,
+      "p10_s2": 0.4,
+      "p10_s3": 0.4,
+      "p10_s4": 0.4,
+      "delta_p_over_s3": 0.0,
+      "delta_p_over_s4": 0.0,
+      "sfi10_s2": 0.4,
+      "sfi10_s3": 0.4,
+      "sfi10_s4": 0.4,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "نمو شعر الإنسان",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'شعر الإنسان': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S2",
+          "title": "العناية بالشعر",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'العناية بالشعر': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S3",
+          "title": "أشعرية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'أشعرية': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S3",
+          "title": "نمو شعر الإنسان",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'شعر الإنسان': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S3",
+          "title": "العناية بالشعر",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'العناية بالشعر': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S4",
+          "title": "أشعرية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'أشعرية': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S4",
+          "title": "نمو شعر الإنسان",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'شعر الإنسان': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S4",
+          "title": "العناية بالشعر",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'العناية بالشعر': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        }
+      ]
+    },
+    {
+      "query_id": "Q20",
+      "query_term": "بحر",
+      "category_id": 5,
+      "p10_s2": 0.7,
+      "p10_s3": 0.5,
+      "p10_s4": 0.6,
+      "delta_p_over_s3": 0.2,
+      "delta_p_over_s4": 0.1,
+      "sfi10_s2": 0.2,
+      "sfi10_s3": 0.4,
+      "sfi10_s4": 0.3,
+      "collisions_detected": [
+        {
+          "system": "S2",
+          "title": "تسلسل زمني للاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S2",
+          "title": "الاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S3",
+          "title": "الاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S3",
+          "title": "تسلسل زمني للاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S3",
+          "title": "إسماعيل عبد اللطيف",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Body dominated by collision terms (3 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "حقوق الإنسان في البحرين",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S4",
+          "title": "تسلسل زمني للاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S4",
+          "title": "الاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S4",
+          "title": "إسماعيل عبد اللطيف",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Body dominated by collision terms (3 vs 1)"
+        }
+      ]
+    }
+  ],
+  "case_studies": {
+    "Q01": {
+      "query_id": "Q01",
+      "query_term": "كتب",
+      "description": "Foundational baseline benchmark for regular triliteral morphology. Probes the ability to bridge verbal inflections, nominal derivations, and broken plurals.",
+      "p10_s2": 0.6,
+      "p10_s3": 0.3,
+      "p10_s4": 0.3,
+      "delta_p_s3": 0.3,
+      "delta_p_s4": 0.3,
+      "sfi10_s2": 0.3,
+      "sfi10_s3": 0.1,
+      "sfi10_s4": 0.1,
+      "s3_top_titles": [
+        "بيت الحكمة",
+        "أمية",
+        "كتب جوجل",
+        "جورج أورويل",
+        "التشكيك في أصالة شكسبير"
+      ],
+      "s4_top_titles": [
+        "بيت الحكمة",
+        "أمية",
+        "كتب جوجل",
+        "جورج أورويل",
+        "إرنست همينغوي"
+      ],
+      "s2_top_titles": [
+        "كتب جوجل",
+        "بيت الحكمة",
+        "مناظرات دينية حول سلسلة هاري بوتر",
+        "إتلاف كتب المكتبات العامة",
+        "الحديث النبوي"
+      ],
+      "sample_collisions": []
+    },
+    "Q09": {
+      "query_id": "Q09",
+      "query_term": "سلم",
+      "description": "Probes multi-layer agglutination ('وسيسلمونها' = conjunction + future + present prefix + stem + plural + direct object pronoun).",
+      "p10_s2": 0.0,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_s3": 0.0,
+      "delta_p_s4": 0.0,
+      "sfi10_s2": 1.0,
+      "sfi10_s3": 1.0,
+      "sfi10_s4": 1.0,
+      "s3_top_titles": [
+        "الإسلام في تايوان",
+        "الفتح الإسلامي للشام",
+        "الفتح الإسلامي للمغرب",
+        "محمد بن سلمان آل سعود",
+        "حصار عين العرب"
+      ],
+      "s4_top_titles": [
+        "الإسلام في تايوان",
+        "الفتح الإسلامي للشام",
+        "الفتح الإسلامي للمغرب",
+        "محمد بن سلمان آل سعود",
+        "حصار عين العرب"
+      ],
+      "s2_top_titles": [
+        "محمد بن سلمان آل سعود",
+        "مفارقة السلم",
+        "أمراض وطفيليات الأسماك",
+        "سلمون قوس قزح",
+        "عيسى بن علي آل خليفة"
+      ],
+      "sample_collisions": [
+        {
+          "system": "S3",
+          "title": "الإسلام في تايوان",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S3",
+          "title": "الفتح الإسلامي للشام",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S3",
+          "title": "الفتح الإسلامي للمغرب",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'إسلام': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        },
+        {
+          "system": "S3",
+          "title": "محمد بن سلمان آل سعود",
+          "type": "DERIVATIONAL_SPECIALIZATION_COLLISION",
+          "explanation": "Title contains collision keyword 'سلمان': Conflation of peace treaties with Islamic conquest theology, personal names, and physical ladders"
+        }
+      ]
+    },
+    "Q17": {
+      "query_id": "Q17",
+      "query_term": "وفى",
+      "description": "Doubly weak root ('و' and 'ي'). In present tense 'يفي', both weak letters are affected; in passive 'توفي', it denotes death.",
+      "p10_s2": 0.0,
+      "p10_s3": 0.0,
+      "p10_s4": 0.0,
+      "delta_p_s3": 0.0,
+      "delta_p_s4": 0.0,
+      "sfi10_s2": 1.0,
+      "sfi10_s3": 1.0,
+      "sfi10_s4": 1.0,
+      "s3_top_titles": [
+        "جائحة فيروس كورونا في الجزائر",
+        "الجدول الزمني لجائحة فيروس كورونا 2020 في روسيا",
+        "ونستون تشرشل",
+        "الحرب في أفغانستان (2001–2021)",
+        "أزمة الديون الأوروبية"
+      ],
+      "s4_top_titles": [
+        "الجدول الزمني لجائحة فيروس كورونا 2020 في روسيا",
+        "جائحة فيروس كورونا في الجزائر",
+        "ونستون تشرشل",
+        "محادثات محور ألمانيا والاتحاد السوفيتي",
+        "روسيا"
+      ],
+      "s2_top_titles": [
+        "جائحة فيروس كورونا في الجزائر",
+        "الجدول الزمني لجائحة فيروس كورونا 2020 في روسيا",
+        "ونستون تشرشل",
+        "الحرب في أفغانستان (2001–2021)",
+        "أزمة الديون الأوروبية"
+      ],
+      "sample_collisions": [
+        {
+          "system": "S3",
+          "title": "جائحة فيروس كورونا في أفغانستان",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        },
+        {
+          "system": "S4",
+          "title": "الدفنات الآدمية في بلاد الشام خلال عصور ما قبل التاريخ",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Body dominated by collision terms (1 vs 0)"
+        }
+      ]
+    },
+    "Q18": {
+      "query_id": "Q18",
+      "query_term": "عين",
+      "description": "Canonical Arabic homonym (المشترك اللفظي). Senses include anatomical eye, water spring, intelligence spy, and dignitary/noble.",
+      "p10_s2": 0.5,
+      "p10_s3": 0.6,
+      "p10_s4": 0.5,
+      "delta_p_s3": -0.1,
+      "delta_p_s4": 0.0,
+      "sfi10_s2": 0.2,
+      "sfi10_s3": 0.3,
+      "sfi10_s4": 0.4,
+      "s3_top_titles": [
+        "طب العيون",
+        "أبو المعين النسفي",
+        "حصار عين العرب",
+        "نوم حركة العين السريعة",
+        "ذاكرة شهود العيان"
+      ],
+      "s4_top_titles": [
+        "حصار عين العرب",
+        "محمد مؤنس عوض",
+        "عين غزال (الأردن)",
+        "عين الحقل",
+        "عين بن فهيد"
+      ],
+      "s2_top_titles": [
+        "حصار عين العرب",
+        "نوم حركة العين السريعة",
+        "طب العيون",
+        "محمد مؤنس عوض",
+        "عين غزال (الأردن)"
+      ],
+      "sample_collisions": [
+        {
+          "system": "S3",
+          "title": "حصار عين العرب",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين العرب': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S3",
+          "title": "عين غزال (الأردن)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين غزال': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S4",
+          "title": "حصار عين العرب",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين العرب': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        },
+        {
+          "system": "S4",
+          "title": "عين غزال (الأردن)",
+          "type": "HOMONYM_SENSE_COLLISION",
+          "explanation": "Title contains collision keyword 'عين غزال': Canonical homonym conflating ophthalmology with water springs, government appointments, and senate"
+        }
+      ]
+    },
+    "Q19": {
+      "query_id": "Q19",
+      "query_term": "شعر",
+      "description": "Major semantic branching benchmark. Distinguishes biological hair ('شَعْر'), literary poetry ('شِعْر'), emotion ('شُعُور'), and notification ('إشعار').",
+      "p10_s2": 0.4,
+      "p10_s3": 0.4,
+      "p10_s4": 0.4,
+      "delta_p_s3": 0.0,
+      "delta_p_s4": 0.0,
+      "sfi10_s2": 0.4,
+      "sfi10_s3": 0.4,
+      "sfi10_s4": 0.4,
+      "s3_top_titles": [
+        "جائزة عبد العزيز سعود البابطين للإبداع الشعري",
+        "أدب عربي",
+        "أشعرية",
+        "شاعر في نيويورك",
+        "نمو شعر الإنسان"
+      ],
+      "s4_top_titles": [
+        "أدب عربي",
+        "جائزة عبد العزيز سعود البابطين للإبداع الشعري",
+        "أشعرية",
+        "شاعر في نيويورك",
+        "نمو شعر الإنسان"
+      ],
+      "s2_top_titles": [
+        "نمو شعر الإنسان",
+        "العناية بالشعر",
+        "أدب عربي",
+        "أدونيس (شاعر)",
+        "جائزة عبد العزيز سعود البابطين للإبداع الشعري"
+      ],
+      "sample_collisions": [
+        {
+          "system": "S3",
+          "title": "أشعرية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'أشعرية': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S3",
+          "title": "نمو شعر الإنسان",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'شعر الإنسان': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S3",
+          "title": "العناية بالشعر",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'العناية بالشعر': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        },
+        {
+          "system": "S4",
+          "title": "أشعرية",
+          "type": "POLYSEMY_DISPERSION",
+          "explanation": "Title contains collision keyword 'أشعرية': Conflation of literary poetry with dermatological hair growth, emotions, and theological sects"
+        }
+      ]
+    },
+    "Q20": {
+      "query_id": "Q20",
+      "query_term": "بحر",
+      "description": "Probes root stemmer susceptibility to false morphological reduction of proper nouns and geopolitical entities (specifically the sovereign Kingdom of Bahrain 'البحرين').",
+      "p10_s2": 0.7,
+      "p10_s3": 0.5,
+      "p10_s4": 0.6,
+      "delta_p_s3": 0.2,
+      "delta_p_s4": 0.1,
+      "sfi10_s2": 0.2,
+      "sfi10_s3": 0.4,
+      "sfi10_s4": 0.3,
+      "s3_top_titles": [
+        "البحرية الملكية البريطانية",
+        "الاحتجاجات البحرينية 2011",
+        "البحرية الهندية",
+        "تسلسل زمني للاحتجاجات البحرينية 2011",
+        "بحرية الولايات المتحدة"
+      ],
+      "s4_top_titles": [
+        "البحرية الملكية البريطانية",
+        "البحرية الهندية",
+        "تسلسل زمني للاحتجاجات البحرينية 2011",
+        "الاحتجاجات البحرينية 2011",
+        "بحرية الولايات المتحدة"
+      ],
+      "s2_top_titles": [
+        "البحرية الهندية",
+        "البحرية الملكية البريطانية",
+        "تسلسل زمني للاحتجاجات البحرينية 2011",
+        "بحرية الولايات المتحدة",
+        "الاحتجاجات البحرينية 2011"
+      ],
+      "sample_collisions": [
+        {
+          "system": "S3",
+          "title": "الاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S3",
+          "title": "تسلسل زمني للاحتجاجات البحرينية 2011",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        },
+        {
+          "system": "S3",
+          "title": "إسماعيل عبد اللطيف",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Body dominated by collision terms (3 vs 1)"
+        },
+        {
+          "system": "S3",
+          "title": "حقوق الإنسان في البحرين",
+          "type": "PROPER_NOUN_DRIFT",
+          "explanation": "Title contains collision keyword 'البحرين': Improper root reduction of sovereign Kingdom of Bahrain to common sea noun (بحر)"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,108 @@
+# ==============================================================================
+# .gitignore for Arabic Root-Based Full-Text Indexing in PostgreSQL 16
+# ==============================================================================
+
+# Operating System Metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python & Environment Artifacts
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Linting
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.ruff_cache/
+.mypy_cache/
+
+# Docker & PostgreSQL Persistent Storage
+pgdata/
+data/postgres/
+*.sock
+
+# Corpus Acquisition, Dumps & Large Data Files
+data/*
+!data/khoja_roots.txt
+raw_data/
+/corpus/
+*.parquet
+*.bz2
+*.tar.gz
+*.zip
+*.arrow
+*.h5
+dump/
+
+# Benchmark Artifacts & Heavy Results (Retain folder structure and data)
+results/*.png
+results/*.svg
+results/*.log
+results/*.md
+!results/.gitkeep
+!results/corpus_statistics.json
+!results/benchmark_s0_latency.json
+!results/benchmark_s0_latency.csv
+!results/indexing_benchmarks.json
+!results/ir_evaluation_metrics.json
+!results/overstemming_fallout.json
+!queries/golden_queries_20.json
+!queries/qrels_graded.json
+!queries/qrels.tsv
+
+# IDEs & Text Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local Secrets & Environment Variables
+.env
+.env.local
+*.pem
+*.key
+
+# Agent Metadata & Internal Scratchpad
+.agents/
+
+# Internal Notes, Prompts, Documents & Academic Drafts
+ORIGINAL_REQUEST.md
+PROJECT.md
+docs/
+*.docx
+*.txt
+!data/khoja_roots.txt
+واجبات المشرف عن المشروع*/
+واجبات المشرف عن المشروع/

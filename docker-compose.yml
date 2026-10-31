@@ -1,0 +1,26 @@
+name: arabic_ir
+
+services:
+  arabic_ir_db:
+    image: postgres:16
+    container_name: arabic_ir_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: arabic_ir
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d arabic_ir"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  pgdata:

@@ -1,0 +1,623 @@
+{
+  "metadata": {
+    "corpus": "Arabic Wikipedia 100,000 Articles (Seed 42)",
+    "benchmark": "Arabic Root-Based Full-Text Indexing Benchmark (PostgreSQL 16)",
+    "systems_evaluated": ["S0", "S1", "S2", "S3", "S4", "S5"],
+    "metrics": ["P@10", "MAP", "nDCG@10", "Recall@100", "Delta_P_over"],
+    "total_queries": 20,
+    "categories": [
+      {
+        "id": 1,
+        "name_en": "Sound Triliteral Verbs & Regular Derivations",
+        "name_ar": "الفعل السالم ومشتقاته القياسية",
+        "query_ids": ["Q01", "Q02", "Q03", "Q04", "Q05"]
+      },
+      {
+        "id": 2,
+        "name_en": "Complex Clitic Concatenation & Infixation",
+        "name_ar": "السوابق واللواحق المركبة والزوائد الداخلية",
+        "query_ids": ["Q06", "Q07", "Q08", "Q09"]
+      },
+      {
+        "id": 3,
+        "name_en": "Broken Plurals & Templatic Nouns",
+        "name_ar": "جموع التكسير والأوزان الجمعية",
+        "query_ids": ["Q10", "Q11", "Q12", "Q13"]
+      },
+      {
+        "id": 4,
+        "name_en": "Weak, Assimilated, Hollow, & Defective Roots",
+        "name_ar": "الأفعال المعتلة: مثال وأجوف وناقص ولفيف",
+        "query_ids": ["Q14", "Q15", "Q16", "Q17"]
+      },
+      {
+        "id": 5,
+        "name_en": "Semantic Drift, Homonymy, & Proper Nouns",
+        "name_ar": "التشعب الدلالي والمشترك اللفظي والأعلام",
+        "query_ids": ["Q18", "Q19", "Q20"]
+      }
+    ]
+  },
+  "queries": [
+    {
+      "query_id": "Q01",
+      "query_term": "كتب",
+      "root": "ك-ت-ب",
+      "root_type": "سالم (Sound)",
+      "category_id": 1,
+      "category_name_en": "Sound Triliteral Verbs & Regular Derivations",
+      "category_name_ar": "الفعل السالم ومشتقاته القياسية",
+      "linguistic_pattern": "فَعَلَ (Form I perfect active verb) / فُعُل (Broken plural)",
+      "description": "Foundational baseline benchmark for regular triliteral morphology. Probes the ability to bridge verbal inflections, nominal derivations, and broken plurals.",
+      "expected_surface_forms": [
+        "كاتب", "مكتوب", "مكتبة", "يكتبون", "كتبوا", "كتاب", "كتبي", "اكتتب", "مكاتب"
+      ],
+      "relevance_criteria": {
+        "0": "Unrelated document or severe semantic collision (e.g. military battalion 'كتيبة').",
+        "1": "Passing mention of writing, books, or documentation without thematic focus.",
+        "2": "Substantive discussion of authorship, libraries, literature, or books.",
+        "3": "Authoritative article specifically focused on books, libraries, writing systems, or authorship."
+      },
+      "expected_system_behavior": {
+        "s0": "Matches only verbatim 'كتب'. Fails on inflected verbs and derived nouns. Expected Recall < 5%.",
+        "s1": "Matches verbatim 'كتب' after stopword filtering. Recall remains < 5%.",
+        "s2": "Strips simple affixes. Matches 'كتب', 'يكتب' (partially). Fails on 'مكتبة', 'مكاتب'. Moderate Precision, low-to-medium Recall.",
+        "s3": "ISRI extracts root 'كتب' via patterns. Retrieves verbal and nominal forms. High Recall.",
+        "s4": "Khoja validates against lexicon root 'كتب'. Retrieves all derived forms. Highest Recall, moderate over-stemming.",
+        "s5": "Trigram matching captures character substrings with varying similarity scores. Moderate precision, high computational cost."
+      },
+      "over_stemming_risk": "Moderate-to-High. Root stemmers (S3/S4) conflate 'كتيبة' (military battalion) and 'مكتب' (office/bureau) with 'كتاب' (book), degrading P@10."
+    },
+    {
+      "query_id": "Q02",
+      "query_term": "درس",
+      "root": "د-ر-س",
+      "root_type": "سالم (Sound)",
+      "category_id": 1,
+      "category_name_en": "Sound Triliteral Verbs & Regular Derivations",
+      "category_name_ar": "الفعل السالم ومشتقاته القياسية",
+      "linguistic_pattern": "فَعَلَ (Form I verb) / دَرْس (Verbal noun)",
+      "description": "Sound root representing education and pedagogy. Tests derivation across schools, students, studying, and teaching.",
+      "expected_surface_forms": [
+        "مدرسة", "مدارس", "دارس", "يدرسون", "دراسة", "تدريس", "مدروس", "دراسات"
+      ],
+      "relevance_criteria": {
+        "0": "Off-topic or irrelevant document.",
+        "1": "Incidental mention of a school or study in a biography or historical article.",
+        "2": "Discussion of educational systems, pedagogical methods, or academic studies.",
+        "3": "Dedicated article on educational institutions, academic disciplines, or schools."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails on all derivations. Zero recall for 'مدرسة' or 'دراسة'.",
+        "s1": "Identical to S0; zero recall on derived vocabulary.",
+        "s2": "Captures 'دارس', 'يدرس'. Fails to connect 'مدرسة' or broken plural 'مدارس'.",
+        "s3": "Extracts root 'درس'. Retrieves 'مدرسة', 'دراسة', 'تدريس'. High Recall.",
+        "s4": "Khoja root match succeeds. Captures educational corpus comprehensively.",
+        "s5": "Matches overlapping trigrams for 'مدرس' and 'دراسة'; misses non-overlapping patterns."
+      },
+      "over_stemming_risk": "Moderate. S3/S4 conflates 'مدروس' (carefully calculated/planned) and agricultural threshing ('درس المحصول') with pedagogical education."
+    },
+    {
+      "query_id": "Q03",
+      "query_term": "حكم",
+      "root": "ح-ك-م",
+      "root_type": "سالم (Sound)",
+      "category_id": 1,
+      "category_name_en": "Sound Triliteral Verbs & Regular Derivations",
+      "category_name_ar": "الفعل السالم ومشتقاته القياسية",
+      "linguistic_pattern": "فَعَلَ (Form I verb) / حُكْم (Judicial/political ruling)",
+      "description": "Legal, political, and philosophical sound root. Features wide semantic dispersion across government, courts, wisdom, and arbitration.",
+      "expected_surface_forms": [
+        "حكومة", "حاكم", "محكمة", "محاكم", "أحكام", "يتحاكمون", "حكيم", "تحكيم", "حكام"
+      ],
+      "relevance_criteria": {
+        "0": "Completely off-topic document.",
+        "1": "Passing mention of a ruling, wise quote, or administrative rule.",
+        "2": "Detailed analysis of governance, legal rulings, judicial systems, or political regimes.",
+        "3": "Comprehensive treatise on political governance, constitutional law, or judicial authority."
+      },
+      "expected_system_behavior": {
+        "s0": "Matches only exact token 'حكم'. Misses 'حكومة' and 'محكمة'.",
+        "s1": "Eliminates prepositions; exact token match only.",
+        "s2": "Strips inflectional affixes; matches 'حاكم', 'حكومة'. Fails on broken plural 'محاكم'.",
+        "s3": "ISRI extracts root 'حكم'. Unifies courts, governance, and wisdom.",
+        "s4": "Khoja maps all terms to root 'حكم'. Highest Recall.",
+        "s5": "Partial trigram matches across 'محكمة' and 'حكومة'."
+      },
+      "over_stemming_risk": "High. Severe semantic drift between 'حكومة' (executive government), 'محكمة' (judicial court), and 'حكيم' (sage/philosopher). Causes substantial P@10 drop."
+    },
+    {
+      "query_id": "Q04",
+      "query_term": "خرج",
+      "root": "خ-ر-ج",
+      "root_type": "سالم (Sound)",
+      "category_id": 1,
+      "category_name_en": "Sound Triliteral Verbs & Regular Derivations",
+      "category_name_ar": "الفعل السالم ومشتقاته القياسية",
+      "linguistic_pattern": "فَعَلَ (Form I) / اِسْتَفْعَلَ (Form X) / مَفْعَل (Noun of place)",
+      "description": "Tests derived verbal forms (particularly Form X 'استخراج') and spatial nominalization ('مخرج', 'مخارج').",
+      "expected_surface_forms": [
+        "مخرج", "استخراج", "خارج", "خارجية", "يخرجون", "مخارج", "تخرج", "إخراج"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Incidental mention of graduation, exiting, or extraction.",
+        "2": "Substantive article discussing foreign policy, natural resource extraction, or theatrical direction.",
+        "3": "Dedicated topic regarding foreign relations ('وزارة الخارجية'), cinematic directing, or mineral extraction."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails across all derived forms.",
+        "s1": "Fails across all derived forms.",
+        "s2": "Captures 'خارج', 'يخرجون'. Fails on Form X 'استخراج' and broken plural 'مخارج'.",
+        "s3": "Accurately strips Form X prefixes ('است-') and patterns to root 'خرج'.",
+        "s4": "Khoja correctly extracts root 'خرج'.",
+        "s5": "Low similarity between 'استخراج' and 'خرج'."
+      },
+      "over_stemming_risk": "Very High. Conflates 'خارجية' (foreign diplomacy), 'مخرج' (film director), 'تخرج' (academic graduation), and 'استخراج النفط' (petroleum extraction)."
+    },
+    {
+      "query_id": "Q05",
+      "query_term": "علم",
+      "root": "ع-ل-م",
+      "root_type": "سالم (Sound)",
+      "category_id": 1,
+      "category_name_en": "Sound Triliteral Verbs & Regular Derivations",
+      "category_name_ar": "الفعل السالم ومشتقاته القياسية",
+      "linguistic_pattern": "فَعِلَ (Form I verb) / عِلْم (Science/knowledge) / عَالَم (World)",
+      "description": "High-frequency polysemic root representing knowledge, education, media, and the universe. Key benchmark for precision degradation.",
+      "expected_surface_forms": [
+        "عالم", "معلومة", "معلومات", "تعليم", "علماء", "إعلام", "علامة", "عالمي", "معلم"
+      ],
+      "relevance_criteria": {
+        "0": "Unrelated document.",
+        "1": "Passing mention of a scientist, teacher, or media outlet.",
+        "2": "Substantial discussion of scientific disciplines, educational theory, or information science.",
+        "3": "Core encyclopedic article dedicated to science, knowledge theory, or educational pedagogy."
+      },
+      "expected_system_behavior": {
+        "s0": "Matches 'علم' only. Misses 'علماء', 'تعليم', 'معلومات'.",
+        "s1": "Matches 'علم' only.",
+        "s2": "Keeps 'تعليم' and 'عالم' distinct. Maintains high precision on specific senses.",
+        "s3": "Collapses all occurrences into root 'علم'. Massive recall explosion.",
+        "s4": "Lexicon validation succeeds on 'علم'. Huge recall, massive false positive pool.",
+        "s5": "Trigram matching yields large number of ambiguous candidates."
+      },
+      "over_stemming_risk": "Extreme. S3/S4 merges 'عَالَم' (universe/world), 'عِلْم' (science), 'تَعْلِيم' (education), and 'إِعْلَام' (mass media), collapsing P@10."
+    },
+    {
+      "query_id": "Q06",
+      "query_term": "سفر",
+      "root": "س-ف-ر",
+      "root_type": "سالم مع زوائد مركبة",
+      "category_id": 2,
+      "category_name_en": "Complex Clitic Concatenation & Infixation",
+      "category_name_ar": "السوابق واللواحق المركبة والزوائد الداخلية",
+      "linguistic_pattern": "فَعَلَ / سَافَرَ (Form III) مع سوابق ولواحق",
+      "description": "Evaluates heavy proclitic chaining (conjunction 'و', future marker 'س', present prefix 'ي', plural suffix 'ون').",
+      "expected_surface_forms": [
+        "وسيسافرون", "مسافر", "سفارة", "أسفار", "فسافروا", "بسفرهم", "مسافرين"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Minor reference to traveling or an embassy.",
+        "2": "Discussion of travel, transportation, tourism, or diplomatic embassies.",
+        "3": "Comprehensive article on international travel, tourism industry, or diplomatic missions."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails completely on 'وسيسافرون'.",
+        "s1": "Fails on attached proclitics.",
+        "s2": "Larkey light10 iteratively strips 'و+س' and 'ون', successfully matching 'سافر'.",
+        "s3": "ISRI strips affixes and patterns down to root 'سفر'.",
+        "s4": "Khoja validates candidate against root 'سفر'.",
+        "s5": "Poor trigram overlap with heavily prefixed 'وسيسافرون'."
+      },
+      "over_stemming_risk": "Moderate. Root stemmers merge 'سفارة' (diplomatic embassy) and biblical 'أسفار' (books of scripture) with mundane travel ('سفر')."
+    },
+    {
+      "query_id": "Q07",
+      "query_term": "نصر",
+      "root": "ن-ص-ر",
+      "root_type": "سالم مع زوائد حشوية",
+      "category_id": 2,
+      "category_name_en": "Complex Clitic Concatenation & Infixation",
+      "category_name_ar": "السوابق واللواحق المركبة والزوائد الداخلية",
+      "linguistic_pattern": "اِفْتَعَلَ (Form VIII infixation: -ت- inside root)",
+      "description": "Probes non-concatenative infixation where the reflexive marker '-ت-' is inserted between root radicals (e.g. 'فانتصروا').",
+      "expected_surface_forms": [
+        "فانتصروا", "منتصر", "انتصار", "مناصرين", "ناصر", "نصرة", "استنصار"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Brief mention of a victory or support in a conflict.",
+        "2": "Detailed historical account of military victories, triumphs, or alliances.",
+        "3": "Authoritative historical analysis of military battles, triumphs, or doctrine of victory."
+      },
+      "expected_system_behavior": {
+        "s0": "Zero match on 'فانتصروا' or 'انتصار'.",
+        "s1": "Zero match on inflected or infixed forms.",
+        "s2": "Light stemmer strips 'فـ' and 'وا', leaving 'انتصر'. Fails to remove infixed '-ت-'. Cannot match query 'نصر'.",
+        "s3": "ISRI applies Form VIII template 'افتعل' -> successfully extracts root 'نصر'.",
+        "s4": "Khoja morphological pattern analysis correctly strips infixed '-ت-' -> extracts 'نصر'.",
+        "s5": "Low trigram similarity between 'نصر' and 'انتصار'."
+      },
+      "over_stemming_risk": "High. Root stemmers conflate 'نصرانية' (Christianity), 'الناصرة' (Nazareth), and 'انتصار' (military victory)."
+    },
+    {
+      "query_id": "Q08",
+      "query_term": "عمل",
+      "root": "ع-م-ل",
+      "root_type": "سالم مع لواحق ضميرية",
+      "category_id": 2,
+      "category_name_en": "Complex Clitic Concatenation & Infixation",
+      "category_name_ar": "السوابق واللواحق المركبة والزوائد الداخلية",
+      "linguistic_pattern": "فَعَلَ / فَعَّلَ / اِسْتَفْعَلَ مع ضمائر متصلة",
+      "description": "Tests pronominal enclitic attachments ('-هم', '-نا', '-ها') combined with prepositions ('بـ') and dual/plural markers.",
+      "expected_surface_forms": [
+        "أعمالهم", "بالعملية", "فعملنا", "معاملهم", "عاملان", "يستعملونها", "عمالة"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Passing mention of labor or operations.",
+        "2": "Detailed discussion of labor economics, employment, or operational processes.",
+        "3": "Core encyclopedic article on labor rights, industrial work, or economic employment."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails on attached clitics.",
+        "s1": "Fails on attached clitics.",
+        "s2": "Larkey light10 effectively strips 'بالـ', '-ية', '-هم', and dual '-ان'. High performance.",
+        "s3": "ISRI extracts root 'عمل'.",
+        "s4": "Khoja extracts root 'عمل'.",
+        "s5": "Trigram matching captures partial substrings on long words like 'يستعملونها'."
+      },
+      "over_stemming_risk": "High. S3/S4 conflates 'معمل/معامل' (chemical laboratories/factories) with 'معاملة' (personal treatment/transaction) and 'عمالة' (workforce)."
+    },
+    {
+      "query_id": "Q09",
+      "query_term": "سلم",
+      "root": "س-ل-م",
+      "root_type": "سالم مع زوائد مركبة متعددة",
+      "category_id": 2,
+      "category_name_en": "Complex Clitic Concatenation & Infixation",
+      "category_name_ar": "السوابق واللواحق المركبة والزوائد الداخلية",
+      "linguistic_pattern": "فَعَلَ / أَفْعَلَ / اِسْتَفْعَلَ مع سوابق ولواحق متعددة",
+      "description": "Probes multi-layer agglutination ('وسيسلمونها' = conjunction + future + present prefix + stem + plural + direct object pronoun).",
+      "expected_surface_forms": [
+        "وسيسلمونها", "استسلام", "مسالم", "إسلام", "سلامة", "سالمين", "تسليم"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Passing reference to peace, delivery, or safety.",
+        "2": "Substantial article on peace treaties, peaceful conflict resolution, or surrender.",
+        "3": "Major historical or political article dedicated to peace treaties ('معاهدات السلام') or pacificism."
+      },
+      "expected_system_behavior": {
+        "s0": "Zero match on complex compound forms.",
+        "s1": "Zero match.",
+        "s2": "May fail on 'وسيسلمونها' due to deep prefix/suffix nesting exceeding single-pass limits.",
+        "s3": "ISRI heuristic stripping penetrates nested clitics to extract root 'سلم'.",
+        "s4": "Khoja extracts root 'سلم'.",
+        "s5": "Trigram fails on multi-prefix compounds."
+      },
+      "over_stemming_risk": "Catastrophic. S3/S4 merges 'إسلام' (Islam / religious theology), 'استسلام' (military surrender), 'سلامة' (industrial safety), and 'سُلَّم' (physical ladder)."
+    },
+    {
+      "query_id": "Q10",
+      "query_term": "شجر",
+      "root": "ش-ج-ر",
+      "root_type": "سالم (تكسير: أفعال)",
+      "category_id": 3,
+      "category_name_en": "Broken Plurals & Templatic Nouns",
+      "category_name_ar": "جموع التكسير والأوزان الجمعية",
+      "linguistic_pattern": "أَفْعَال (Non-concatenative broken plural: أشجار)",
+      "description": "Archetypal benchmark for broken plurals. Tests the non-concatenative plural 'أشجار' against singular 'شجرة' and collective 'شجر'.",
+      "expected_surface_forms": [
+        "أشجار", "شجرة", "شجيرات", "تشجير", "مشجر", "الشجرة", "بالأشجار"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Passing reference to trees in a geographical description.",
+        "2": "Substantial discussion of forestry, botanical trees, or afforestation.",
+        "3": "Encyclopedic article dedicated to trees, arboriculture, or forest ecology."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails on 'أشجار' and 'شجرة'.",
+        "s1": "Fails on all inflected forms.",
+        "s2": "Reduces 'الأشجار' to 'أشجار' and 'شجرة' to 'شجر'. Fails to connect 'أشجار' with query 'شجر'.",
+        "s3": "ISRI maps pattern 'أفعال' to root -> extracts 'شجر'. Successfully connects singular and plural.",
+        "s4": "Khoja correctly extracts root 'شجر' across all forms. Demonstrates clear superiority over light stemming.",
+        "s5": "Low trigram similarity between 'شجر' and 'أشجار'."
+      },
+      "over_stemming_risk": "Very Low. Semantic cohesion remains tightly bounded within botanical and forestry contexts."
+    },
+    {
+      "query_id": "Q11",
+      "query_term": "قلب",
+      "root": "ق-ل-ب",
+      "root_type": "سالم (تكسير: فعول / انفعال)",
+      "category_id": 3,
+      "category_name_en": "Broken Plurals & Templatic Nouns",
+      "category_name_ar": "جموع التكسير والأوزان الجمعية",
+      "linguistic_pattern": "فُعُول (Broken plural: قلوب) / اِنْفِعَال (Form VII: انقلاب)",
+      "description": "Broken plural 'قلوب' and Form VII nominalization 'انقلاب'. High morphological variance and dramatic semantic divergence.",
+      "expected_surface_forms": [
+        "قلوب", "انقلاب", "متقلب", "تقلبات", "قلبي", "انقلابات", "قلبه"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Metaphorical use of 'قلب' (e.g. in the heart of the city).",
+        "2": "Discussion of cardiology, heart anatomy, or cardiovascular diseases.",
+        "3": "Comprehensive medical or biological article on the mammalian heart ('عضلة القلب')."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails on 'قلوب' and 'انقلاب'.",
+        "s1": "Fails on derived forms.",
+        "s2": "Matches 'قلبي'. Fails on broken plural 'قلوب' and Form VII 'انقلاب'.",
+        "s3": "ISRI extracts root 'قلب' across all variants.",
+        "s4": "Khoja extracts root 'قلب'. Highest recall.",
+        "s5": "Partial trigram matches."
+      },
+      "over_stemming_risk": "Critical. Root stemmers (S3/S4) merge cardiology ('أمراض القلب') with military coups ('انقلاب عسكري') and meteorological fluctuations ('تقلبات جوية')."
+    },
+    {
+      "query_id": "Q12",
+      "query_term": "طرق",
+      "root": "ط-ر-ق",
+      "root_type": "سالم (تكسير: فعل / فعائل)",
+      "category_id": 3,
+      "category_name_en": "Broken Plurals & Templatic Nouns",
+      "category_name_ar": "جموع التكسير والأوزان الجمعية",
+      "linguistic_pattern": "فُعُل (Broken plural: طرق) / فَعَائِل (Broken plural: طرائق) / مِفْعَلَة (Tool: مطرقة)",
+      "description": "Multiple broken plural patterns for road ('طريق' -> 'طرق') and method ('طريقة' -> 'طرائق'), plus instrument noun ('مطرقة').",
+      "expected_surface_forms": [
+        "طرق", "طرائق", "طارق", "طريقة", "مطرقة", "طرقات", "طرقية"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Passing mention of a road or methodology.",
+        "2": "Substantial discussion of road networks, transportation infrastructure, or systematic methods.",
+        "3": "Core article on highway engineering, transportation infrastructure, or formal methodology."
+      },
+      "expected_system_behavior": {
+        "s0": "Matches verbatim 'طرق' only. Misses 'طريق', 'طريقة', 'طرائق'.",
+        "s1": "Matches verbatim 'طرق' only.",
+        "s2": "Fails to equate 'طريقة' or 'طريق' with broken plural 'طرائق'.",
+        "s3": "ISRI extracts root 'طرق' for both broken plurals and tool nouns.",
+        "s4": "Khoja extracts root 'طرق'. High recall.",
+        "s5": "Partial overlap on character n-grams."
+      },
+      "over_stemming_risk": "High. S3/S4 conflates physical highways ('طرق معبدة'), scientific methodologies ('طرائق البحث'), blacksmith tools ('مطرقة'), and the historical figure 'طارق بن زياد'."
+    },
+    {
+      "query_id": "Q13",
+      "query_term": "صحب",
+      "root": "ص-ح-ب",
+      "root_type": "سالم (تكسير: أفعال / فعالة)",
+      "category_id": 3,
+      "category_name_en": "Broken Plurals & Templatic Nouns",
+      "category_name_ar": "جموع التكسير والأوزان الجمعية",
+      "linguistic_pattern": "أَفْعَال (أصحاب) / فَعَالَة (صحابة)",
+      "description": "Broken plurals of companionship. Tests religious/historical terminology ('الصحابة') against secular companionship ('أصحاب', 'صاحب').",
+      "expected_surface_forms": [
+        "أصحاب", "صحابة", "مصاحبة", "صاحب", "يصاحبون", "مصاحب", "صاحبة"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Incidental mention of friends or associates.",
+        "2": "Detailed historical/theological discussion of the Companions of the Prophet or companionship ethics.",
+        "3": "Dedicated article on the Companions of the Prophet ('الصحابة') in Islamic history."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails on 'أصحاب' and 'صحابة'.",
+        "s1": "Fails on broken plurals.",
+        "s2": "Strips 'الـ' to leave 'صحابة' and 'أصحاب'; cannot reduce to root 'صحب'.",
+        "s3": "ISRI identifies broken plural patterns and extracts root 'صحب'.",
+        "s4": "Khoja extracts root 'صحب'.",
+        "s5": "Moderate trigram similarity between 'صاحب' and 'صحابة'."
+      },
+      "over_stemming_risk": "Moderate-to-High. Merges specific historical entities ('صحابة رسول الله') with general proprietary usage ('أصحاب الشركات')."
+    },
+    {
+      "query_id": "Q14",
+      "query_term": "قال",
+      "root": "ق-و-ل",
+      "root_type": "معتل أجوف (Hollow Root: Middle Radical Weak)",
+      "category_id": 4,
+      "category_name_en": "Weak, Assimilated, Hollow, & Defective Roots",
+      "category_name_ar": "الأفعال المعتلة: مثال وأجوف وناقص ولفيف",
+      "linguistic_pattern": "فَعَلَ (Past: قال) / يَفْعُلُ (Present: يقول) / مَفْعُول (مقالة)",
+      "description": "Classic hollow verb benchmark. The middle radical alternates between Alif ('قال'), Waw ('يقول', 'أقوال', 'مقولة'), and Yaa in passive ('قيل').",
+      "expected_surface_forms": [
+        "يقول", "قول", "مقالة", "أقوال", "قائل", "مقولة", "قيل", "يقولون", "مقالات"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Direct quotation attribution ('قال فلان').",
+        "2": "Substantial discussion of journalistic essays, aphorisms, or linguistic sayings.",
+        "3": "Comprehensive article on journalistic essay writing ('فن المقالة') or philosophical maxims."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails completely. 'قال' has 0% match against 'يقول' or 'أقوال'.",
+        "s1": "Fails completely.",
+        "s2": "Fails completely. Light stemmer leaves 'قال' and 'يقول' with distinct radical vowels.",
+        "s3": "ISRI applies hollow verb restoration rules to extract root 'قول'. High recall.",
+        "s4": "Khoja validates candidate against root 'قول'. Connects 'قال' to 'يقول' and 'مقالة'.",
+        "s5": "Poor trigram overlap between 'قال' and 'يقول' (share only 'ق')."
+      },
+      "over_stemming_risk": "Moderate. Root extraction successfully restores morphological connection, but retrieves massive noise from ubiquitous narrative attribution."
+    },
+    {
+      "query_id": "Q15",
+      "query_term": "وقف",
+      "root": "و-ق-ف",
+      "root_type": "معتل مثال (Assimilated Root: Initial Radical Weak)",
+      "category_id": 4,
+      "category_name_en": "Weak, Assimilated, Hollow, & Defective Roots",
+      "category_name_ar": "الأفعال المعتلة: مثال وأجوف وناقص ولفيف",
+      "linguistic_pattern": "فَعَلَ (وقف) / يَفْعِلُ (حذف الفاء: يقف) / مَفْعَل (موقف)",
+      "description": "Assimilated verb where the initial radical 'و' drops completely in the imperfect tense ('يقف' instead of 'يوقف').",
+      "expected_surface_forms": [
+        "يقف", "موقف", "أوقاف", "توقيف", "مواقف", "استيقاف", "واقف"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Passing mention of stopping or standing.",
+        "2": "Detailed discussion of religious endowments ('أوقاف') or legal arrest procedures.",
+        "3": "Dedicated legal or historical article on Islamic endowment trusts ('الوقف الإسلامي')."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails on 'يقف' and 'أوقاف'.",
+        "s1": "Fails on derived forms.",
+        "s2": "Strips 'يـ' from 'يقف' leaving 2-letter stem 'قف' (fails min length 3 constraint). Cannot match 'وقف'.",
+        "s3": "ISRI weak-verb heuristic reconstructs initial 'و' -> maps 'يقف' to root 'وقف'.",
+        "s4": "Khoja dictionary lookup restores root 'وقف'.",
+        "s5": "Zero overlap between 'يقف' and 'وقف'."
+      },
+      "over_stemming_risk": "High. Severe divergence between religious endowments ('وزارة الأوقاف'), physical parking ('موقف سيارات'), political stances, and police custody ('توقيف')."
+    },
+    {
+      "query_id": "Q16",
+      "query_term": "رمى",
+      "root": "ر-م-ي",
+      "root_type": "معتل ناقص (Defective Root: Final Radical Weak)",
+      "category_id": 4,
+      "category_name_en": "Weak, Assimilated, Hollow, & Defective Roots",
+      "category_name_ar": "الأفعال المعتلة: مثال وأجوف وناقص ولفيف",
+      "linguistic_pattern": "فَعَلَ (رمى) / يَفْعِلُ (يرمي) / فُعَاة (تكسير: رماة) / مَفْعَل (مرمى)",
+      "description": "Defective verb with weak final radical (Alif Maqsura 'ى' / Yaa 'ي'). Tests broken plurals ('رماة') and sports nouns of place ('مرمى').",
+      "expected_surface_forms": [
+        "يرمي", "رماية", "رامي", "مرمى", "رماة", "رموا", "الرامي"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Passing mention of archery or throwing.",
+        "2": "Substantial article on the sport of archery, military archers, or football goal analysis.",
+        "3": "Comprehensive article dedicated to the sport of archery ('رياضة الرماية') or historical archers."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails on 'يرمي', 'مرمى', and 'رماة'.",
+        "s1": "Fails on all derived forms.",
+        "s2": "Matches 'رامي' (after ya normalization). Fails on broken plural 'رماة' and past plural 'رموا'.",
+        "s3": "ISRI extracts root 'رمي'.",
+        "s4": "Khoja extracts root 'رمي'. High recall.",
+        "s5": "Very low trigram similarity between 'رمى' and 'رماة'."
+      },
+      "over_stemming_risk": "Moderate. Conflates sports archery ('رماية'), soccer goal/goalkeeper ('حارس المرمى'), and projectile weapon firing."
+    },
+    {
+      "query_id": "Q17",
+      "query_term": "وفى",
+      "root": "و-ف-ي",
+      "root_type": "معتل لفيف مفروق (Doubly Weak: Initial and Final Weak)",
+      "category_id": 4,
+      "category_name_en": "Weak, Assimilated, Hollow, & Defective Roots",
+      "category_name_ar": "الأفعال المعتلة: مثال وأجوف وناقص ولفيف",
+      "linguistic_pattern": "فَعَلَ (وفى) / يَفْعِلُ (يفي) / تَفَعَّلَ (توفي) / فَعِيلَة (وفيات)",
+      "description": "Doubly weak root ('و' and 'ي'). In present tense 'يفي', both weak letters are affected; in passive 'توفي', it denotes death.",
+      "expected_surface_forms": [
+        "وفاء", "استيفاء", "موافاة", "توفي", "وفيات", "يفي", "موفور"
+      ],
+      "relevance_criteria": {
+        "0": "Irrelevant document.",
+        "1": "Passing biographical death notice ('توفي عام...').",
+        "2": "Detailed demographic study of mortality rates, or ethical analysis of loyalty/fulfillment.",
+        "3": "Authoritative demographic/medical research on mortality statistics ('معدل الوفيات') or virtue of loyalty."
+      },
+      "expected_system_behavior": {
+        "s0": "Fails completely on 'يفي' and 'وفيات'.",
+        "s1": "Fails completely.",
+        "s2": "Fails completely on 'يفي' (stripped to single letter) and 'توفي'.",
+        "s3": "ISRI struggles with doubly weak roots, prone to irregular pattern assignment.",
+        "s4": "Khoja dictionary contains root 'وفي' and correctly maps candidate roots.",
+        "s5": "Extremely low trigram score."
+      },
+      "over_stemming_risk": "Severe. Catastrophic collision between moral virtue 'وفاء' (loyalty/faithfulness) and demographic mortality 'وفيات' (deaths)."
+    },
+    {
+      "query_id": "Q18",
+      "query_term": "عين",
+      "root": "ع-ي-ن",
+      "root_type": "سالم مع اشتراك لفظي (Homonymy)",
+      "category_id": 5,
+      "category_name_en": "Semantic Drift, Homonymy, & Proper Nouns",
+      "category_name_ar": "التشعب الدلالي والمشترك اللفظي والأعلام",
+      "linguistic_pattern": "فَعْل / فُعُول (عيون) / تَفْعِيل (تعيين) / مُفَاعَلَة (معاينة)",
+      "description": "Canonical Arabic homonym (المشترك اللفظي). Senses include anatomical eye, water spring, intelligence spy, and dignitary/noble.",
+      "expected_surface_forms": [
+        "عيون", "معاينة", "تعيين", "أعيان", "عيني", "العين", "بالعين"
+      ],
+      "relevance_criteria": {
+        "0": "Documents on government appointment ('تعيين') or inspection ('معاينة').",
+        "1": "Passing mention of eyes or vision.",
+        "2": "Substantial article on human ophthalmology or natural water springs.",
+        "3": "Encyclopedic treatise on the human eye anatomy ('عين الإنسان') and ophthalmology."
+      },
+      "expected_system_behavior": {
+        "s0": "Matches verbatim 'عين' only. High precision on isolated noun, misses plural 'عيون'.",
+        "s1": "Matches verbatim 'عين' only.",
+        "s2": "Strips clitics from 'بالعين' -> matches 'عين'. Leaves 'تعيين' and 'معاينة' distinct. Preserves reasonable precision.",
+        "s3": "ISRI collapses 'تعيين', 'معاينة', and 'أعيان' into root 'عين'. Precision collapses.",
+        "s4": "Khoja collapses all occurrences into root 'عين'. Catastrophic drop in P@10.",
+        "s5": "Trigram matches surface substrings with high ambiguity."
+      },
+      "over_stemming_risk": "Extreme. Definitive homonymy benchmark. In S3/S4, querying anatomical eye retrieves water springs ('عين ماء'), espionage ('عين على العدو'), and job appointments ('تعيين وزاري')."
+    },
+    {
+      "query_id": "Q19",
+      "query_term": "شعر",
+      "root": "ش-ع-ر",
+      "root_type": "سالم مع تشعب دلالي (Semantic Divergence)",
+      "category_id": 5,
+      "category_name_en": "Semantic Drift, Homonymy, & Proper Nouns",
+      "category_name_ar": "التشعب الدلالي والمشترك اللفظي والأعلام",
+      "linguistic_pattern": "فَعْر (شَعْر: Hair) / فِعْل (شِعْر: Poetry) / فُعُول (شُعُور: Emotion)",
+      "description": "Major semantic branching benchmark. Distinguishes biological hair ('شَعْر'), literary poetry ('شِعْر'), emotion ('شُعُور'), and notification ('إشعار').",
+      "expected_surface_forms": [
+        "شاعر", "شعراء", "شعور", "مشاعر", "إشعار", "شعرية", "أشعار", "شعر"
+      ],
+      "relevance_criteria": {
+        "0": "Documents discussing human hair/dermatology, emotional psychology, or bank notifications.",
+        "1": "Passing quotation of a poetic verse.",
+        "2": "Substantial critique of Arabic poetic forms, metrics, or famous poets.",
+        "3": "Comprehensive literary treatise on Arabic poetry ('الشعر العربي') and poetic meters."
+      },
+      "expected_system_behavior": {
+        "s0": "Matches unvocalized surface 'شعر'. Cannot distinguish hair from poetry.",
+        "s1": "Matches unvocalized surface 'شعر'.",
+        "s2": "Distinguishes 'شاعر' (poet) and 'أشعار' from 'مشاعر' (feelings). Maintains superior P@10.",
+        "s3": "ISRI maps 'شاعر', 'شعراء', 'شعور', 'مشاعر', and 'إشعار' to root 'شعر'. P@10 plunges.",
+        "s4": "Khoja merges all concepts under root 'شعر'. Massive semantic contamination.",
+        "s5": "Trigram matches substrings across all senses indiscriminately."
+      },
+      "over_stemming_risk": "Extreme. S3/S4 Precision degrades by >50% due to cross-contamination between literature (poetry), biology (hair), and psychology (emotions)."
+    },
+    {
+      "query_id": "Q20",
+      "query_term": "بحر",
+      "root": "ب-ح-ر",
+      "root_type": "سالم مع انزلاق أسماء الأعلام (Proper Noun Drift)",
+      "category_id": 5,
+      "category_name_en": "Semantic Drift, Homonymy, & Proper Nouns",
+      "category_name_ar": "التشعب الدلالي والمشترك اللفظي والأعلام",
+      "linguistic_pattern": "فَعْل (بحر) / فَعْلَيْن (البحرين: Proper noun / Dual)",
+      "description": "Probes root stemmer susceptibility to false morphological reduction of proper nouns and geopolitical entities (specifically the sovereign Kingdom of Bahrain 'البحرين').",
+      "expected_surface_forms": [
+        "بحار", "بحيرة", "بحري", "إبحار", "البحرين", "بحرية", "بحارة"
+      ],
+      "relevance_criteria": {
+        "0": "Articles on the Kingdom of Bahrain, domestic politics of Manama, or unrelated geographic topics.",
+        "1": "Passing mention of the sea in a travelogue.",
+        "2": "Substantial discussion of marine biology, oceanography, or maritime navigation.",
+        "3": "Authoritative encyclopedic article on oceanography, maritime ecology, or the Mediterranean/Red Sea."
+      },
+      "expected_system_behavior": {
+        "s0": "Matches verbatim 'بحر' only. Does not match 'البحرين'. High precision on marine topic.",
+        "s1": "Matches verbatim 'بحر' only.",
+        "s2": "Strips 'الـ' from 'البحرين' leaving 'بحرين'. Recognizes it as distinct from 'بحر'. Preserves precision.",
+        "s3": "ISRI strips suffix '-ين' (treating as dual/plural) and prefix 'الـ' -> forcibly stems country 'البحرين' to root 'بحر'!",
+        "s4": "Khoja validates candidate root 'بحر' against dictionary -> stems 'البحرين' to 'بحر'!",
+        "s5": "High trigram overlap between 'بحر' and 'البحرين'."
+      },
+      "over_stemming_risk": "Catastrophic. Root stemmers (S3/S4) stem the geopolitical nation-state 'البحرين' (Bahrain) to root 'بحر' (sea), causing total topical contamination between sovereign politics and marine biology."
+    }
+  ]
+}

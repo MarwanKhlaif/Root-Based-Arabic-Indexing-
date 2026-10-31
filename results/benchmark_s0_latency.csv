@@ -1,0 +1,21 @@
+query_id,query_term,category_id,category_name,root,cold_latency_ms,cold_read_blocks,warm_min_ms,warm_max_ms,warm_mean_ms,warm_median_p50_ms,warm_stddev_ms,warm_buffer_hit_pct
+Q01,كتب,1,Sound Triliteral Verbs & Regular Derivations,ك-ت-ب,2986.446,23408,226.895,578.658,314.641,258.504,115.357,53.39
+Q02,درس,1,Sound Triliteral Verbs & Regular Derivations,د-ر-س,615.315,6701,50.986,65.026,54.282,52.599,4.393,100.0
+Q03,حكم,1,Sound Triliteral Verbs & Regular Derivations,ح-ك-م,526.502,13570,121.691,184.014,130.068,123.768,19.115,95.3
+Q04,خرج,1,Sound Triliteral Verbs & Regular Derivations,خ-ر-ج,96.804,3373,28.758,34.613,30.712,30.061,1.783,99.64
+Q05,علم,1,Sound Triliteral Verbs & Regular Derivations,ع-ل-م,534.175,23187,244.794,300.764,264.368,252.904,21.416,54.12
+Q06,سفر,2,Complex Clitic Concatenation & Infixation,س-ف-ر,65.705,3167,30.348,43.919,33.552,31.775,4.565,100.0
+Q07,نصر,2,Complex Clitic Concatenation & Infixation,ن-ص-ر,50.472,2503,21.945,23.399,22.443,22.386,0.396,100.0
+Q08,عمل,2,Complex Clitic Concatenation & Infixation,ع-م-ل,481.512,28886,300.213,370.377,315.837,304.815,21.583,53.33
+Q09,سلم,2,Complex Clitic Concatenation & Infixation,س-ل-م,32.538,1985,15.484,16.458,16.143,16.225,0.326,100.0
+Q10,شجر,3,Broken Plurals & Templatic Nouns,ش-ج-ر,10.671,554,4.687,5.975,5.163,5.013,0.492,100.0
+Q11,قلب,3,Broken Plurals & Templatic Nouns,ق-ل-ب,114.919,5496,45.275,51.06,47.035,46.811,1.736,100.0
+Q12,طرق,3,Broken Plurals & Templatic Nouns,ط-ر-ق,148.799,8820,78.06,127.76,88.421,79.71,16.932,93.72
+Q13,صحب,3,Broken Plurals & Templatic Nouns,ص-ح-ب,3.381,98,1.103,2.729,1.771,1.573,0.572,100.0
+Q14,قال,4,"Weak, Assimilated, Hollow, & Defective Roots",ق-و-ل,239.689,16126,176.706,254.898,192.514,184.736,23.179,50.36
+Q15,وقف,4,"Weak, Assimilated, Hollow, & Defective Roots",و-ق-ف,68.631,3473,43.332,55.722,45.364,44.195,3.703,100.0
+Q16,رمى,4,"Weak, Assimilated, Hollow, & Defective Roots",ر-م-ي,0.592,2,0.01,0.02,0.013,0.011,0.003,100.0
+Q17,وفى,4,"Weak, Assimilated, Hollow, & Defective Roots",و-ف-ي,0.473,1,0.009,0.031,0.016,0.012,0.008,100.0
+Q18,عين,5,"Semantic Drift, Homonymy, & Proper Nouns",ع-ي-ن,157.959,10818,82.809,117.081,90.763,84.213,13.791,92.29
+Q19,شعر,5,"Semantic Drift, Homonymy, & Proper Nouns",ش-ع-ر,87.726,4926,49.338,66.107,51.911,50.014,5.11,95.4
+Q20,بحر,5,"Semantic Drift, Homonymy, & Proper Nouns",ب-ح-ر,75.631,3388,33.908,34.591,34.272,34.273,0.24,100.0
