@@ -1,7 +1,7 @@
 /**
- * Arabic IR Web Interface - Frontend Application Engine
- * Handles tabs, real-time search across S0-S5, instant morphological playground,
- * golden query selection, and interactive benchmark visualizations with Chart.js.
+ * Arabic IR Web Interface - Frontend Application Engine (Anti-Slop Modernized)
+ * Handles segmented tabs, parallel multi-system search, instant morphological playground,
+ * golden query execution, and Chart.js telemetry visualizations.
  */
 
 let currentViewMode = 'side'; // 'side' or 'tabs'
@@ -9,14 +9,14 @@ let lastSearchResults = null;
 let allGoldenQueries = [];
 let charts = {};
 
-// Color map for systems
+// Color map for systems matching CSS identity tokens
 const SYSTEM_COLORS = {
-  S0: { hex: '#64748b', bg: '#f1f5f9', badge: 'badge-gray' },
-  S1: { hex: '#0284c7', bg: '#e0f2fe', badge: 'badge-blue' },
-  S2: { hex: '#0d9488', bg: '#ccfbf1', badge: 'badge-emerald' },
-  S3: { hex: '#7c3aed', bg: '#f3e8ff', badge: 'badge-purple' },
-  S4: { hex: '#059669', bg: '#dcfce7', badge: 'badge-emerald' },
-  S5: { hex: '#d97706', bg: '#fef3c7', badge: 'badge-amber' },
+  S0: { hex: '#94a3b8', bg: 'rgba(148, 163, 184, 0.08)' },
+  S1: { hex: '#38bdf8', bg: 'rgba(56, 189, 248, 0.08)' },
+  S2: { hex: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.08)' },
+  S3: { hex: '#a855f7', bg: 'rgba(168, 85, 247, 0.08)' },
+  S4: { hex: '#34d399', bg: 'rgba(52, 211, 153, 0.08)' },
+  S5: { hex: '#fbbf24', bg: 'rgba(251, 191, 36, 0.08)' },
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -62,9 +62,11 @@ function initTabs() {
         pane.classList.add('active');
       }
 
-      // If switching to benchmarks, resize charts
+      // If switching to benchmarks, resize charts to fit container
       if (targetId === 'tab-benchmarks') {
-        Object.values(charts).forEach(c => c && c.resize && c.resize());
+        setTimeout(() => {
+          Object.values(charts).forEach(c => c && c.resize && c.resize());
+        }, 50);
       }
     });
   });
@@ -91,21 +93,21 @@ async function checkStatus() {
 
     if (data.connected && data.total_documents > 0) {
       dot.className = 'status-dot online';
-      text.textContent = `متصل بـ PostgreSQL (${data.total_documents.toLocaleString()} مقال)`;
+      text.textContent = `متصل بـ PostgreSQL (${Number(data.total_documents).toLocaleString()} مقال)`;
       if (demoBadge) demoBadge.style.display = 'none';
     } else if (data.connected) {
       dot.className = 'status-dot';
-      text.textContent = 'متصل بـ PostgreSQL (جدول docs فارغ - تفعيل وضع المعاينة)';
-      if (demoBadge) demoBadge.style.display = 'block';
+      text.textContent = 'متصل بـ PostgreSQL (جدول docs فارغ - وضع المعاينة)';
+      if (demoBadge) demoBadge.style.display = 'flex';
     } else {
       dot.className = 'status-dot offline';
       text.textContent = 'قاعدة البيانات غير متصلة (وضع المعاينة مفعّل)';
-      if (demoBadge) demoBadge.style.display = 'block';
+      if (demoBadge) demoBadge.style.display = 'flex';
     }
   } catch (err) {
     dot.className = 'status-dot offline';
     text.textContent = 'تعذر التحقق من الاتصال (وضع المعاينة)';
-    if (demoBadge) demoBadge.style.display = 'block';
+    if (demoBadge) demoBadge.style.display = 'flex';
   }
 }
 
@@ -123,7 +125,12 @@ async function triggerSearch() {
   }
 
   btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> <span>جاري البحث...</span>';
+  btn.innerHTML = `
+    <svg class="ui-icon" style="animation: spin 1s linear infinite;" viewBox="0 0 24 24">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+    </svg>
+    <span>جاري البحث...</span>
+  `;
 
   try {
     // 1. Fetch transformation
@@ -144,19 +151,23 @@ async function triggerSearch() {
     // Toggle demo badge
     const demoBadge = document.getElementById('demo-mode-badge');
     if (demoBadge) {
-      demoBadge.style.display = data.is_demo_mode ? 'block' : 'none';
+      demoBadge.style.display = data.is_demo_mode ? 'flex' : 'none';
     }
   } catch (err) {
     console.error('Search error:', err);
     alert('حدث خطأ أثناء تنفيذ البحث: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<span>🔍</span> <span>تنفيذ البحث</span>';
+    btn.innerHTML = `
+      <svg class="ui-icon" viewBox="0 0 24 24">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <span>تنفيذ البحث</span>
+    `;
   }
 }
 
 async function fetchTransformation(query) {
-  const container = document.getElementById('transform-badges-grid');
   try {
     const res = await fetch('/api/transform', {
       method: 'POST',
@@ -191,12 +202,12 @@ function renderTransformationStrip(data) {
     }
 
     html += `
-      <div class="transform-card ${sysId.toLowerCase()}">
-        <div class="card-head">
-          <span class="system-tag" style="color:var(--${sysId.toLowerCase()}-color);">${sys.id}: ${sys.name.split('(')[0]}</span>
-          <span class="desc">${sys.level.split('/')[0]}</span>
+      <div class="transform-card" data-sys="${sysId}">
+        <div class="transform-card-head">
+          <span class="sys-id-tag">${sys.id}: ${(sys.name || sysId).split('(')[0].trim()}</span>
+          <span class="sys-level-desc">${(sys.level || '').split('/')[0].trim()}</span>
         </div>
-        <div class="output-tokens" title="${tokenText}">
+        <div class="transform-tokens-output" title="${escapeHtml(tokenText)}">
           ${escapeHtml(tokenText)}
         </div>
       </div>
@@ -238,9 +249,9 @@ function renderSideBySideResults(data, container) {
   const systemsToRender = systems.length > 0 ? systems : Object.keys(data.systems || {});
 
   if (systemsToRender.length === 6) {
-    container.classList.add('six-columns');
+    container.classList.add('six-cols');
   } else {
-    container.classList.remove('six-columns');
+    container.classList.remove('six-cols');
   }
 
   systemsToRender.forEach(sysId => {
@@ -249,18 +260,23 @@ function renderSideBySideResults(data, container) {
     const results = sysData.results || [];
 
     html += `
-      <div class="system-column">
-        <div class="system-header ${sysId.toLowerCase()}">
-          <div class="sys-title-row">
-            <span class="sys-code">${sysId}: ${(meta.name || sysId).split('(')[0]}</span>
-            <span class="sys-level">${(meta.level || '').split('(')[0]}</span>
+      <div class="system-column-card">
+        <div class="column-header">
+          <div class="column-title-row">
+            <span class="column-sys-title">
+              <span class="sys-id-tag" style="background:var(--${sysId.toLowerCase()}-bg); color:var(--${sysId.toLowerCase()}-color);">${sysId}</span>
+              <span>${(meta.name || sysId).split('(')[0].trim()}</span>
+            </span>
           </div>
-          <div class="sys-metrics-badge">
-            <span>⚡ ${sysData.latency_ms || 0} ms</span>
-            <span>عدد النتائج: <strong>${sysData.total_found || 0}</strong></span>
+          <div class="column-metrics-row">
+            <span class="latency-metric">
+              <svg class="ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>${sysData.latency_ms || 0} ms</span>
+            </span>
+            <span>النتائج: <strong class="tabular">${sysData.total_found || 0}</strong></span>
           </div>
         </div>
-        <div class="system-body">
+        <div class="column-body">
           ${renderArticlesList(results, sysId, sysData.error)}
         </div>
       </div>
@@ -274,7 +290,7 @@ function renderTabbedResults(data, container) {
   const activeSystems = getSelectedSystems();
   const systems = activeSystems.filter(s => data.systems && data.systems[s]);
   const systemsToRender = systems.length > 0 ? systems : Object.keys(data.systems || {});
-  let navHtml = '<div class="result-tabs-nav">';
+  let navHtml = '<div class="filter-pills-row" style="margin-bottom:1rem;">';
   let contentHtml = '';
 
   systemsToRender.forEach((sysId, index) => {
@@ -283,18 +299,19 @@ function renderTabbedResults(data, container) {
     const meta = data.transformation?.systems?.[sysId] || {};
 
     navHtml += `
-      <button class="result-tab-btn ${isActive}" onclick="switchResultTab('${sysId}', this)">
-        ${sysId} (${sysData.total_found || 0}) - ${sysData.latency_ms} ms
+      <button class="filter-pill ${isActive}" onclick="switchResultTab('${sysId}', this)">
+        <span>${sysId} (${sysData.total_found || 0})</span>
+        <span class="tabular" style="font-size:0.75rem; opacity:0.8;">${sysData.latency_ms}ms</span>
       </button>
     `;
 
     contentHtml += `
       <div id="tab-res-${sysId}" class="result-tab-content" style="display: ${index === 0 ? 'block' : 'none'};">
-        <div style="margin-bottom:1rem; padding:0.75rem; background:#f8fafc; border-radius:var(--radius-sm); border:1px solid #e2e8f0;">
-          <h4 style="color:var(--${sysId.toLowerCase()}-color); font-weight:800;">${meta.name || sysId}</h4>
-          <p style="font-size:0.85rem; color:#64748b;">${meta.description || ''}</p>
+        <div style="margin-bottom:1rem; padding:0.85rem; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+          <div style="font-weight:700; color:var(--${sysId.toLowerCase()}-color); font-size:0.95rem;">${meta.name || sysId}</div>
+          <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.25rem;">${meta.description || ''}</div>
         </div>
-        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        <div style="display:flex; flex-direction:column; gap:0.65rem;">
           ${renderArticlesList(sysData.results || [], sysId, sysData.error)}
         </div>
       </div>
@@ -304,7 +321,7 @@ function renderTabbedResults(data, container) {
   navHtml += '</div>';
 
   container.innerHTML = `
-    <div class="tabs-result-view">
+    <div class="control-console" style="margin-bottom:0;">
       ${navHtml}
       ${contentHtml}
     </div>
@@ -312,7 +329,7 @@ function renderTabbedResults(data, container) {
 }
 
 function switchResultTab(sysId, btn) {
-  document.querySelectorAll('.result-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.result-tab-content').forEach(c => c.style.display = 'none');
 
   btn.classList.add('active');
@@ -326,39 +343,43 @@ function renderArticlesList(results, sysId, error) {
   if (error) {
     return `
       <div class="system-error-card">
-        <div style="font-weight:700; margin-bottom:0.25rem;">⚠️ ملاحظة في المعالجة:</div>
+        <div style="font-weight:700; margin-bottom:0.25rem;">إشعار معالجة الاستعلام:</div>
         <div>${escapeHtml(error)}</div>
       </div>
     `;
   }
 
   if (!results || results.length === 0) {
-    let emptyTip = 'لم يتم العثور على وثائق مطابقة';
+    let emptyTip = 'لم يتم العثور على وثائق مطابقة للاستعلام.';
     if (sysId === 'S0') {
-      emptyTip = 'إخفاق مطابقة السطح البسيط لعدم تطابق الحروف الصرفية مع الأصل.';
+      emptyTip = 'فشل مطابقة السطح البسيط لعدم تطابق الحروف الصرفية مع الأصل.';
     }
     return `
-      <div class="empty-results-box">
-        <div class="icon">🔍</div>
-        <div class="title">لا توجد نتائج</div>
-        <div class="desc">${emptyTip}</div>
+      <div class="empty-state-notice">
+        <svg class="ui-icon" style="margin:0 auto 0.5rem auto; display:block; color:var(--text-muted);" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <div>لا توجد نتائج مطابقة</div>
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">${emptyTip}</div>
       </div>
     `;
   }
 
   return results.map(r => `
-    <div class="article-card">
-      <div class="article-header">
-        <span class="article-rank">#${r.rank}</span>
-        <a href="${r.url || '#'}" target="_blank" rel="noopener noreferrer" class="article-title" title="${escapeHtml(r.title)}">
-          ${escapeHtml(r.title)}
-        </a>
-        <span class="article-score">Score: ${r.score}</span>
+    <div class="article-item">
+      <div class="article-top-row">
+        <span class="article-rank-badge tabular">#${r.rank}</span>
+        <span class="article-score-metric tabular">Score: ${r.score}</span>
       </div>
+      <a href="${r.url || '#'}" target="_blank" rel="noopener noreferrer" class="article-title-link" title="${escapeHtml(r.title)}">
+        <span>${escapeHtml(r.title)}</span>
+        <svg class="ui-icon-sm" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+      </a>
       <div class="article-snippet">
         ${r.snippet}
       </div>
-      ${r.rationale ? `<div style="font-size:0.75rem; color:#059669; margin-top:0.2rem;">💡 معيار الحكم: ${escapeHtml(r.rationale)}</div>` : ''}
+      ${r.rationale ? `<div style="font-size:0.72rem; color:var(--success); border-top:1px dashed var(--border-subtle); padding-top:0.35rem; margin-top:0.25rem;">معيار الصلة: ${escapeHtml(r.rationale)}</div>` : ''}
     </div>
   `).join('');
 }
@@ -374,7 +395,7 @@ function initPlayground() {
   const runUpdate = async () => {
     const text = textarea.value.trim();
     if (!text) {
-      document.getElementById('playground-cards-grid').innerHTML = '<div style="color:#64748b;">اكتب نصاً في المربع أعلاه لمشاهدة النتائج...</div>';
+      document.getElementById('playground-cards-grid').innerHTML = '<div class="empty-state-notice">اكتب نصاً في المربع أعلاه لمشاهدة التفكيك الصرفي...</div>';
       return;
     }
 
@@ -393,7 +414,7 @@ function initPlayground() {
 
   textarea.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runUpdate, 250);
+    debounceTimer = setTimeout(runUpdate, 200);
   });
 
   // Initial trigger
@@ -413,38 +434,38 @@ function renderPlaygroundCards(data) {
     if (sysId === 'S5') {
       const trigrams = sys.trigrams || [];
       content = `
-        <div style="font-size:0.85rem; color:#64748b; margin-bottom:0.4rem;">
-          عدد المقاطع الكلي: <strong>${trigrams.length}</strong>
+        <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.4rem;">
+          عدد المقاطع الكلي: <strong class="tabular">${trigrams.length}</strong>
         </div>
-        <div class="token-cloud">
-          ${trigrams.map(t => `<span class="token-pill" style="font-family:monospace;">${escapeHtml(t.replace(/ /g, '␣'))}</span>`).join('')}
+        <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">
+          ${trigrams.map(t => `<span class="tabular" style="font-size:0.78rem; padding:0.15rem 0.4rem; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:3px;">${escapeHtml(t.replace(/ /g, '␣'))}</span>`).join('')}
         </div>
       `;
     } else {
       const tokens = sys.display_tokens || [];
       content = `
-        <div class="token-cloud">
-          ${tokens.length > 0 ? tokens.map(t => `<span class="token-pill">${escapeHtml(t)}</span>`).join('') : '<span style="color:#94a3b8;">(لا توجد كلمات بعد المعالجة)</span>'}
+        <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+          ${tokens.length > 0 ? tokens.map(t => `<span style="font-size:0.85rem; font-weight:600; padding:0.2rem 0.5rem; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:4px;">${escapeHtml(t)}</span>`).join('') : '<span style="color:var(--text-muted); font-size:0.8rem;">(لا توجد كلمات بعد المعالجة)</span>'}
         </div>
       `;
       if (sysId === 'S1' && sys.removed_stopwords && sys.removed_stopwords.length > 0) {
         content += `
-          <div style="margin-top:0.6rem; font-size:0.8rem; color:#dc2626;">
-            🚫 كلمات التوقف المحذوفة: <strong>${sys.removed_stopwords.map(escapeHtml).join('، ')}</strong>
+          <div style="margin-top:0.6rem; font-size:0.75rem; color:var(--danger);">
+            كلمات التوقف المستبعدة: <strong class="tabular">${sys.removed_stopwords.map(escapeHtml).join('، ')}</strong>
           </div>
         `;
       }
     }
 
     html += `
-      <div class="playground-system-card" style="border-top: 4px solid var(--${sysId.toLowerCase()}-color);">
-        <h4>
-          <span style="color:var(--${sysId.toLowerCase()}-color); font-weight:800;">${sys.id}:</span>
-          <span>${sys.name}</span>
-        </h4>
-        <div style="font-size:0.82rem; color:#64748b;">${sys.description}</div>
-        <div style="margin-top:0.5rem;">
-          <div style="font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:0.3rem;">المخرجات الصرفية:</div>
+      <div class="transform-card" style="border-top: 3px solid var(--${sysId.toLowerCase()}-color);">
+        <div class="transform-card-head">
+          <span class="sys-id-tag" style="background:var(--${sysId.toLowerCase()}-bg); color:var(--${sysId.toLowerCase()}-color);">${sys.id}: ${sys.name.split('(')[0].trim()}</span>
+          <span class="sys-level-desc">${sys.level.split('/')[0].trim()}</span>
+        </div>
+        <div style="font-size:0.8rem; color:var(--text-secondary); margin:0.35rem 0 0.65rem 0;">${sys.description}</div>
+        <div style="border-top:1px solid var(--border-subtle); padding-top:0.5rem;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:0.35rem;">المخرجات الصرفية:</div>
           ${content}
         </div>
       </div>
@@ -455,53 +476,63 @@ function renderPlaygroundCards(data) {
 }
 
 // =============================================================================
-// 5. 20 GOLDEN QUERIES TAB
+// 5. 20 GOLDEN QUERIES CATALOG
 // =============================================================================
 async function loadGoldenQueries() {
   try {
     const res = await fetch('/api/golden-queries');
-    const data = await res.json();
-    allGoldenQueries = data.queries || [];
+    const queries = await res.json();
+    allGoldenQueries = queries;
 
-    // Populate Dropdown
-    const select = document.getElementById('golden-select');
-    if (select) {
-      select.innerHTML = '<option value="">-- اختر استعلاماً من الـ 20 الذهبية --</option>';
-      allGoldenQueries.forEach(q => {
-        select.innerHTML += `<option value="${escapeHtml(q.query_term)}">${q.query_id}: ${escapeHtml(q.query_term)} (${q.category_name_ar})</option>`;
-      });
-
-      select.addEventListener('change', (e) => {
-        const val = e.target.value;
-        if (val) {
-          const input = document.getElementById('search-input');
-          input.value = val;
-          triggerSearch();
-        }
-      });
-    }
-
-    // Populate Category filter buttons
-    const catContainer = document.getElementById('category-filter-buttons');
-    if (catContainer && data.categories) {
-      data.categories.forEach(cat => {
-        catContainer.innerHTML += `
-          <button class="view-btn" onclick="filterGoldenTable(${cat.category_id}, this)">
-            ${cat.category_name_ar} (${cat.queries.length})
-          </button>
-        `;
-      });
-    }
-
-    // Populate Table
-    renderGoldenTable(allGoldenQueries);
+    populateGoldenSelect(queries);
+    populateCategoryFilters(queries);
+    renderGoldenTable(queries);
   } catch (err) {
     console.error('Failed to load golden queries:', err);
   }
 }
 
+function populateGoldenSelect(queries) {
+  const select = document.getElementById('golden-select');
+  if (!select) return;
+
+  queries.forEach(q => {
+    const opt = document.createElement('option');
+    opt.value = q.query_term;
+    opt.textContent = `${q.query_id}: ${q.query_term} (${q.category_name_ar})`;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener('change', (e) => {
+    if (e.target.value) {
+      document.getElementById('search-input').value = e.target.value;
+      triggerSearch();
+    }
+  });
+}
+
+function populateCategoryFilters(queries) {
+  const container = document.getElementById('category-filter-buttons');
+  if (!container) return;
+
+  const categories = {};
+  queries.forEach(q => {
+    if (!categories[q.category_id]) {
+      categories[q.category_id] = q.category_name_ar;
+    }
+  });
+
+  Object.entries(categories).forEach(([id, name]) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-pill';
+    btn.textContent = name;
+    btn.onclick = () => filterGoldenTable(id, btn);
+    container.appendChild(btn);
+  });
+}
+
 function filterGoldenTable(catId, btn) {
-  document.querySelectorAll('#category-filter-buttons .view-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#category-filter-buttons .filter-pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
   if (catId === 'all') {
@@ -518,15 +549,15 @@ function renderGoldenTable(queries) {
 
   tbody.innerHTML = queries.map(q => `
     <tr>
-      <td><strong>${q.query_id}</strong></td>
-      <td><span style="font-size:1.05rem; font-weight:800; color:var(--primary);">${escapeHtml(q.query_term)}</span></td>
-      <td><code>${escapeHtml(q.root || '-')}</code></td>
-      <td><span class="badge badge-gray">${escapeHtml(q.root_type || '-')}</span></td>
-      <td>${escapeHtml(q.category_name_ar)}</td>
-      <td style="font-size:0.82rem; color:#475569;">${(q.expected_surface_forms || []).slice(0, 5).map(escapeHtml).join('، ')}</td>
+      <td><span class="tabular font-mono" style="font-weight:700;">${q.query_id}</span></td>
+      <td><strong style="color:var(--accent-primary-hover); font-size:1rem;">${escapeHtml(q.query_term)}</strong></td>
+      <td><code class="tabular">${escapeHtml(q.root || '-')}</code></td>
+      <td><span class="tabular" style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(q.root_type || '-')}</span></td>
+      <td><span style="font-size:0.8rem;">${escapeHtml(q.category_name_ar)}</span></td>
+      <td style="font-size:0.78rem; color:var(--text-secondary);">${(q.expected_surface_forms || []).slice(0, 5).map(escapeHtml).join('، ')}</td>
       <td>
-        <button class="btn-sm-action" onclick="applyQueryToSearch('${escapeHtml(q.query_term)}')">
-          <span>🔍</span>
+        <button class="btn-table-action" onclick="applyQueryToSearch('${escapeHtml(q.query_term)}')">
+          <svg class="ui-icon-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           <span>تشغيل</span>
         </button>
       </td>
@@ -542,7 +573,7 @@ function applyQueryToSearch(term) {
 }
 
 // =============================================================================
-// 6. BENCHMARK METRICS & CHARTS
+// 6. BENCHMARK METRICS & CHARTS (DARK/OBSIDIAN THEME)
 // =============================================================================
 async function loadBenchmarkData() {
   try {
@@ -563,16 +594,16 @@ function renderMacroMetricsTable(systems) {
 
   tbody.innerHTML = systems.map(s => `
     <tr>
-      <td><strong style="color:var(--${s.system_id.toLowerCase()}-color);">${s.system_id}: ${s.system_name.split('(')[0]}</strong></td>
-      <td style="font-size:0.82rem;">${s.morphological_level.split('/')[0]}</td>
-      <td><strong style="color:#1e40af;">${Number(s.p_at_10).toFixed(4)}</strong></td>
-      <td>${Number(s.map).toFixed(4)}</td>
-      <td>${Number(s.ndcg_at_10).toFixed(4)}</td>
-      <td><strong style="color:#059669;">${Number(s.recall_at_100).toFixed(4)}</strong></td>
-      <td>${s.index_size_mb} MB</td>
-      <td>${s.relative_size_pct}%</td>
-      <td>${s.cold_latency_ms} ms</td>
-      <td><strong>${s.warm_latency_ms} ms</strong></td>
+      <td><strong style="color:var(--${s.system_id.toLowerCase()}-color);">${s.system_id}: ${s.system_name.split('(')[0].trim()}</strong></td>
+      <td style="font-size:0.8rem; color:var(--text-secondary);">${s.morphological_level.split('/')[0].trim()}</td>
+      <td><strong class="tabular" style="color:var(--accent-primary-hover);">${Number(s.p_at_10).toFixed(4)}</strong></td>
+      <td class="tabular">${Number(s.map).toFixed(4)}</td>
+      <td class="tabular">${Number(s.ndcg_at_10).toFixed(4)}</td>
+      <td><strong class="tabular" style="color:var(--success);">${Number(s.recall_at_100).toFixed(4)}</strong></td>
+      <td class="tabular">${s.index_size_mb} MB</td>
+      <td class="tabular">${s.relative_size_pct}%</td>
+      <td class="tabular">${s.cold_latency_ms} ms</td>
+      <td><strong class="tabular">${s.warm_latency_ms} ms</strong></td>
     </tr>
   `).join('');
 }
@@ -582,6 +613,39 @@ function renderCharts(systems) {
 
   const labels = systems.map(s => s.system_id);
   const colors = systems.map(s => SYSTEM_COLORS[s.system_id]?.hex || '#3b82f6');
+
+  // Chart Global Dark Theme Options
+  const darkChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#94a3b8',
+          font: { family: "'Cairo', sans-serif", size: 12 }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#161c28',
+        titleColor: '#f8fafc',
+        bodyColor: '#94a3b8',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 6,
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+        ticks: { color: '#94a3b8', font: { family: "'JetBrains Mono', monospace", size: 11 } }
+      },
+      y: {
+        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+        ticks: { color: '#94a3b8', font: { family: "'JetBrains Mono', monospace", size: 11 } }
+      }
+    }
+  };
 
   // 1. Chart: Precision & Recall
   const ctxPR = document.getElementById('chart-precision-recall');
@@ -595,24 +659,26 @@ function renderCharts(systems) {
           {
             label: 'الدقة P@10',
             data: systems.map(s => s.p_at_10),
-            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-            borderColor: '#2563eb',
+            backgroundColor: 'rgba(59, 130, 246, 0.85)',
+            borderColor: '#3b82f6',
             borderWidth: 1,
+            borderRadius: 4,
           },
           {
-            label: 'نسبة الاسترجاع Recall@100',
+            label: 'الاسترجاع Recall@100',
             data: systems.map(s => s.recall_at_100),
-            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-            borderColor: '#059669',
+            backgroundColor: 'rgba(16, 185, 129, 0.85)',
+            borderColor: '#10b981',
             borderWidth: 1,
+            borderRadius: 4,
           }
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        ...darkChartOptions,
         scales: {
-          y: { beginAtZero: true, max: 1.0 }
+          ...darkChartOptions.scales,
+          y: { ...darkChartOptions.scales.y, beginAtZero: true, max: 1.0 }
         }
       }
     });
@@ -629,15 +695,17 @@ function renderCharts(systems) {
         datasets: [{
           label: 'حجم الفهرس (MB)',
           data: systems.map(s => s.index_size_mb),
-          backgroundColor: colors,
+          backgroundColor: colors.map(c => c + 'd0'),
+          borderColor: colors,
           borderWidth: 1,
+          borderRadius: 4,
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        ...darkChartOptions,
         scales: {
-          y: { beginAtZero: true, title: { display: true, text: 'ميغابايت' } }
+          ...darkChartOptions.scales,
+          y: { ...darkChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميغابايت', color: '#64748b' } }
         }
       }
     });
@@ -655,22 +723,26 @@ function renderCharts(systems) {
           {
             label: 'الزمن الدافئ Warm (ms)',
             data: systems.map(s => s.warm_latency_ms),
-            backgroundColor: 'rgba(13, 148, 136, 0.8)',
+            backgroundColor: 'rgba(45, 212, 191, 0.85)',
+            borderColor: '#2dd4bf',
             borderWidth: 1,
+            borderRadius: 4,
           },
           {
             label: 'الزمن البارد Cold (ms)',
             data: systems.map(s => s.cold_latency_ms),
-            backgroundColor: 'rgba(239, 68, 68, 0.7)',
+            backgroundColor: 'rgba(244, 63, 94, 0.75)',
+            borderColor: '#f43f5e',
             borderWidth: 1,
+            borderRadius: 4,
           }
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        ...darkChartOptions,
         scales: {
-          y: { beginAtZero: true, title: { display: true, text: 'ميلي ثانية (ms)' } }
+          ...darkChartOptions.scales,
+          y: { ...darkChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميلي ثانية', color: '#64748b' } }
         }
       }
     });
@@ -688,26 +760,30 @@ function renderCharts(systems) {
           {
             label: 'nDCG@10',
             data: systems.map(s => s.ndcg_at_10),
-            borderColor: '#7c3aed',
-            backgroundColor: 'rgba(124, 58, 237, 0.1)',
+            borderColor: '#a855f7',
+            backgroundColor: 'rgba(168, 85, 247, 0.12)',
             fill: true,
-            tension: 0.3,
+            tension: 0.35,
+            pointBackgroundColor: '#a855f7',
+            pointRadius: 4,
           },
           {
             label: 'MAP',
             data: systems.map(s => s.map),
-            borderColor: '#d97706',
-            backgroundColor: 'rgba(217, 119, 6, 0.1)',
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251, 191, 36, 0.1)',
             fill: true,
-            tension: 0.3,
+            tension: 0.35,
+            pointBackgroundColor: '#fbbf24',
+            pointRadius: 4,
           }
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        ...darkChartOptions,
         scales: {
-          y: { beginAtZero: true, max: 1.0 }
+          ...darkChartOptions.scales,
+          y: { ...darkChartOptions.scales.y, beginAtZero: true, max: 1.0 }
         }
       }
     });

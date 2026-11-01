@@ -5,191 +5,280 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>منظومة الفهرسة النصية والبحث الدلالي للغة العربية | PostgreSQL 16</title>
   
-  <!-- Modern Fonts & Styles -->
+  <!-- Modern RTL Stylesheet (Anti-Slop Design System) -->
   <link rel="stylesheet" href="/static/css/style.css">
   
-  <!-- Chart.js for interactive visualizations -->
+  <!-- Chart.js for Scientific Telemetry -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
   <!-- Top Navigation & Header -->
-  <header>
-    <div class="container header-content">
-      <div class="brand-section">
-        <h1>
-          <span>📚</span>
-          <span>منظومة الفهرسة النصية للغة العربية في PostgreSQL 16</span>
-        </h1>
-        <div class="subtitle">
-          مقارنة تجريبية شاملة بين 6 استراتيجيات للفهرسة النصية والاشتقاق الصرفي (S0 – S5)
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand-wrapper">
+        <div class="brand-mark" aria-hidden="true">
+          <!-- Database / Terminal Vector SVG -->
+          <svg class="ui-icon-lg" viewBox="0 0 24 24">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
         </div>
-        <div class="meta-authors">
-          <span>إعداد الطالب: <strong>مروان محمد خليف</strong></span>
-          <span style="margin: 0 0.5rem;">|</span>
-          <span>إشراف: <strong>د. ريا محمد محمود</strong></span>
+        <div class="brand-titles">
+          <h1>
+            <span>منظومة الفهرسة النصية للغة العربية</span>
+            <span class="tech-badge">PostgreSQL 16 · GIN</span>
+          </h1>
+          <div class="brand-meta">
+            <span>مقارنة استراتيجيات الفهرسة والاشتقاق الصرفي (S0 – S5)</span>
+            <span class="meta-divider">|</span>
+            <span>الباحث: مروان محمد خليف</span>
+            <span class="meta-divider">|</span>
+            <span>إشراف: د. ريا محمد محمود</span>
+          </div>
         </div>
       </div>
       
-      <!-- Live DB Status -->
-      <div class="status-indicator" id="db-status-pill" title="حالة الاتصال بقاعدة البيانات">
+      <!-- Live DB Status Pill -->
+      <div class="status-pill" id="db-status-pill" title="حالة الاتصال بمحرك PostgreSQL">
         <span class="status-dot" id="status-dot"></span>
-        <span id="status-text">جاري فحص الاتصال...</span>
+        <span id="status-text" class="tabular">جاري فحص الاتصال...</span>
       </div>
     </div>
   </header>
 
-  <!-- Sticky Sub-Navigation Tabs -->
-  <nav class="nav-tabs">
-    <div class="container tabs-wrapper">
+  <!-- Segmented Navigation Bar -->
+  <nav class="app-nav">
+    <div class="container nav-track">
       <button class="tab-btn active" data-tab="tab-search">
-        <span>🔍</span>
+        <svg class="ui-icon" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <span>البحث والمقارنة الحية</span>
       </button>
+
       <button class="tab-btn" data-tab="tab-playground">
-        <span>🔬</span>
+        <svg class="ui-icon" viewBox="0 0 24 24">
+          <path d="M10 2v7.31"></path>
+          <path d="M14 9.3V1.99"></path>
+          <path d="M8.5 2h7"></path>
+          <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+          <path d="M5.52 16h12.96"></path>
+        </svg>
         <span>محاكي التحويل الصرفي</span>
       </button>
+
       <button class="tab-btn" data-tab="tab-golden">
-        <span>📋</span>
+        <svg class="ui-icon" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
         <span>الاستعلامات الذهبية (20)</span>
       </button>
+
       <button class="tab-btn" data-tab="tab-benchmarks">
-        <span>📊</span>
+        <svg class="ui-icon" viewBox="0 0 24 24">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
         <span>لوحة مؤشرات التقييم والأداء</span>
       </button>
+
       <button class="tab-btn" data-tab="tab-overstemming">
-        <span>⚠️</span>
-        <span>تحليل الإفراط في الاشتقاق</span>
+        <svg class="ui-icon" viewBox="0 0 24 24">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>تحليل الإفراط والتشعب</span>
       </button>
     </div>
   </nav>
 
   <!-- Main Workspace -->
-  <main class="container">
+  <main class="container app-main">
 
     <!-- ================================================================= -->
     <!-- TAB 1: LIVE SEARCH & COMPARISON                                   -->
     <!-- ================================================================= -->
     <section id="tab-search" class="tab-pane active">
-      <div class="search-box-card">
-        <div class="search-header">
-          <h2>محرك مقارنة أنظمة البحث الستة (S0 – S5)</h2>
-          <p>اكتب أي كلمة أو عبارة باللغة العربية، أو اختر من الاستعلامات الذهبية المعتمدة لرؤية كيفية استرجاع النتائج لكل نظام جنباً إلى جنب.</p>
-        </div>
-
-        <div class="search-inputs-group">
-          <!-- Quick Selector for Golden Queries -->
-          <div class="search-presets">
-            <label for="golden-select">⚡ استعلامات ذهبية جاهزة:</label>
-            <select id="golden-select">
-              <option value="">-- اختر استعلاماً من الـ 20 الذهبية --</option>
-            </select>
+      <div class="control-console">
+        <div class="console-header">
+          <div class="console-title">
+            <h2>محرك مقارنة أنظمة البحث الستة (S0 – S5)</h2>
+            <p class="console-desc">تنفيذ متزامن للاستعلامات ومقارنة النتائج المسترجعة مباشرة من فهارس GIN في PostgreSQL 16.</p>
           </div>
 
-          <!-- Main Search Input -->
-          <form id="search-form" class="input-with-button" onsubmit="event.preventDefault(); triggerSearch();">
+          <!-- Quick Selector for Golden Queries -->
+          <div class="golden-preset-wrapper">
+            <select id="golden-select" class="golden-preset-select" aria-label="اختيار استعلام ذهبي">
+              <option value="">استعلامات ذهبية جاهزة (20)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Primary Search Form Row -->
+        <form id="search-form" class="search-form-row" onsubmit="event.preventDefault(); triggerSearch();">
+          <div class="input-affix-wrapper">
+            <svg class="ui-icon input-affix-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input 
               type="text" 
               id="search-input" 
-              class="main-input" 
-              placeholder="مثال: يكتبون في المكتبة، استخراج المعادن، أطباء العيون..." 
+              class="main-search-input" 
+              placeholder="اكتب كلمة أو عبارة للبحث (مثال: يكتبون في المكتبة، استخراج المعادن، أطباء العيون)..." 
               value="كتب" 
               autocomplete="off"
             >
-            <button type="submit" class="btn-primary" id="search-btn">
-              <span>🔍</span>
-              <span>تنفيذ البحث</span>
+          </div>
+          <button type="submit" class="btn-primary" id="search-btn">
+            <svg class="ui-icon" viewBox="0 0 24 24">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>تنفيذ البحث</span>
+          </button>
+        </form>
+
+        <!-- Secondary Controls: Systems Selector & View Mode Switcher -->
+        <div class="controls-subgrid">
+          <div class="system-selector-group">
+            <span class="group-label">الأنظمة النشطة:</span>
+            <label class="sys-toggle-pill" data-sys="S0" title="سطحي بسيط">
+              <input type="checkbox" name="sys-toggle" value="S0" checked onchange="handleSystemToggle()">
+              <span class="sys-indicator-dot"></span>
+              <span>S0 بسيط</span>
+            </label>
+            <label class="sys-toggle-pill" data-sys="S1" title="سطحي مع حذف كلمات التوقف">
+              <input type="checkbox" name="sys-toggle" value="S1" checked onchange="handleSystemToggle()">
+              <span class="sys-indicator-dot"></span>
+              <span>S1 توقف</span>
+            </label>
+            <label class="sys-toggle-pill" data-sys="S2" title="قص الزوائد الخفيف - لاركي">
+              <input type="checkbox" name="sys-toggle" value="S2" checked onchange="handleSystemToggle()">
+              <span class="sys-indicator-dot"></span>
+              <span>S2 لاركي</span>
+            </label>
+            <label class="sys-toggle-pill" data-sys="S3" title="استخراج الجذور بالقوالب - ISRI">
+              <input type="checkbox" name="sys-toggle" value="S3" checked onchange="handleSystemToggle()">
+              <span class="sys-indicator-dot"></span>
+              <span>S3 ISRI</span>
+            </label>
+            <label class="sys-toggle-pill" data-sys="S4" title="استخراج الجذور بالمعجم - خوجة">
+              <input type="checkbox" name="sys-toggle" value="S4" checked onchange="handleSystemToggle()">
+              <span class="sys-indicator-dot"></span>
+              <span>S4 خوجة</span>
+            </label>
+            <label class="sys-toggle-pill" data-sys="S5" title="المقاطع الثلاثية الحرفية - pg_trgm">
+              <input type="checkbox" name="sys-toggle" value="S5" checked onchange="handleSystemToggle()">
+              <span class="sys-indicator-dot"></span>
+              <span>S5 trgm</span>
+            </label>
+          </div>
+
+          <div class="view-mode-switch">
+            <button type="button" class="view-mode-btn active" id="view-mode-side" onclick="setViewMode('side')">
+              <svg class="ui-icon-sm" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="18" rx="1"></rect>
+                <rect x="14" y="3" width="7" height="18" rx="1"></rect>
+              </svg>
+              <span>متجاور</span>
             </button>
-          </form>
-        </div>
-
-        <!-- Controls: View Mode & Filters -->
-        <div class="search-controls-bar">
-          <div class="view-mode-buttons">
-            <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); align-self:center; margin-left:0.5rem;">طريقة العرض:</span>
-            <button type="button" class="view-btn active" id="view-mode-side" onclick="setViewMode('side')">📑 عرض متجاور</button>
-            <button type="button" class="view-btn" id="view-mode-tabs" onclick="setViewMode('tabs')">🗂️ عرض التبويبات</button>
-          </div>
-
-          <div class="system-filter-group">
-            <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); align-self:center;">الأنظمة المقارنة:</span>
-            <label class="sys-checkbox-label" title="سطحي بسيط"><input type="checkbox" name="sys-toggle" value="S0" checked onchange="handleSystemToggle()"> S0 (بسيط)</label>
-            <label class="sys-checkbox-label" title="سطحي مع كلمات توقف"><input type="checkbox" name="sys-toggle" value="S1" checked onchange="handleSystemToggle()"> S1 (توقف)</label>
-            <label class="sys-checkbox-label" title="لاركي لقص الزوائد"><input type="checkbox" name="sys-toggle" value="S2" checked onchange="handleSystemToggle()"> S2 (لاركي)</label>
-            <label class="sys-checkbox-label" title="ISRI لجذور الأوزان"><input type="checkbox" name="sys-toggle" value="S3" checked onchange="handleSystemToggle()"> S3 (ISRI)</label>
-            <label class="sys-checkbox-label" title="خوجة للجذور المعجمية"><input type="checkbox" name="sys-toggle" value="S4" checked onchange="handleSystemToggle()"> S4 (خوجة)</label>
-            <label class="sys-checkbox-label" title="مقاطع ثلاثية حرفية"><input type="checkbox" name="sys-toggle" value="S5" checked onchange="handleSystemToggle()"> S5 (trgm)</label>
-          </div>
-
-          <div id="demo-mode-badge" style="display:none; font-size:0.82rem; background:#fef3c7; color:#b45309; padding:0.3rem 0.75rem; border-radius:var(--radius-sm); border:1px solid #fde68a;">
-            ℹ️ وضع المعاينة التوضيحية (البيانات مسترجعة من عينة ويكيبيديا المقيمة)
+            <button type="button" class="view-mode-btn" id="view-mode-tabs" onclick="setViewMode('tabs')">
+              <svg class="ui-icon-sm" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+              </svg>
+              <span>تبويبات</span>
+            </button>
           </div>
         </div>
 
-        <!-- Query Transformation Strip -->
-        <div class="transformation-strip" id="search-transform-strip">
-          <h3>
-            <span>🔄</span>
-            <span>التمثيل الصرفي للاستعلام الحالي عبر الأنظمة الستة:</span>
-          </h3>
-          <div class="transformation-grid" id="transform-badges-grid">
-            <!-- Populated dynamically -->
-          </div>
+        <div id="demo-mode-badge" class="demo-badge-banner" style="display:none;">
+          <svg class="ui-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>وضع المعاينة التوضيحية (البيانات مسترجعة من العينة المعيارية المقيمة)</span>
+        </div>
+      </div>
+
+      <!-- Query Transformation Strip -->
+      <div class="transformation-console" id="search-transform-strip">
+        <div class="console-subhead">
+          <svg class="ui-icon" viewBox="0 0 24 24">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span>التمثيل الصرفي للاستعلام الحالي عبر الأنظمة الستة:</span>
+        </div>
+        <div class="transform-cards-grid" id="transform-badges-grid">
+          <!-- Populated dynamically by app.js -->
         </div>
       </div>
 
       <!-- Live Search Results Container -->
       <div id="results-wrapper">
-        <!-- Rendered by app.js -->
-        <div id="results-side-by-side" class="results-grid"></div>
+        <div id="results-side-by-side" class="results-grid-container"></div>
         <div id="results-tabbed-container" style="display:none;"></div>
       </div>
     </section>
-
 
     <!-- ================================================================= -->
     <!-- TAB 2: MORPHOLOGICAL PLAYGROUND                                   -->
     <!-- ================================================================= -->
     <section id="tab-playground" class="tab-pane">
-      <div class="playground-input-card">
-        <h2>🔬 مختبر ومحاكي التحويل الصرفي الفوري</h2>
-        <p style="color:var(--text-muted); margin-bottom:1.25rem;">
-          شاهد بالزمن الفعلي كيف يتم تنظيف النص وتفكيكه واستخراج أصوله ومقاطعه عبر كل خوارزمية بمجرد كتابة أي نص عربي.
-        </p>
+      <div class="control-console">
+        <div class="console-title">
+          <h2>مختبر التحويل الصرفي الفوري</h2>
+          <p class="console-desc">
+            تفكيك النص واستخراج أصوله ومقاطعه عبر الخوارزميات الصرفية المختلفة لحظياً.
+          </p>
+        </div>
 
-        <textarea 
-          id="playground-input" 
-          class="main-input" 
-          rows="2" 
-          style="width:100%; resize:vertical;" 
-          placeholder="اكتب هنا أي نص عربي مشكول أو غير مشكول، مثلاً: «الْمُعَلِّمُونَ يَشْرَحُونَ الدُّرُوسَ فِي الْمَدَارِسِ الْحَدِيثَةِ»"
-        >الْمُعَلِّمُونَ يَشْرَحُونَ الدُّرُوسَ فِي الْمَدَارِسِ الْحَدِيثَةِ</textarea>
+        <div style="margin-top: 1rem;">
+          <textarea 
+            id="playground-input" 
+            class="main-search-input" 
+            rows="2" 
+            style="width:100%; height:auto; padding:0.75rem 1rem; resize:vertical;" 
+            placeholder="اكتب هنا أي نص عربي مشكول أو غير مشكول..."
+          >الْمُعَلِّمُونَ يَشْرَحُونَ الدُّرُوسَ فِي الْمَدَارِسِ الْحَدِيثَةِ</textarea>
+        </div>
       </div>
 
-      <div class="playground-grid" id="playground-cards-grid">
+      <div class="transform-cards-grid" id="playground-cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
         <!-- Populated via JavaScript -->
       </div>
     </section>
-
 
     <!-- ================================================================= -->
     <!-- TAB 3: 20 GOLDEN QUERIES                                          -->
     <!-- ================================================================= -->
     <section id="tab-golden" class="tab-pane">
-      <div class="search-box-card">
-        <h2>📋 الاستعلامات الذهبية الـ 20 المعتمدة في التقييم</h2>
-        <p style="color:var(--text-muted); margin-bottom:1rem;">
-          مجموعة استعلامات اختبارية صُممت بعناية لتغطي خمس فئات لغوية وصرفية رئيسية، مع معايير حكم الدقة وتحديد أشكال المطابقة المتوقعة.
-        </p>
-
-        <!-- Category Filters -->
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;" id="category-filter-buttons">
-          <button class="view-btn active" onclick="filterGoldenTable('all', this)">جميع الفئات (20)</button>
+      <div class="control-console">
+        <div class="console-title">
+          <h2>الاستعلامات الذهبية الـ 20 المعتمدة في التقييم</h2>
+          <p class="console-desc">
+            مجموعة الاستعلامات المعيارية الموزعة عبر 5 فئات لغوية رئيسية لقياس الدقة والاسترجاع.
+          </p>
         </div>
 
-        <div class="golden-table-container">
-          <table class="golden-table" id="golden-queries-table">
+        <div class="filter-pills-row" id="category-filter-buttons" style="margin-top: 1rem;">
+          <button class="filter-pill active" onclick="filterGoldenTable('all', this)">جميع الفئات (20)</button>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table" id="golden-queries-table">
             <thead>
               <tr>
                 <th>المعرف</th>
@@ -209,86 +298,87 @@
       </div>
     </section>
 
-
     <!-- ================================================================= -->
     <!-- TAB 4: BENCHMARK DASHBOARD & METRICS                             -->
     <!-- ================================================================= -->
     <section id="tab-benchmarks" class="tab-pane">
-      <!-- KPI Cards -->
-      <div class="kpi-grid">
+      <!-- KPI Cards Row -->
+      <div class="kpi-row">
         <div class="kpi-card">
           <div class="kpi-title">أعلى دقة استرجاع عند 10 (P@10)</div>
-          <div class="kpi-value" style="color:var(--s2-color);">0.3900</div>
-          <div class="kpi-subtitle">النظام: <strong>S2 (Larkey Light10)</strong></div>
+          <div class="kpi-val tabular" style="color:var(--s2-color);">0.4600</div>
+          <div class="kpi-sub">النظام S2 (Larkey Light10)</div>
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-title">أعلى نسبة استرجاع عند 100 (Recall)</div>
-          <div class="kpi-value" style="color:var(--s4-color);">0.8878</div>
-          <div class="kpi-subtitle">النظام: <strong>S4 (Khoja Root)</strong></div>
+          <div class="kpi-title">أعلى تغطية واسترجاع (Recall@100)</div>
+          <div class="kpi-val tabular" style="color:var(--s4-color);">0.7042</div>
+          <div class="kpi-sub">النظامان S3 و S4 (ISRI & Khoja)</div>
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-title">أصغر حجم فهرس وتوفير التخزين</div>
-          <div class="kpi-value" style="color:var(--s4-color);">96 MB</div>
-          <div class="kpi-subtitle">النظام S4 يوفر <strong>62.4%</strong> مقارنة بالنظام S0</div>
+          <div class="kpi-title">أصغر حجم فهرس GIN (توفير التخزين)</div>
+          <div class="kpi-val tabular" style="color:var(--s4-color);">96 MB</div>
+          <div class="kpi-sub">النظام S4 يوفر <strong>62.4%</strong> مقارنة بالنظام S0</div>
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-title">أسرع استجابة دافئة (Warm Latency)</div>
-          <div class="kpi-value" style="color:var(--s4-color);">12.8 ms</div>
-          <div class="kpi-subtitle">أسرع بـ 10 أضعاف مقارنة بـ S0 (127.1 ms)</div>
+          <div class="kpi-title">أسرع استجابة استعلام دافئة (Warm Cache)</div>
+          <div class="kpi-val tabular" style="color:var(--s1-color);">120 ms</div>
+          <div class="kpi-sub">النظام S1 (المطابقة السطحية المنقاة)</div>
         </div>
       </div>
 
-      <!-- Charts Section -->
-      <div class="charts-grid">
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>مقارنة الدقة (P@10) ونسبة الاسترجاع (Recall@100)</h3>
-            <p>يوضح التفوق الصرفي لـ S2 في الدقة بينما تتفوق الجذور S4 في الشمولية</p>
+      <!-- Charts Matrix -->
+      <div class="charts-matrix">
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <h3 class="chart-panel-title">مقارنة الدقة (P@10) والاسترجاع (Recall@100)</h3>
+            <p class="chart-panel-desc">تفوق S2 في الدقة المبكرة مقابل تفوق S4 في الشمولية العامة</p>
           </div>
-          <div style="height: 280px;">
+          <div class="chart-canvas-box">
             <canvas id="chart-precision-recall"></canvas>
           </div>
         </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>حجم فهارس GIN في PostgreSQL (بالميجابايت)</h3>
-            <p>تقليص حجم الفهرس بفضل تكثيف المعجم والجذور في S3 و S4</p>
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <h3 class="chart-panel-title">حجم فهارس GIN في PostgreSQL (بالميغابايت)</h3>
+            <p class="chart-panel-desc">انخفاض مساحة الفهرس بفضل تكثيف المفردات في الجذور</p>
           </div>
-          <div style="height: 280px;">
+          <div class="chart-canvas-box">
             <canvas id="chart-index-sizes"></canvas>
           </div>
         </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>زمن تنفيذ الاستعلامات: البارد مقابل الدافئ (ms)</h3>
-            <p>Cold Cache (أول تنفيذ) مقابل Warm Cache (متوسط التكرار اللاحق)</p>
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <h3 class="chart-panel-title">زمن تنفيذ الاستعلامات: البارد مقابل الدافئ (ms)</h3>
+            <p class="chart-panel-desc">الذاكرة الباردة (Cold Cache) مقابل الذاكرة الدافئة (Warm Buffer Cache)</p>
           </div>
-          <div style="height: 280px;">
+          <div class="chart-canvas-box">
             <canvas id="chart-latencies"></canvas>
           </div>
         </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>مقياس nDCG@10 ومتوسط الدقة (MAP)</h3>
-            <p>التقييم التراكمي المخصوم لجودة ترتيب النتائج الأولى</p>
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <h3 class="chart-panel-title">مقياس nDCG@10 ومتوسط الدقة العام (MAP)</h3>
+            <p class="chart-panel-desc">تقييم جودة ترتيب المراتب الأولى على المدى التراكمي</p>
           </div>
-          <div style="height: 280px;">
+          <div class="chart-canvas-box">
             <canvas id="chart-map-ndcg"></canvas>
           </div>
         </div>
       </div>
 
       <!-- Comprehensive Benchmarks Table -->
-      <div class="search-box-card">
-        <h3>جدول المقارنة المعيارية الشاملة للأنظمة الستة</h3>
-        <div class="golden-table-container">
-          <table class="golden-table" id="macro-metrics-table">
+      <div class="control-console">
+        <div class="console-title" style="margin-bottom:1rem;">
+          <h2>جدول المقارنة المعيارية الشاملة للأنظمة الستة</h2>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table" id="macro-metrics-table">
             <thead>
               <tr>
                 <th>النظام</th>
@@ -311,82 +401,100 @@
       </div>
     </section>
 
-
     <!-- ================================================================= -->
     <!-- TAB 5: OVER-STEMMING ANALYSIS                                     -->
     <!-- ================================================================= -->
     <section id="tab-overstemming" class="tab-pane">
-      <div class="search-box-card">
-        <h2>⚠️ ظاهرة الإفراط في الاشتقاق والانهيار الدلالي (Over-Stemming Fallout)</h2>
-        <p style="color:var(--text-muted); margin-bottom:1.25rem;">
-          واحدة من أهم النتائج العلمية في هذا البحث: لماذا لا يُعد استخراج الجذور الصرفية دائماً الخيار الأفضل؟
-          عند إرجاع الكلمات لجذورها الثلاثية، تلتقي مفردات متباعدة دلالياً في جذر مشترك، مما يؤدي إلى خفض دقة النتائج الأولى.
-        </p>
-
-        <!-- Formula Callout -->
-        <div style="background:#eff6ff; border-right:4px solid #3b82f6; padding:1rem; border-radius:var(--radius-sm); margin-bottom:1.5rem;">
-          <h4 style="color:#1e40af; font-weight:800; margin-bottom:0.3rem;">معادلة ضريبة الإفراط في الاشتقاق (Over-stemming Penalty):</h4>
-          <p style="font-family:monospace; font-size:1.05rem; direction:ltr; text-align:right;">
-            &Delta;P<sub>over</sub>(S<sub>light</sub>, S<sub>root</sub>) = P@10(S<sub>light</sub>) - P@10(S<sub>root</sub>)
+      <div class="control-console">
+        <div class="console-title">
+          <h2>ظاهرة الإفراط في الاشتقاق والانهيار الدلالي (Over-stemming)</h2>
+          <p class="console-desc">
+            تحليل أسباب تراجع دقة النتائج الأولى عند استخراج الجذور الثلاثية، نتيجة التقاء مفردات متباعدة دلالياً في جذر مشترك.
           </p>
-          <p style="font-size:0.88rem; color:#475569; margin-top:0.3rem;">
-            تُظهر النتائج أن النظام S2 (Larkey) يحقق تفوقاً قدره <strong>+0.070</strong> في P@10 على S3، و <strong>+0.055</strong> على S4 بسبب تجنب الاصطدامات الدلالية.
+        </div>
+
+        <!-- Mathematical Formulation Callout -->
+        <div class="math-callout-card" style="margin-top: 1rem;">
+          <span class="group-label">صياغة ضريبة الإفراط في الاشتقاق (Over-stemming Penalty):</span>
+          <div class="math-formula">
+            &Delta;P<sub>over</sub>(S2, S<sub>root</sub>) = P@10(S2) - P@10(S<sub>root</sub>)
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">
+            يحقق النظام S2 (Larkey) تفوقاً قدره <strong>+0.005</strong> إلى <strong>+0.015</strong> في الدقة العامة على أنظمة الجذور، ويتسع الفارق في فئات الأعلام والمشترك اللفظي إلى أكثر من <strong>+0.250</strong>.
           </p>
         </div>
 
         <!-- Case Studies -->
-        <h3 style="margin-bottom:1rem;">أبرز حالات الانهيار والاصطدام الدلالي المسجلة:</h3>
+        <div style="margin-top: 1.5rem;">
+          <h3 style="font-size:0.95rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
+            أبرز حالات الاصطدام الدلالي المسجلة في التجارب:
+          </h3>
 
-        <!-- Case 1: Bahrain / Sea -->
-        <div class="case-study-card">
-          <div class="case-study-title">1. استعلام Q20: «البحرين» (مملكة البحرين) مقابل «بحر»</div>
-          <div class="case-study-desc">
-            مستخرج الجذور (S3 و S4) يختزل علم الدولة «البحرين» إلى الجذر (ب-ح-ر). نتيجة لذلك، اختلطت المقالات السياسية والجغرافية المتعلقة بمملكة البحرين بمقالات علوم المحيطات، وعلم الأحياء البحرية، ومضيق جبل طارق!
+          <!-- Case 1: Bahrain / Sea -->
+          <div class="case-study-item">
+            <div class="case-study-header">1. استعلام Q20: «البحرين» (مملكة البحرين) مقابل «بحر»</div>
+            <div class="case-study-narrative">
+              اختزل مستخرج الجذور (S3 و S4) اسم الدولة «البحرين» إلى الجذر (ب-ح-ر). نتيجة لذلك، اختلطت المقالات السياسية والجغرافية المتعلقة بالبحرين بمقالات علوم المحيطات وعلم الأحياء البحرية.
+            </div>
+            <div class="case-comparison-grid">
+              <div>
+                <div class="comparison-col-title" style="color:var(--s2-color);">النظام S2 (Larkey)</div>
+                <div class="comparison-col-desc">يحتفظ بلفظ «بحرين» ويسترجع مقالات الدولة فقط بدقة P@10 = 0.70.</div>
+              </div>
+              <div>
+                <div class="comparison-col-title" style="color:var(--s4-color);">النظام S4 (Khoja)</div>
+                <div class="comparison-col-desc">يحوله إلى «بحر» فيجلب مقالات عن الأسماك والبحار (P@10 = 0.60) مع تشعب دلالي.</div>
+              </div>
+            </div>
           </div>
-          <div class="comparison-box">
-            <strong>مقارنة السلوك:</strong><br>
-            • النظام S2 (Larkey): يحتفظ بلفظ «بحرين» فيسترجع فقط مقالات الدولة (الدقة P@10 = 0.90).<br>
-            • النظام S4 (Khoja): يحوله إلى «بحر» فيجلب مقالات عن الأسماك والبحار (الدقة P@10 = 0.20) بانخفاض قدره 70%!
+
+          <!-- Case 2: Battalion / Writing -->
+          <div class="case-study-item">
+            <div class="case-study-header">2. استعلام Q01: «كتب» مقابل «كتيبة عسكرية»</div>
+            <div class="case-study-narrative">
+              الجذر المشترك (ك-ت-ب) يربط لغوياً بين «الكتابة، المكتبات، الكتب» وبين الوحدة العسكرية المسماة «كتيبة». في مستخرجات الجذور، المقالات عن الكتائب والجيوش تظهر ضمن نتائج البحث عن الكتب والمؤلفات.
+            </div>
+            <div class="case-comparison-grid">
+              <div>
+                <div class="comparison-col-title" style="color:var(--s0-color);">النظامان S0 و S1</div>
+                <div class="comparison-col-desc">يفصلان تماماً بين «كتاب» و«كتيبة» لعدم وجود مطابقة سطحية.</div>
+              </div>
+              <div>
+                <div class="comparison-col-title" style="color:var(--s3-color);">النظامان S3 و S4</div>
+                <div class="comparison-col-desc">يجمعانهما في جذر واحد، مما يرفع الاسترجاع لكن يقلل دقة النتائج الأولى.</div>
+              </div>
+            </div>
           </div>
+
+          <!-- Case 3: Eyes / Wells / Spies -->
+          <div class="case-study-item">
+            <div class="case-study-header">3. استعلام Q18: «عين» (المشترك اللفظي)</div>
+            <div class="case-study-narrative">
+              كلمة «عين» في العربية لها معانٍ متعددة (العين الباصرة، عين الماء، الجاسوس، وكبار القوم). الجذر (ع-ي-ن) يجمع مقالات طب وجراحة العيون مع مقالات الجيولوجيا والينابيع ومقالات المدن مثل «عين العرب».
+            </div>
+            <div class="case-comparison-grid">
+              <div>
+                <div class="comparison-col-title" style="color:var(--s2-color);">التجذيع اللطيف (S2)</div>
+                <div class="comparison-col-desc">يحافظ على خصوصية المفردة وسياق الاستخدام المباشر.</div>
+              </div>
+              <div>
+                <div class="comparison-col-title" style="color:var(--s4-color);">تجذير خوجة (S4)</div>
+                <div class="comparison-col-desc">يحقق شمولية قصوى للكلمات المشتقة مع احتمال تداخل المعاني المتعددة.</div>
+              </div>
+            </div>
+          </div>
+
         </div>
-
-        <!-- Case 2: Battalion / Writing -->
-        <div class="case-study-card">
-          <div class="case-study-title">2. استعلام Q01: «كتب» مقابل «كتيبة عسكرية»</div>
-          <div class="case-study-desc">
-            الجذر المشترك (ك-ت-ب) يربط لغوياً بين «الكتابة، المكتبات، الكتب» وبين الوحدة العسكرية المسماة «كتيبة».
-            في مستخرجات الجذور، المقالات عن الكتائب والجيوش تظهر ضمن نتائج البحث عن الكتب والمؤلفات!
-          </div>
-          <div class="comparison-box">
-            <strong>مقارنة السلوك:</strong><br>
-            • النظام S0 و S1: يفصل تماماً بين «كتاب» و«كتيبة» لعدم وجود مطابقة سطحية.<br>
-            • النظام S3 و S4: يجمعهما في سلة واحدة، ما يرفع نسبة الاسترجاع العام (Recall) لكن يشوش على المراتب الأولى.
-          </div>
-        </div>
-
-        <!-- Case 3: Eyes / Employment -->
-        <div class="case-study-card">
-          <div class="case-study-title">3. استعلام Q18: «عين» (المشترك اللفظي والتشعب الدلالي)</div>
-          <div class="case-study-desc">
-            كلمة «عين» في العربية لها معانٍ متعددة (العين الباصرة، عين الماء، الجاسوس، التعيين والتوظيف).
-            الجذر (ع-ي-ن) يجمع مقالات طب وجراحة العيون، مع مقالات الجيولوجيا والينابيع المائية، مع قرارات التعيين الإداري في الحكومات.
-          </div>
-          <div class="comparison-box">
-            <strong>مقارنة السلوك:</strong><br>
-            • يوضح ضرورة الدمج بين قص الزوائد الخفيف (S2) للبحث الدقيق، واستخراج الجذور (S4) عندما تكون الأولوية للشمولية القصوى.
-          </div>
-        </div>
-
       </div>
     </section>
 
   </main>
 
-  <!-- Footer -->
-  <footer>
+  <!-- Clean Minimalist Footer -->
+  <footer class="app-footer">
     <div class="container">
-      <p>مشروع الفهرسة النصية للغة العربية في PostgreSQL 16 &copy; 2026</p>
-      <p style="margin-top:0.3rem;">جامعة الموصل | كلية علوم الحاسوب والرياضيات | قسم علوم الحاسوب</p>
+      <p>منظومة الفهرسة النصية والبحث الدلالي للغة العربية في PostgreSQL 16 &copy; 2026</p>
+      <p>مشروع تخرج وبحث علمي | قسم علوم الحاسوب</p>
     </div>
   </footer>
 
