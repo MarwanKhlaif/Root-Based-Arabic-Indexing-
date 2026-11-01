@@ -9,11 +9,14 @@ import re
 import html
 import json
 import time
+import logging
 from typing import Dict, Any, List, Set, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import psycopg
 from psycopg.errors import QueryCanceled
+
+logger = logging.getLogger(__name__)
 
 from src.db.connection import get_connection, get_db_config
 from src.preprocessing.normalize import normalize_arabic
@@ -414,12 +417,17 @@ def execute_system_search(
                     # Prepare Tier 1 input: map Arabic 'أو' / 'او' to 'or' for websearch_to_tsquery
                     web_input = effective_query.replace(" أو ", " or ").replace(" او ", " or ")
 
-                    # Tier 1: Exact phrase and conjunctive websearch
+                    # Tier 1: Exact phrase and conjunctive websearch with bounded candidate CTE
                     sql_tier1 = f"""
-                        SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
+                        WITH candidates AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, {col_name}
+                            FROM docs
+                            WHERE {col_name} @@ websearch_to_tsquery('{cfg_name}', %s)
+                            LIMIT 100
+                        )
+                        SELECT id, doc_id, title, body_sample,
                                ts_rank({col_name}, websearch_to_tsquery('{cfg_name}', %s)) AS score
-                        FROM docs
-                        WHERE {col_name} @@ websearch_to_tsquery('{cfg_name}', %s)
+                        FROM candidates
                         ORDER BY score DESC, id ASC
                         LIMIT %s;
                     """
@@ -428,51 +436,73 @@ def execute_system_search(
 
                     # Tier 2: Flexible OR fallback if fewer than limit results
                     if len(rows) < limit:
-                        tokens = [t for t in effective_query.split() if t]
-                        content_tokens = [t for t in tokens if t not in stopwords and len(t) > 1]
-                        or_tokens = content_tokens if content_tokens else tokens
-                        clean_tokens = [re.sub(r"[^\w\u0600-\u06FF]", "", t) for t in or_tokens]
+                        raw_tokens = list(dict.fromkeys(effective_query.split()))
+                        content_tokens = [t for t in raw_tokens if t not in stopwords and len(t) > 1]
+                        selected_tokens = sorted(content_tokens, key=len, reverse=True)[:5] if content_tokens else raw_tokens[:4]
+                        clean_tokens = [re.sub(r"[^\w\u0600-\u06FF]", "", t) for t in selected_tokens]
                         clean_tokens = [t for t in clean_tokens if t]
 
                         if clean_tokens and (len(clean_tokens) > 1 or not rows):
                             or_q = " | ".join(clean_tokens)
                             existing_ids = [r[0] for r in rows]
                             needed = limit - len(rows)
+                            cfg_tier2 = "simple" if (cfg_name == "arabic_simple" and not content_tokens) else cfg_name
                             try:
                                 if existing_ids:
                                     sql_tier2 = f"""
-                                        SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                                               ts_rank({col_name}, to_tsquery('{cfg_name}', %s)) AS score
-                                        FROM docs
-                                        WHERE {col_name} @@ to_tsquery('{cfg_name}', %s)
-                                          AND NOT (id = ANY(%s))
+                                        WITH candidates AS (
+                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, {col_name}
+                                            FROM docs
+                                            WHERE {col_name} @@ to_tsquery('{cfg_tier2}', %s)
+                                              AND NOT (id = ANY(%s))
+                                            LIMIT 100
+                                        )
+                                        SELECT id, doc_id, title, body_sample,
+                                               ts_rank({col_name}, to_tsquery('{cfg_tier2}', %s)) AS score
+                                        FROM candidates
                                         ORDER BY score DESC, id ASC
                                         LIMIT %s;
                                     """
-                                    cur.execute(sql_tier2, (or_q, or_q, existing_ids, needed))
+                                    cur.execute(sql_tier2, (or_q, existing_ids, or_q, needed))
                                 else:
                                     sql_tier2 = f"""
-                                        SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                                               ts_rank({col_name}, to_tsquery('{cfg_name}', %s)) AS score
-                                        FROM docs
-                                        WHERE {col_name} @@ to_tsquery('{cfg_name}', %s)
+                                        WITH candidates AS (
+                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, {col_name}
+                                            FROM docs
+                                            WHERE {col_name} @@ to_tsquery('{cfg_tier2}', %s)
+                                            LIMIT 100
+                                        )
+                                        SELECT id, doc_id, title, body_sample,
+                                               ts_rank({col_name}, to_tsquery('{cfg_tier2}', %s)) AS score
+                                        FROM candidates
                                         ORDER BY score DESC, id ASC
                                         LIMIT %s;
                                     """
                                     cur.execute(sql_tier2, (or_q, or_q, needed))
                                 fallback_rows = cur.fetchall()
                                 rows.extend(fallback_rows)
-                            except Exception:
-                                pass
+                            except Exception as exc:
+                                conn.rollback()
+                                logger.warning(
+                                    "Tier 2 fallback search failed for system %s on query %r: %s",
+                                    system_id,
+                                    or_q,
+                                    exc,
+                                )
 
                 elif system_id == "S5":
                     norm_q = normalize_arabic(raw_query, normalize_teh=True)
-                    tokens = [t for t in norm_q.split() if t not in stopwords and len(t) > 1]
+                    clean_phrase = re.sub(r"[%_\\]", " ", norm_q).strip()
+                    clean_phrase = " ".join(clean_phrase.split())
+                    all_tokens = clean_phrase.split() if clean_phrase else norm_q.split()
+
+                    # Filter stopwords for token selection
+                    tokens = [t for t in all_tokens if t not in stopwords and len(t) > 1]
                     if not tokens:
-                        tokens = [t for t in norm_q.split() if t]
+                        tokens = [t for t in all_tokens if t]
 
                     # Tier 1: Continuous normalized phrase search via GIN
-                    if len(norm_q.split()) > 1:
+                    if len(all_tokens) > 1 and clean_phrase:
                         sql_s5_phrase = """
                             WITH candidates AS (
                                 SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
@@ -486,47 +516,60 @@ def execute_system_search(
                             ORDER BY score DESC, id ASC
                             LIMIT %s;
                         """
-                        cur.execute(sql_s5_phrase, (f"%{norm_q}%", norm_q, limit))
+                        cur.execute(sql_s5_phrase, (f"%{clean_phrase}%", clean_phrase, limit))
                         rows = list(cur.fetchall())
 
                     # Tier 2: Multi-term LIKE ANY fallback for non-adjacent words or remaining slots
                     if len(rows) < limit and tokens:
                         needed = limit - len(rows)
                         existing_ids = [r[0] for r in rows]
-                        like_tokens = [f"%{t}%" for t in tokens]
-                        if existing_ids:
-                            sql_s5_fallback = """
-                                WITH candidates AS (
-                                    SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
-                                    FROM docs
-                                    WHERE s5_trgm_text LIKE ANY(%s)
-                                      AND NOT (id = ANY(%s))
-                                    LIMIT 50
+                        s5_content = [t for t in tokens if t not in stopwords and len(t) > 1]
+                        s5_top = sorted(s5_content, key=len, reverse=True)[:4] if s5_content else tokens[:4]
+                        sanitized_tokens = [re.sub(r"[%_\\]", "", t) for t in s5_top]
+                        like_tokens = [f"%{t}%" for t in sanitized_tokens if t]
+
+                        if like_tokens:
+                            try:
+                                if existing_ids:
+                                    sql_s5_fallback = """
+                                        WITH candidates AS (
+                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
+                                            FROM docs
+                                            WHERE s5_trgm_text LIKE ANY(%s)
+                                              AND NOT (id = ANY(%s))
+                                            LIMIT 50
+                                        )
+                                        SELECT id, doc_id, title, body_sample,
+                                               word_similarity(%s, s5_trgm_text) AS score
+                                        FROM candidates
+                                        ORDER BY score DESC, id ASC
+                                        LIMIT %s;
+                                    """
+                                    cur.execute(sql_s5_fallback, (like_tokens, existing_ids, clean_phrase or norm_q, needed))
+                                else:
+                                    sql_s5_fallback = """
+                                        WITH candidates AS (
+                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
+                                            FROM docs
+                                            WHERE s5_trgm_text LIKE ANY(%s)
+                                            LIMIT 50
+                                        )
+                                        SELECT id, doc_id, title, body_sample,
+                                               word_similarity(%s, s5_trgm_text) AS score
+                                        FROM candidates
+                                        ORDER BY score DESC, id ASC
+                                        LIMIT %s;
+                                    """
+                                    cur.execute(sql_s5_fallback, (like_tokens, clean_phrase or norm_q, needed))
+                                fallback_rows = cur.fetchall()
+                                rows.extend(fallback_rows)
+                            except Exception as exc:
+                                conn.rollback()
+                                logger.warning(
+                                    "Tier 2 fallback search failed for system S5 on query %r: %s",
+                                    clean_phrase or norm_q,
+                                    exc,
                                 )
-                                SELECT id, doc_id, title, body_sample,
-                                       word_similarity(%s, s5_trgm_text) AS score
-                                FROM candidates
-                                ORDER BY score DESC, id ASC
-                                LIMIT %s;
-                            """
-                            cur.execute(sql_s5_fallback, (like_tokens, existing_ids, norm_q, needed))
-                        else:
-                            sql_s5_fallback = """
-                                WITH candidates AS (
-                                    SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
-                                    FROM docs
-                                    WHERE s5_trgm_text LIKE ANY(%s)
-                                    LIMIT 50
-                                )
-                                SELECT id, doc_id, title, body_sample,
-                                       word_similarity(%s, s5_trgm_text) AS score
-                                FROM candidates
-                                ORDER BY score DESC, id ASC
-                                LIMIT %s;
-                            """
-                            cur.execute(sql_s5_fallback, (like_tokens, norm_q, needed))
-                        fallback_rows = cur.fetchall()
-                        rows.extend(fallback_rows)
 
     except (QueryCanceled, psycopg.OperationalError) as exc:
         latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
@@ -555,6 +598,28 @@ def execute_system_search(
         }
 
     latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+
+    # Explicit deduplication and strictly monotonic score descending sort
+    deduped_rows: Dict[Any, Tuple] = {}
+    for r in rows:
+        pk = r[0]
+        score_val = float(r[4]) if (len(r) > 4 and r[4] is not None) else 0.0
+        if pk not in deduped_rows:
+            deduped_rows[pk] = r
+        else:
+            prev_score = float(deduped_rows[pk][4]) if (len(deduped_rows[pk]) > 4 and deduped_rows[pk][4] is not None) else 0.0
+            if score_val > prev_score:
+                deduped_rows[pk] = r
+
+    unique_rows = list(deduped_rows.values())
+    unique_rows.sort(
+        key=lambda r: (
+            float(r[4]) if (len(r) > 4 and r[4] is not None) else 0.0,
+            -int(r[0]) if (len(r) > 0 and isinstance(r[0], (int, float))) else 0,
+        ),
+        reverse=True,
+    )
+    rows = unique_rows[:limit]
 
     # Highlight terms
     search_terms = raw_query.split() + effective_query.split()
