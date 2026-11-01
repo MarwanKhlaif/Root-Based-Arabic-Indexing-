@@ -53,6 +53,7 @@ class SearchRequest(BaseModel):
 
 
 @app.get("/", response_class=HTMLResponse)
+@app.head("/", response_class=HTMLResponse)
 async def serve_index():
     """Serve the primary Single-Page Application interface."""
     index_file = os.path.join(TEMPLATES_DIR, "index.html")

@@ -41,6 +41,7 @@ services:
       arabic_ir_db:
         condition: service_healthy
     volumes:
+      - ./src:/app/src
       - ./results:/app/results:ro
       - ./queries:/app/queries:ro
 
