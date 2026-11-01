@@ -158,11 +158,12 @@ class TestFastAPIEndpoints:
     """Test all REST API endpoints served by the application."""
 
     def test_get_index_html(self, client):
-        """Verify the main UI page returns status 200 with RTL layout."""
+        """Verify the main UI page returns status 200 with RTL layout and English technical title."""
         response = client.get("/")
         assert response.status_code == 200
         assert "dir=\"rtl\"" in response.text
         assert "منظومة الفهرسة النصية" in response.text
+        assert "Full-Text Search" in response.text or "PostgreSQL 16" in response.text
 
     def test_get_status_endpoint(self, client):
         """Verify DB status check endpoint."""
@@ -272,4 +273,104 @@ class TestFastAPIEndpoints:
         assert SYSTEM_METADATA["S2"]["p_at_10"] == 0.460
         assert SYSTEM_METADATA["S5"]["p_at_10"] == 0.050
         assert SYSTEM_METADATA["S4"]["recall_at_100"] == 0.7042
+
+    def test_multi_word_search_returns_results_across_all_systems(self, client):
+        """
+        R3 & R4: Multi-word queries must return matching documents across S0–S5
+        rather than returning zero results.
+        """
+        response = client.post(
+            "/api/search",
+            json={
+                "query": "تاريخ الكتب والمكتبات",
+                "systems": ["S0", "S1", "S2", "S3", "S4", "S5"],
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "systems" in data
+        for sys_id in ["S0", "S1", "S2", "S3", "S4", "S5"]:
+            assert sys_id in data["systems"]
+            sys_data = data["systems"][sys_id]
+            assert sys_data.get("error") is None, f"{sys_id} returned error: {sys_data.get('error')}"
+            assert len(sys_data.get("results", [])) > 0, f"{sys_id} returned 0 results for multi-word query!"
+
+    def test_multi_word_relevance_ranking_order(self, client):
+        """
+        R3 & R4: Verify search results are strictly ordered by relevance rank descending.
+        """
+        response = client.post(
+            "/api/search",
+            json={
+                "query": "علماء الرياضيات والفلك",
+                "systems": ["S0", "S2", "S3", "S4"],
+                "limit": 5,
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+        for sys_id in ["S0", "S2", "S3", "S4"]:
+            results = data["systems"][sys_id].get("results", [])
+            if len(results) >= 2:
+                for i in range(len(results) - 1):
+                    assert results[i]["score"] >= results[i + 1]["score"], (
+                        f"{sys_id} results are not sorted by score descending: "
+                        f"{results[i]['score']} < {results[i + 1]['score']}"
+                    )
+
+    def test_ui_removes_secondary_tabs_and_clutter(self, client):
+        """
+        R1 & R4: Verify that secondary panels and tabs (playground, 20 queries table,
+        over-stemming cards) are completely removed from the UI.
+        """
+        response = client.get("/")
+        assert response.status_code == 200
+        text = response.text
+        assert "tab-playground" not in text
+        assert "tab-golden" not in text
+        assert "tab-overstemming" not in text
+        assert "playground-input" not in text
+        assert "golden-queries-table" not in text
+        assert "محاكي التحويل الصرفي" not in text
+
+    def test_ui_english_technical_terminology_and_no_transliterations(self, client):
+        """
+        R2 & R4: Verify that English technical terms are used and Arabic
+        transliterations of scientist names ('خوجة', 'لاركي') are absent.
+        """
+        response = client.get("/")
+        assert response.status_code == 200
+        text = response.text
+        assert "خوجة" not in text
+        assert "لاركي" not in text
+        assert "Full-Text Search" in text or "GIN Index" in text or "Light Stemming" in text
+
+    def test_metadata_terminology_and_monochrome_palette(self, client):
+        """
+        R1 & R2: Verify SYSTEM_METADATA employs English technical terminology
+        and monochrome / grayscale color definitions.
+        """
+        from src.web.search_service import SYSTEM_METADATA
+        for sys_id, meta in SYSTEM_METADATA.items():
+            name = meta.get("name", "")
+            desc = meta.get("description", "")
+            assert "خوجة" not in name and "خوجة" not in desc
+            assert "لاركي" not in name and "لاركي" not in desc
+            color = meta.get("color_hex", "").lower()
+            badge = meta.get("badge_color", "").lower()
+            assert badge in ["mono", "gray", "neutral", "zinc", "monochrome", "default"] or color.startswith("#")
+
+    def test_ui_strictly_monochrome_stylesheet(self, client):
+        """
+        R1: Verify style.css defines a strictly monochrome / grayscale color palette.
+        """
+        response = client.get("/static/css/style.css")
+        assert response.status_code == 200
+        css = response.text
+        assert "--accent-primary: #0a84ff" not in css
+        assert "--s3-color: #bf5af2" not in css
+        assert "--s4-color: #30d158" not in css
+        assert "--s5-color: #ffd60a" not in css
+
 

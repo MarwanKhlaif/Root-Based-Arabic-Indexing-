@@ -1,35 +1,18 @@
 /**
- * Arabic IR Web Interface - Frontend Application Engine (Apple macOS HIG)
- * Handles segmented tabs, parallel multi-system search, instant morphological playground,
- * golden query execution, and high-precision Chart.js telemetry visualizations.
+ * Arabic IR Web Interface - Streamlined Monochrome Engine (Apple Design)
+ * Multi-system parallel search comparison console for PostgreSQL 16 (S0–S5).
  */
 
-let currentViewMode = 'side'; // 'side' or 'tabs'
 let lastSearchResults = null;
-let allGoldenQueries = [];
-let charts = {};
-
-// Apple HIG Dark Mode System Palette for S0–S5
-const SYSTEM_COLORS = {
-  S0: { hex: '#8e8e93', bg: 'rgba(142, 142, 147, 0.12)' }, // System Gray
-  S1: { hex: '#64d2ff', bg: 'rgba(100, 210, 255, 0.12)' }, // System Cyan
-  S2: { hex: '#63e6e2', bg: 'rgba(99, 230, 226, 0.12)' }, // System Mint / Teal
-  S3: { hex: '#bf5af2', bg: 'rgba(191, 90, 242, 0.12)' }, // System Purple
-  S4: { hex: '#30d158', bg: 'rgba(48, 209, 88, 0.12)' },  // System Green
-  S5: { hex: '#ffd60a', bg: 'rgba(255, 214, 10, 0.12)' }, // System Yellow
-};
 
 document.addEventListener('DOMContentLoaded', () => {
-  initTabs();
   checkStatus();
-  loadGoldenQueries();
-  loadBenchmarkData();
-  initPlayground();
+  loadGoldenPresets();
 
-  // Populate morphological strip on initial load without heavy DB scan
-  const initialInput = document.getElementById('search-input');
-  if (initialInput && initialInput.value.trim()) {
-    fetchTransformation(initialInput.value.trim());
+  const searchInput = document.getElementById('search-input');
+  if (searchInput && searchInput.value.trim()) {
+    fetchTransformation(searchInput.value.trim());
+    triggerSearch();
   }
 });
 
@@ -46,102 +29,90 @@ function handleSystemToggle() {
 }
 
 // =============================================================================
-// 1. TABS MANAGEMENT (macOS Segmented Control)
-// =============================================================================
-function initTabs() {
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabButtons.forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-selected', 'false');
-      });
-      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-      const targetId = btn.getAttribute('data-tab');
-      const pane = document.getElementById(targetId);
-      if (pane) {
-        pane.classList.add('active');
-      }
-
-      // If switching to benchmarks, resize charts to fit container
-      if (targetId === 'tab-benchmarks') {
-        setTimeout(() => {
-          Object.values(charts).forEach(c => c && c.resize && c.resize());
-        }, 60);
-      }
-    });
-  });
-}
-
-function switchToTab(tabId) {
-  const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-  if (btn) {
-    btn.click();
-  }
-}
-
-// =============================================================================
-// 2. STATUS & HEALTH
+// 1. Status & Database Health
 // =============================================================================
 async function checkStatus() {
   const dot = document.getElementById('status-dot');
   const text = document.getElementById('status-text');
-  const demoBadge = document.getElementById('demo-mode-badge');
 
   try {
     const res = await fetch('/api/status');
     const data = await res.json();
 
     if (data.connected && data.total_documents > 0) {
-      dot.className = 'status-dot online';
-      text.textContent = `متصل بـ PostgreSQL (${Number(data.total_documents).toLocaleString()} مقال)`;
-      if (demoBadge) demoBadge.style.display = 'none';
+      dot.className = 'status-dot';
+      text.textContent = `PostgreSQL 16 (${Number(data.total_documents).toLocaleString()} Articles)`;
     } else if (data.connected) {
       dot.className = 'status-dot';
-      text.textContent = 'متصل بـ PostgreSQL (جدول docs فارغ - وضع المعاينة)';
-      if (demoBadge) demoBadge.style.display = 'flex';
+      text.textContent = 'PostgreSQL 16 Connected (Docs Empty)';
     } else {
       dot.className = 'status-dot offline';
-      text.textContent = 'قاعدة البيانات غير متصلة (وضع المعاينة مفعّل)';
-      if (demoBadge) demoBadge.style.display = 'flex';
+      text.textContent = 'PostgreSQL 16 Offline (Demo Mode)';
     }
   } catch (err) {
     dot.className = 'status-dot offline';
-    text.textContent = 'تعذر التحقق من الاتصال (وضع المعاينة)';
-    if (demoBadge) demoBadge.style.display = 'flex';
+    text.textContent = 'PostgreSQL 16 Offline (Demo Mode)';
   }
 }
 
 // =============================================================================
-// 3. SEARCH & TRANSFORMATION EXECUTION
+// 2. Golden Query Presets
+// =============================================================================
+async function loadGoldenPresets() {
+  const select = document.getElementById('golden-select');
+  if (!select) return;
+
+  try {
+    const res = await fetch('/api/golden-queries');
+    const queries = await res.json();
+
+    queries.forEach(q => {
+      const opt = document.createElement('option');
+      opt.value = q.query_term;
+      opt.textContent = `${q.query_id}: ${q.query_term} (${q.category_name_ar || q.category_id})`;
+      select.appendChild(opt);
+    });
+
+    select.addEventListener('change', (e) => {
+      if (e.target.value) {
+        const input = document.getElementById('search-input');
+        if (input) {
+          input.value = e.target.value;
+          triggerSearch();
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Failed to load golden query presets:', err);
+  }
+}
+
+// =============================================================================
+// 3. Search & Query Transformation Execution
 // =============================================================================
 async function triggerSearch() {
   const input = document.getElementById('search-input');
   const btn = document.getElementById('search-btn');
-  const query = input.value.trim();
+  const query = input ? input.value.trim() : '';
 
   if (!query) {
-    input.focus();
+    if (input) input.focus();
     return;
   }
 
-  btn.disabled = true;
-  btn.innerHTML = `
-    <svg class="ui-icon" style="animation: spin 0.8s linear infinite;" viewBox="0 0 24 24">
-      <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-    </svg>
-    <span>جاري البحث...</span>
-  `;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Executing...';
+  }
+
+  const selectedSystems = getSelectedSystems();
+  renderLoadingSkeletons(selectedSystems);
 
   try {
-    // 1. Fetch transformation
+    // 1. Fetch transformation in parallel
     fetchTransformation(query);
 
-    // 2. Fetch search results across selected systems
-    const selectedSystems = getSelectedSystems();
+    // 2. Execute parallel search
     const res = await fetch('/api/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -151,22 +122,14 @@ async function triggerSearch() {
     const data = await res.json();
     lastSearchResults = data;
     renderSearchResults(data);
-
-    // Toggle demo badge
-    const demoBadge = document.getElementById('demo-mode-badge');
-    if (demoBadge) {
-      demoBadge.style.display = data.is_demo_mode ? 'flex' : 'none';
-    }
   } catch (err) {
-    console.error('Search error:', err);
+    console.error('Search execution error:', err);
+    renderSearchError(selectedSystems, String(err));
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = `
-      <svg class="ui-icon" viewBox="0 0 24 24">
-        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-      </svg>
-      <span>تنفيذ البحث</span>
-    `;
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Execute Search';
+    }
   }
 }
 
@@ -180,37 +143,38 @@ async function fetchTransformation(query) {
     const data = await res.json();
     renderTransformationStrip(data);
   } catch (err) {
-    console.error('Transform error:', err);
+    console.error('Transformation error:', err);
   }
 }
 
 function renderTransformationStrip(data) {
   const container = document.getElementById('transform-badges-grid');
-  if (!data || !data.systems) {
-    container.innerHTML = '';
-    return;
-  }
+  if (!container || !data || !data.systems) return;
 
   let html = '';
-  ['S0', 'S1', 'S2', 'S3', 'S4', 'S5'].forEach(sysId => {
+  const order = ['S0', 'S1', 'S2', 'S3', 'S4', 'S5'];
+
+  order.forEach(sysId => {
     const sys = data.systems[sysId];
     if (!sys) return;
 
     let tokenText = '';
     if (sysId === 'S5') {
       tokenText = (sys.trigrams_sample || []).join(' | ');
-      if (sys.trigrams_count > 12) tokenText += ` (+${sys.trigrams_count - 12} مقطع)`;
+      if (sys.trigrams_count > 12) {
+        tokenText += ` (+${sys.trigrams_count - 12} more)`;
+      }
     } else {
-      tokenText = (sys.display_tokens || []).join(' ') || '(فارغ)';
+      tokenText = (sys.display_tokens || []).join(' ') || '(empty)';
     }
 
     html += `
       <div class="transform-card" data-sys="${sysId}">
         <div class="transform-card-head">
-          <span class="sys-id-tag">${sys.id}: ${(sys.name || sysId).split('(')[0].trim()}</span>
-          <span class="sys-level-desc">${(sys.level || '').split('/')[0].trim()}</span>
+          <span class="transform-sys-id">${sys.id}</span>
+          <span class="transform-sys-name">${escapeHtml(sys.name || sysId)}</span>
         </div>
-        <div class="transform-tokens-output tabular" title="${escapeHtml(tokenText)}">
+        <div class="transform-tokens tabular" title="${escapeHtml(tokenText)}">
           ${escapeHtml(tokenText)}
         </div>
       </div>
@@ -220,256 +184,126 @@ function renderTransformationStrip(data) {
   container.innerHTML = html;
 }
 
-function setViewMode(mode) {
-  currentViewMode = mode;
-  document.getElementById('view-mode-side').classList.toggle('active', mode === 'side');
-  document.getElementById('view-mode-tabs').classList.toggle('active', mode === 'tabs');
+// =============================================================================
+// 4. Monochrome Results Rendering
+// =============================================================================
+function renderLoadingSkeletons(systems) {
+  const container = document.getElementById('results-side-by-side');
+  if (!container) return;
 
-  if (lastSearchResults) {
-    renderSearchResults(lastSearchResults);
-  }
+  container.className = `results-grid-container ${systems.length === 6 ? 'six-cols' : ''}`;
+  let html = '';
+
+  systems.forEach(sysId => {
+    html += `
+      <div class="comparison-column" data-sys="${sysId}">
+        <div class="col-header">
+          <div class="col-header-top">
+            <span class="col-sys-badge">${sysId}</span>
+            <span class="col-latency">Searching...</span>
+          </div>
+          <div class="col-sys-title">Executing Query</div>
+        </div>
+        <div class="skeleton-loader">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderSearchError(systems, errorMsg) {
+  const container = document.getElementById('results-side-by-side');
+  if (!container) return;
+
+  let html = '';
+  systems.forEach(sysId => {
+    html += `
+      <div class="comparison-column" data-sys="${sysId}">
+        <div class="col-header">
+          <span class="col-sys-badge">${sysId}</span>
+        </div>
+        <div class="col-error-state">
+          <strong>Error Executing Query</strong>
+          <div>${escapeHtml(errorMsg)}</div>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
 }
 
 function renderSearchResults(data) {
-  const sideContainer = document.getElementById('results-side-by-side');
-  const tabbedContainer = document.getElementById('results-tabbed-container');
+  const container = document.getElementById('results-side-by-side');
+  if (!container || !data || !data.systems) return;
 
-  if (currentViewMode === 'side') {
-    sideContainer.style.display = 'grid';
-    tabbedContainer.style.display = 'none';
-    renderSideBySideResults(data, sideContainer);
-  } else {
-    sideContainer.style.display = 'none';
-    tabbedContainer.style.display = 'block';
-    renderTabbedResults(data, tabbedContainer);
-  }
-}
-
-function renderSideBySideResults(data, container) {
-  let html = '';
   const activeSystems = getSelectedSystems();
-  const systems = activeSystems.filter(s => data.systems && data.systems[s]);
-  const systemsToRender = systems.length > 0 ? systems : Object.keys(data.systems || {});
+  const systemsToRender = activeSystems.filter(s => data.systems && data.systems[s]);
+  const systemsList = systemsToRender.length > 0 ? systemsToRender : Object.keys(data.systems);
 
-  if (systemsToRender.length === 6) {
-    container.classList.add('six-cols');
-  } else {
-    container.classList.remove('six-cols');
-  }
+  container.className = `results-grid-container ${systemsList.length === 6 ? 'six-cols' : ''}`;
 
-  systemsToRender.forEach(sysId => {
+  let html = '';
+
+  systemsList.forEach(sysId => {
     const sysData = data.systems[sysId] || { results: [], total_found: 0, latency_ms: 0 };
     const meta = data.transformation?.systems?.[sysId] || {};
     const results = sysData.results || [];
+    const isError = Boolean(sysData.error);
 
     html += `
-      <div class="system-column-card">
-        <div class="column-header">
-          <div class="column-title-row">
-            <span class="column-sys-title">
-              <span class="sys-id-tag" style="background:var(--${sysId.toLowerCase()}-bg); color:var(--${sysId.toLowerCase()}-color);">${sysId}</span>
-              <span>${(meta.name || sysId).split('(')[0].trim()}</span>
-            </span>
+      <div class="comparison-column" data-sys="${sysId}">
+        <div class="col-header">
+          <div class="col-header-top">
+            <span class="col-sys-badge">${sysId}</span>
+            <span class="col-latency tabular">${sysData.latency_ms || 0} ms</span>
           </div>
-          <div class="column-metrics-row">
-            <span class="latency-metric">
-              <svg class="ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              <span>${sysData.latency_ms || 0} ms</span>
-            </span>
-            <span>النتائج: <strong class="tabular">${sysData.total_found || 0}</strong></span>
+          <div class="col-sys-title">${escapeHtml(sysData.system_name || meta.name || sysId)}</div>
+          <div class="col-meta-specs">
+            <span class="col-meta-tag tabular">${sysData.total_found || results.length} Results</span>
+            ${meta.index_type ? `<span class="col-meta-tag">${escapeHtml(meta.index_type)}</span>` : ''}
           </div>
         </div>
-        <div class="column-body">
-          ${renderArticlesList(results, sysId, sysData.error)}
-        </div>
-      </div>
-    `;
-  });
 
-  container.innerHTML = html;
-}
-
-function renderTabbedResults(data, container) {
-  const activeSystems = getSelectedSystems();
-  const systems = activeSystems.filter(s => data.systems && data.systems[s]);
-  const systemsToRender = systems.length > 0 ? systems : Object.keys(data.systems || {});
-  let navHtml = '<div class="filter-pills-row" style="margin-bottom:1rem;">';
-  let contentHtml = '';
-
-  systemsToRender.forEach((sysId, index) => {
-    const isActive = index === 0 ? 'active' : '';
-    const sysData = data.systems[sysId] || { results: [], total_found: 0, latency_ms: 0 };
-    const meta = data.transformation?.systems?.[sysId] || {};
-
-    navHtml += `
-      <button class="filter-pill ${isActive}" onclick="switchResultTab('${sysId}', this)">
-        <span>${sysId} (${sysData.total_found || 0})</span>
-        <span class="tabular" style="font-size:0.75rem; opacity:0.85;">${sysData.latency_ms}ms</span>
-      </button>
-    `;
-
-    contentHtml += `
-      <div id="tab-res-${sysId}" class="result-tab-content" style="display: ${index === 0 ? 'block' : 'none'};">
-        <div style="margin-bottom:1rem; padding:0.85rem; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:0.5px solid var(--border-subtle);">
-          <div style="font-weight:700; color:var(--${sysId.toLowerCase()}-color); font-size:0.95rem;">${meta.name || sysId}</div>
-          <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.25rem;">${meta.description || ''}</div>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:0.65rem;">
-          ${renderArticlesList(sysData.results || [], sysId, sysData.error)}
-        </div>
-      </div>
-    `;
-  });
-
-  navHtml += '</div>';
-
-  container.innerHTML = `
-    <div class="control-console mac-card" style="margin-bottom:0;">
-      ${navHtml}
-      ${contentHtml}
-    </div>
-  `;
-}
-
-function switchResultTab(sysId, btn) {
-  document.querySelectorAll('#results-tabbed-container .filter-pill').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.result-tab-content').forEach(c => c.style.display = 'none');
-
-  btn.classList.add('active');
-  const target = document.getElementById(`tab-res-${sysId}`);
-  if (target) {
-    target.style.display = 'block';
-  }
-}
-
-function renderArticlesList(results, sysId, error) {
-  if (error) {
-    return `
-      <div class="system-error-card">
-        <div style="font-weight:700; margin-bottom:0.25rem;">إشعار معالجة الاستعلام:</div>
-        <div>${escapeHtml(error)}</div>
-      </div>
-    `;
-  }
-
-  if (!results || results.length === 0) {
-    let emptyTip = 'لم يتم العثور على وثائق مطابقة للاستعلام.';
-    if (sysId === 'S0') {
-      emptyTip = 'فشل مطابقة السطح البسيط لعدم تطابق الحروف الصرفية مع الأصل.';
-    }
-    return `
-      <div class="empty-state-notice">
-        <svg class="ui-icon" style="margin:0 auto 0.5rem auto; display:block; color:var(--text-muted);" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <div>لا توجد نتائج مطابقة</div>
-        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">${emptyTip}</div>
-      </div>
-    `;
-  }
-
-  return results.map(r => `
-    <div class="article-item">
-      <div class="article-top-row">
-        <span class="article-rank-badge tabular">#${r.rank}</span>
-        <span class="article-score-metric tabular">Score: ${r.score}</span>
-      </div>
-      <a href="${r.url || '#'}" target="_blank" rel="noopener noreferrer" class="article-title-link" title="${escapeHtml(r.title)}">
-        <span>${escapeHtml(r.title)}</span>
-        <svg class="ui-icon-sm" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-      </a>
-      <div class="article-snippet">
-        ${r.snippet}
-      </div>
-      ${r.rationale ? `<div style="font-size:0.72rem; color:var(--success); border-top:0.5px dashed var(--border-subtle); padding-top:0.35rem; margin-top:0.25rem;">معيار الصلة: ${escapeHtml(r.rationale)}</div>` : ''}
-    </div>
-  `).join('');
-}
-
-// =============================================================================
-// 4. MORPHOLOGICAL PLAYGROUND
-// =============================================================================
-function initPlayground() {
-  const textarea = document.getElementById('playground-input');
-  if (!textarea) return;
-
-  let debounceTimer = null;
-  const runUpdate = async () => {
-    const text = textarea.value.trim();
-    if (!text) {
-      document.getElementById('playground-cards-grid').innerHTML = '<div class="empty-state-notice">اكتب نصاً في المربع أعلاه لمشاهدة التفكيك الصرفي...</div>';
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/transform', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: text }),
-      });
-      const data = await res.json();
-      renderPlaygroundCards(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  textarea.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runUpdate, 180);
-  });
-
-  // Initial trigger
-  runUpdate();
-}
-
-function renderPlaygroundCards(data) {
-  const container = document.getElementById('playground-cards-grid');
-  if (!data || !data.systems) return;
-
-  let html = '';
-  ['S0', 'S1', 'S2', 'S3', 'S4', 'S5'].forEach(sysId => {
-    const sys = data.systems[sysId];
-    if (!sys) return;
-
-    let content = '';
-    if (sysId === 'S5') {
-      const trigrams = sys.trigrams || [];
-      content = `
-        <div style="font-size:0.76rem; color:var(--text-muted); margin-bottom:0.4rem;">
-          عدد المقاطع الكلي: <strong class="tabular">${trigrams.length}</strong>
-        </div>
-        <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">
-          ${trigrams.map(t => `<span class="tabular" style="font-size:0.78rem; padding:0.15rem 0.45rem; background:rgba(0,0,0,0.25); border:0.5px solid var(--border-subtle); border-radius:3px;">${escapeHtml(t.replace(/ /g, '␣'))}</span>`).join('')}
-        </div>
-      `;
-    } else {
-      const tokens = sys.display_tokens || [];
-      content = `
-        <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
-          ${tokens.length > 0 ? tokens.map(t => `<span style="font-size:0.85rem; font-weight:600; padding:0.2rem 0.5rem; background:rgba(0,0,0,0.25); border:0.5px solid var(--border-subtle); border-radius:4px;">${escapeHtml(t)}</span>`).join('') : '<span style="color:var(--text-muted); font-size:0.8rem;">(لا توجد كلمات بعد المعالجة)</span>'}
-        </div>
-      `;
-      if (sysId === 'S1' && sys.removed_stopwords && sys.removed_stopwords.length > 0) {
-        content += `
-          <div style="margin-top:0.55rem; font-size:0.74rem; color:var(--danger);">
-            كلمات التوقف المستبعدة: <strong class="tabular">${sys.removed_stopwords.map(escapeHtml).join('، ')}</strong>
-          </div>
-        `;
-      }
-    }
-
-    html += `
-      <div class="transform-card mac-card" style="border-top: 3px solid var(--${sysId.toLowerCase()}-color);">
-        <div class="transform-card-head">
-          <span class="sys-id-tag" style="background:var(--${sysId.toLowerCase()}-bg); color:var(--${sysId.toLowerCase()}-color);">${sys.id}: ${sys.name.split('(')[0].trim()}</span>
-          <span class="sys-level-desc">${sys.level.split('/')[0].trim()}</span>
-        </div>
-        <div style="font-size:0.78rem; color:var(--text-secondary); margin:0.35rem 0 0.65rem 0;">${sys.description}</div>
-        <div style="border-top:0.5px solid var(--border-subtle); padding-top:0.5rem;">
-          <div style="font-size:0.74rem; font-weight:700; color:var(--text-muted); margin-bottom:0.35rem;">المخرجات الصرفية:</div>
-          ${content}
+        <div class="col-results-body">
+          ${isError ? `
+            <div class="col-error-state">
+              <strong>Query Execution Notice:</strong>
+              <div>${escapeHtml(sysData.error)}</div>
+            </div>
+          ` : results.length === 0 ? `
+            <div class="col-empty-state">
+              <svg class="ui-icon" style="width:28px;height:28px;stroke:currentColor;fill:none;" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <div>No matching documents found</div>
+            </div>
+          ` : results.map(r => `
+            <div class="result-card">
+              <div class="result-card-header">
+                <span class="result-rank-badge tabular">Rank #${r.rank}</span>
+                <span class="result-score-badge tabular">Score: ${r.score}</span>
+              </div>
+              <h3 class="result-title">
+                <a href="${escapeHtml(r.url || '#')}" target="_blank" rel="noopener noreferrer">
+                  <span>${escapeHtml(r.title)}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+              </h3>
+              <div class="result-snippet">
+                ${r.snippet}
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
@@ -479,327 +313,8 @@ function renderPlaygroundCards(data) {
 }
 
 // =============================================================================
-// 5. 20 GOLDEN QUERIES CATALOG
-// =============================================================================
-async function loadGoldenQueries() {
-  try {
-    const res = await fetch('/api/golden-queries');
-    const queries = await res.json();
-    allGoldenQueries = queries;
-
-    populateGoldenSelect(queries);
-    populateCategoryFilters(queries);
-    renderGoldenTable(queries);
-  } catch (err) {
-    console.error('Failed to load golden queries:', err);
-  }
-}
-
-function populateGoldenSelect(queries) {
-  const select = document.getElementById('golden-select');
-  if (!select) return;
-
-  queries.forEach(q => {
-    const opt = document.createElement('option');
-    opt.value = q.query_term;
-    opt.textContent = `${q.query_id}: ${q.query_term} (${q.category_name_ar})`;
-    select.appendChild(opt);
-  });
-
-  select.addEventListener('change', (e) => {
-    if (e.target.value) {
-      document.getElementById('search-input').value = e.target.value;
-      triggerSearch();
-    }
-  });
-}
-
-function populateCategoryFilters(queries) {
-  const container = document.getElementById('category-filter-buttons');
-  if (!container) return;
-
-  const categories = {};
-  queries.forEach(q => {
-    if (!categories[q.category_id]) {
-      categories[q.category_id] = q.category_name_ar;
-    }
-  });
-
-  Object.entries(categories).forEach(([id, name]) => {
-    const btn = document.createElement('button');
-    btn.className = 'filter-pill';
-    btn.textContent = name;
-    btn.onclick = () => filterGoldenTable(id, btn);
-    container.appendChild(btn);
-  });
-}
-
-function filterGoldenTable(catId, btn) {
-  document.querySelectorAll('#category-filter-buttons .filter-pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-
-  if (catId === 'all') {
-    renderGoldenTable(allGoldenQueries);
-  } else {
-    const filtered = allGoldenQueries.filter(q => q.category_id === catId);
-    renderGoldenTable(filtered);
-  }
-}
-
-function renderGoldenTable(queries) {
-  const tbody = document.getElementById('golden-table-body');
-  if (!tbody) return;
-
-  tbody.innerHTML = queries.map(q => `
-    <tr>
-      <td><span class="tabular" style="font-weight:700; color:var(--text-muted);">${q.query_id}</span></td>
-      <td><strong style="color:var(--accent-primary); font-size:0.96rem;">${escapeHtml(q.query_term)}</strong></td>
-      <td><code class="tabular">${escapeHtml(q.root || '-')}</code></td>
-      <td><span class="tabular" style="font-size:0.74rem; color:var(--text-muted);">${escapeHtml(q.root_type || '-')}</span></td>
-      <td><span style="font-size:0.78rem;">${escapeHtml(q.category_name_ar)}</span></td>
-      <td style="font-size:0.76rem; color:var(--text-secondary);">${(q.expected_surface_forms || []).slice(0, 5).map(escapeHtml).join('، ')}</td>
-      <td>
-        <button class="btn-table-action" onclick="applyQueryToSearch('${escapeHtml(q.query_term)}')">
-          <svg class="ui-icon-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>تشغيل</span>
-        </button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function applyQueryToSearch(term) {
-  const input = document.getElementById('search-input');
-  input.value = term;
-  switchToTab('tab-search');
-  triggerSearch();
-}
-
-// =============================================================================
-// 6. BENCHMARK METRICS & CHARTS (macOS Dark Palette)
-// =============================================================================
-async function loadBenchmarkData() {
-  try {
-    const res = await fetch('/api/benchmarks/summary');
-    const data = await res.json();
-    const systems = data.systems || [];
-
-    renderMacroMetricsTable(systems);
-    renderCharts(systems);
-  } catch (err) {
-    console.error('Failed to load benchmark summary:', err);
-  }
-}
-
-function renderMacroMetricsTable(systems) {
-  const tbody = document.getElementById('macro-metrics-body');
-  if (!tbody) return;
-
-  tbody.innerHTML = systems.map(s => `
-    <tr>
-      <td><strong style="color:var(--${s.system_id.toLowerCase()}-color);">${s.system_id}: ${s.system_name.split('(')[0].trim()}</strong></td>
-      <td style="font-size:0.78rem; color:var(--text-secondary);">${s.morphological_level.split('/')[0].trim()}</td>
-      <td><strong class="tabular" style="color:var(--accent-primary);">${Number(s.p_at_10).toFixed(4)}</strong></td>
-      <td class="tabular">${Number(s.map).toFixed(4)}</td>
-      <td class="tabular">${Number(s.ndcg_at_10).toFixed(4)}</td>
-      <td><strong class="tabular" style="color:var(--success);">${Number(s.recall_at_100).toFixed(4)}</strong></td>
-      <td class="tabular">${s.index_size_mb} MB</td>
-      <td class="tabular">${s.relative_size_pct}%</td>
-      <td class="tabular">${s.cold_latency_ms} ms</td>
-      <td><strong class="tabular">${s.warm_latency_ms} ms</strong></td>
-    </tr>
-  `).join('');
-}
-
-function renderCharts(systems) {
-  if (typeof Chart === 'undefined') return;
-
-  const labels = systems.map(s => s.system_id);
-  const colors = systems.map(s => SYSTEM_COLORS[s.system_id]?.hex || '#0a84ff');
-
-  // Apple macOS Dark Mode Chart Theme
-  const appleChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: {
-      duration: 600,
-      easing: 'easeOutQuart',
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: 'rgba(235, 235, 245, 0.65)',
-          font: { family: '-apple-system, BlinkMacSystemFont, "SF Pro Arabic", "Cairo", sans-serif', size: 12 }
-        }
-      },
-      tooltip: {
-        backgroundColor: 'rgba(28, 28, 32, 0.92)',
-        titleColor: 'rgba(255, 255, 255, 0.95)',
-        bodyColor: 'rgba(235, 235, 245, 0.75)',
-        borderColor: 'rgba(255, 255, 255, 0.14)',
-        borderWidth: 0.5,
-        padding: 10,
-        cornerRadius: 8,
-        titleFont: { family: '-apple-system, BlinkMacSystemFont, "SF Pro Arabic", "Cairo", sans-serif', size: 12, weight: '600' },
-        bodyFont: { family: '"SF Mono", "JetBrains Mono", monospace', size: 11 }
-      }
-    },
-    scales: {
-      x: {
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-        ticks: { color: 'rgba(235, 235, 245, 0.65)', font: { family: '"SF Mono", "JetBrains Mono", monospace', size: 11 } }
-      },
-      y: {
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-        ticks: { color: 'rgba(235, 235, 245, 0.65)', font: { family: '"SF Mono", "JetBrains Mono", monospace', size: 11 } }
-      }
-    }
-  };
-
-  // 1. Chart: Precision & Recall
-  const ctxPR = document.getElementById('chart-precision-recall');
-  if (ctxPR) {
-    if (charts.pr) charts.pr.destroy();
-    charts.pr = new Chart(ctxPR, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'الدقة P@10',
-            data: systems.map(s => s.p_at_10),
-            backgroundColor: 'rgba(10, 132, 255, 0.85)',
-            borderColor: '#0a84ff',
-            borderWidth: 0.5,
-            borderRadius: 5,
-          },
-          {
-            label: 'الاسترجاع Recall@100',
-            data: systems.map(s => s.recall_at_100),
-            backgroundColor: 'rgba(48, 209, 88, 0.85)',
-            borderColor: '#30d158',
-            borderWidth: 0.5,
-            borderRadius: 5,
-          }
-        ]
-      },
-      options: {
-        ...appleChartOptions,
-        scales: {
-          ...appleChartOptions.scales,
-          y: { ...appleChartOptions.scales.y, beginAtZero: true, max: 1.0 }
-        }
-      }
-    });
-  }
-
-  // 2. Chart: Index Sizes
-  const ctxSizes = document.getElementById('chart-index-sizes');
-  if (ctxSizes) {
-    if (charts.sizes) charts.sizes.destroy();
-    charts.sizes = new Chart(ctxSizes, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'حجم الفهرس (MB)',
-          data: systems.map(s => s.index_size_mb),
-          backgroundColor: colors.map(c => c + 'd0'),
-          borderColor: colors,
-          borderWidth: 0.5,
-          borderRadius: 5,
-        }]
-      },
-      options: {
-        ...appleChartOptions,
-        scales: {
-          ...appleChartOptions.scales,
-          y: { ...appleChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميغابايت', color: 'rgba(235, 235, 245, 0.4)' } }
-        }
-      }
-    });
-  }
-
-  // 3. Chart: Warm & Cold Latency
-  const ctxLatency = document.getElementById('chart-latencies');
-  if (ctxLatency) {
-    if (charts.latency) charts.latency.destroy();
-    charts.latency = new Chart(ctxLatency, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'الزمن الدافئ Warm (ms)',
-            data: systems.map(s => s.warm_latency_ms),
-            backgroundColor: 'rgba(99, 230, 226, 0.85)',
-            borderColor: '#63e6e2',
-            borderWidth: 0.5,
-            borderRadius: 5,
-          },
-          {
-            label: 'الزمن البارد Cold (ms)',
-            data: systems.map(s => s.cold_latency_ms),
-            backgroundColor: 'rgba(255, 69, 58, 0.75)',
-            borderColor: '#ff453a',
-            borderWidth: 0.5,
-            borderRadius: 5,
-          }
-        ]
-      },
-      options: {
-        ...appleChartOptions,
-        scales: {
-          ...appleChartOptions.scales,
-          y: { ...appleChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميلي ثانية', color: 'rgba(235, 235, 245, 0.4)' } }
-        }
-      }
-    });
-  }
-
-  // 4. Chart: nDCG & MAP
-  const ctxMap = document.getElementById('chart-map-ndcg');
-  if (ctxMap) {
-    if (charts.map) charts.map.destroy();
-    charts.map = new Chart(ctxMap, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'nDCG@10',
-            data: systems.map(s => s.ndcg_at_10),
-            borderColor: '#bf5af2',
-            backgroundColor: 'rgba(191, 90, 242, 0.12)',
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: '#bf5af2',
-            pointRadius: 4,
-          },
-          {
-            label: 'MAP',
-            data: systems.map(s => s.map),
-            borderColor: '#ffd60a',
-            backgroundColor: 'rgba(255, 214, 10, 0.1)',
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: '#ffd60a',
-            pointRadius: 4,
-          }
-        ]
-      },
-      options: {
-        ...appleChartOptions,
-        scales: {
-          ...appleChartOptions.scales,
-          y: { ...appleChartOptions.scales.y, beginAtZero: true, max: 1.0 }
-        }
-      }
-    });
-  }
-}
-
 // Utilities
+// =============================================================================
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)

@@ -88,11 +88,11 @@ def generate_trigrams(text: str) -> List[str]:
 SYSTEM_METADATA = {
     "S0": {
         "id": "S0",
-        "name": "البحث السطحي البسيط (Surface Simple)",
-        "level": "سطحي / معجمي (Surface Lexical)",
-        "badge_color": "gray",
-        "color_hex": "#64748b",
-        "description": "مطابقة سطحية للأشكال الحرفية كما هي دون حذف زوائد أو إرجاع للجذور.",
+        "name": "Surface Simple (Baseline)",
+        "level": "Surface / Lexical",
+        "badge_color": "neutral",
+        "color_hex": "#171717",
+        "description": "Exact surface form matching without morphological reduction or affix stripping.",
         "index_type": "GIN (simple tsvector)",
         "index_size_mb": 255.0,
         "index_size_pretty": "255 MB",
@@ -102,11 +102,11 @@ SYSTEM_METADATA = {
     },
     "S1": {
         "id": "S1",
-        "name": "البحث السطحي مع كلمات التوقف (Surface + Stopwords)",
-        "level": "سطحي مع تنقية التوقف (arabic_simple)",
-        "badge_color": "blue",
-        "color_hex": "#0284c7",
-        "description": "حذف أدوات الربط والضمائر وحروف الجر الشائعة لتقليص حجم الفهرس.",
+        "name": "Surface + Stopwords",
+        "level": "Stopword Filtered",
+        "badge_color": "neutral",
+        "color_hex": "#262626",
+        "description": "Surface matching with Arabic functional particles and stopwords removed.",
         "index_type": "GIN (arabic_simple tsvector)",
         "index_size_mb": 178.2,
         "index_size_pretty": "178 MB",
@@ -116,11 +116,11 @@ SYSTEM_METADATA = {
     },
     "S2": {
         "id": "S2",
-        "name": "قص الزوائد واللواحق (Larkey Light10 Stemmer)",
-        "level": "صرفي تصريفي (Inflectional Morphology)",
-        "badge_color": "cyan",
-        "color_hex": "#0d9488",
-        "description": "قص السوابق واللواحق الشائعة (الـ، والـ، ـات، ـون، ـين) للحفاظ على المعنى الدلالي.",
+        "name": "Light Stemming (Larkey)",
+        "level": "Inflectional Morphology",
+        "badge_color": "neutral",
+        "color_hex": "#404040",
+        "description": "Affix stripping removing regular prefixes and suffixes while preserving word stems.",
         "index_type": "GIN (light10 tsvector)",
         "index_size_mb": 142.7,
         "index_size_pretty": "143 MB",
@@ -130,11 +130,11 @@ SYSTEM_METADATA = {
     },
     "S3": {
         "id": "S3",
-        "name": "استخراج الجذر بالقوالب (ISRI Morphological Stemmer)",
-        "level": "صرفي اشتقاقي (Derivational / Pattern)",
-        "badge_color": "purple",
-        "color_hex": "#7c3aed",
-        "description": "استخراج الجذور الثلاثية عبر مطابقة الأوزان الصرفية وقص الزوائد الشائعة.",
+        "name": "Morphological Stemmer (ISRI)",
+        "level": "Heuristic Root Extraction",
+        "badge_color": "neutral",
+        "color_hex": "#525252",
+        "description": "Dictionary-free root extraction based on Arabic morphological pattern templates (Awzan).",
         "index_type": "GIN (isri root tsvector)",
         "index_size_mb": 96.8,
         "index_size_pretty": "97 MB",
@@ -144,11 +144,11 @@ SYSTEM_METADATA = {
     },
     "S4": {
         "id": "S4",
-        "name": "استخراج الجذر بالمعجم (Khoja Dictionary Stemmer)",
-        "level": "صرفي اشتقاقي معجمي (Lexicon-Validated Root)",
-        "badge_color": "emerald",
-        "color_hex": "#059669",
-        "description": "استخراج الجذور والتحقق من صحتها مقابل معجم يضم 4,748 جذراً عربياً أصيلاً.",
+        "name": "Dictionary Root Stemmer (Khoja)",
+        "level": "Dictionary-Based Root Extraction",
+        "badge_color": "neutral",
+        "color_hex": "#737373",
+        "description": "Morphological root extraction validated against a canonical 4,748 Arabic root lexicon.",
         "index_type": "GIN (khoja root tsvector)",
         "index_size_mb": 96.0,
         "index_size_pretty": "96 MB",
@@ -158,11 +158,11 @@ SYSTEM_METADATA = {
     },
     "S5": {
         "id": "S5",
-        "name": "المقاطع الثلاثية الحرفية (Character Trigrams pg_trgm)",
-        "level": "مقاطع دون الكلمة (Sub-word / Trigram)",
-        "badge_color": "amber",
-        "color_hex": "#d97706",
-        "description": "فهرسة النصوص كمقاطع ثلاثية متعاقبة للبحث عن التشابه التقريبي ومقاومة الأخطاء.",
+        "name": "Character Trigrams (pg_trgm)",
+        "level": "Sub-word Character 3-gram",
+        "badge_color": "neutral",
+        "color_hex": "#0a0a0a",
+        "description": "Character 3-gram decomposition resilient against typographical and surface variations.",
         "index_type": "GIN (gin_trgm_ops)",
         "index_size_mb": 207.1,
         "index_size_pretty": "207 MB",
@@ -171,6 +171,7 @@ SYSTEM_METADATA = {
         "recall_at_100": 0.1129,
     },
 }
+
 
 
 def transform_query(raw_query: str) -> Dict[str, Any]:
@@ -304,7 +305,7 @@ def highlight_snippet(
     escaped_window = html.escape(window)
 
     def replacer(m):
-        return f'<mark class="bg-amber-200 text-amber-900 font-semibold px-1 rounded">{m.group(0)}</mark>'
+        return f'<mark class="bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 font-semibold px-1 rounded">{m.group(0)}</mark>'
 
     highlighted = pattern.sub(replacer, escaped_window)
     return f"{prefix}{highlighted}{suffix}"
@@ -371,98 +372,169 @@ def execute_system_search(
     limit: int = 10,
 ) -> Dict[str, Any]:
     """
-    Execute search for a single system against PostgreSQL.
+    Execute robust two-tier search for a single system against PostgreSQL.
+    Tier 1 executes strict phrase/websearch matching; Tier 2 falls back to flexible
+    OR / partial matching to ensure multi-word queries never return 0 results.
     """
     meta = SYSTEM_METADATA.get(system_id, {})
     sys_name = meta.get("name", system_id)
 
-    if not transformed_query:
+    # Fallback to normalized raw query if transformed query is empty
+    effective_query = transformed_query.strip() if transformed_query else normalize_arabic(raw_query, normalize_teh=True)
+    if not effective_query:
         return {
             "system_id": system_id,
             "system_name": sys_name,
             "results": [],
             "total_found": 0,
             "latency_ms": 0.0,
-            "error": "الاستعلام فارغ بعد المعالجة الصرفية",
+            "error": "Query is empty after processing.",
         }
 
-    # SQL templates
-    sql_map = {
-        "S0": """
-            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                   ts_rank(s0_tsvector, plainto_tsquery('simple', %s)) AS score
-            FROM docs
-            WHERE s0_tsvector @@ plainto_tsquery('simple', %s)
-            ORDER BY score DESC, id ASC
-            LIMIT %s;
-        """,
-        "S1": """
-            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                   ts_rank(s1_tsvector, plainto_tsquery('arabic_simple', %s)) AS score
-            FROM docs
-            WHERE s1_tsvector @@ plainto_tsquery('arabic_simple', %s)
-            ORDER BY score DESC, id ASC
-            LIMIT %s;
-        """,
-        "S2": """
-            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                   ts_rank(s2_tsvector, plainto_tsquery('simple', %s)) AS score
-            FROM docs
-            WHERE s2_tsvector @@ plainto_tsquery('simple', %s)
-            ORDER BY score DESC, id ASC
-            LIMIT %s;
-        """,
-        "S3": """
-            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                   ts_rank(s3_tsvector, plainto_tsquery('simple', %s)) AS score
-            FROM docs
-            WHERE s3_tsvector @@ plainto_tsquery('simple', %s)
-            ORDER BY score DESC, id ASC
-            LIMIT %s;
-        """,
-        "S4": """
-            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                   ts_rank(s4_tsvector, plainto_tsquery('simple', %s)) AS score
-            FROM docs
-            WHERE s4_tsvector @@ plainto_tsquery('simple', %s)
-            ORDER BY score DESC, id ASC
-            LIMIT %s;
-        """,
-        "S5": """
-            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
-                   word_similarity(%s, s5_trgm_text) AS score
-            FROM docs
-            WHERE s5_trgm_text %%> %s
-            ORDER BY score DESC, id ASC
-            LIMIT %s;
-        """,
-    }
-
-    sql = sql_map.get(system_id)
-    if not sql:
-        raise ValueError(f"Unknown system_id: {system_id}")
-
-    params = (transformed_query, transformed_query, limit)
-
+    stopwords = get_arabic_stopwords()
     t0 = time.perf_counter()
-    rows = []
+    rows: List[Tuple] = []
+
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute("SET random_page_cost = 1.5;")
-                cur.execute("SET statement_timeout = '12000';")  # 12s timeout ceiling
-                cur.execute(sql, params)
-                rows = cur.fetchall()
+                cur.execute("SET statement_timeout = '12000';")  # 12s ceiling
+
+                if system_id in ["S0", "S1", "S2", "S3", "S4"]:
+                    config_map = {
+                        "S0": ("s0_tsvector", "simple"),
+                        "S1": ("s1_tsvector", "arabic_simple"),
+                        "S2": ("s2_tsvector", "simple"),
+                        "S3": ("s3_tsvector", "simple"),
+                        "S4": ("s4_tsvector", "simple"),
+                    }
+                    col_name, cfg_name = config_map[system_id]
+
+                    # Prepare Tier 1 input: map Arabic 'أو' / 'او' to 'or' for websearch_to_tsquery
+                    web_input = effective_query.replace(" أو ", " or ").replace(" او ", " or ")
+
+                    # Tier 1: Exact phrase and conjunctive websearch
+                    sql_tier1 = f"""
+                        SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
+                               ts_rank({col_name}, websearch_to_tsquery('{cfg_name}', %s)) AS score
+                        FROM docs
+                        WHERE {col_name} @@ websearch_to_tsquery('{cfg_name}', %s)
+                        ORDER BY score DESC, id ASC
+                        LIMIT %s;
+                    """
+                    cur.execute(sql_tier1, (web_input, web_input, limit))
+                    rows = list(cur.fetchall())
+
+                    # Tier 2: Flexible OR fallback if fewer than limit results
+                    if len(rows) < limit:
+                        tokens = [t for t in effective_query.split() if t]
+                        content_tokens = [t for t in tokens if t not in stopwords and len(t) > 1]
+                        or_tokens = content_tokens if content_tokens else tokens
+                        clean_tokens = [re.sub(r"[^\w\u0600-\u06FF]", "", t) for t in or_tokens]
+                        clean_tokens = [t for t in clean_tokens if t]
+
+                        if clean_tokens and (len(clean_tokens) > 1 or not rows):
+                            or_q = " | ".join(clean_tokens)
+                            existing_ids = [r[0] for r in rows]
+                            needed = limit - len(rows)
+                            try:
+                                if existing_ids:
+                                    sql_tier2 = f"""
+                                        SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
+                                               ts_rank({col_name}, to_tsquery('{cfg_name}', %s)) AS score
+                                        FROM docs
+                                        WHERE {col_name} @@ to_tsquery('{cfg_name}', %s)
+                                          AND NOT (id = ANY(%s))
+                                        ORDER BY score DESC, id ASC
+                                        LIMIT %s;
+                                    """
+                                    cur.execute(sql_tier2, (or_q, or_q, existing_ids, needed))
+                                else:
+                                    sql_tier2 = f"""
+                                        SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample,
+                                               ts_rank({col_name}, to_tsquery('{cfg_name}', %s)) AS score
+                                        FROM docs
+                                        WHERE {col_name} @@ to_tsquery('{cfg_name}', %s)
+                                        ORDER BY score DESC, id ASC
+                                        LIMIT %s;
+                                    """
+                                    cur.execute(sql_tier2, (or_q, or_q, needed))
+                                fallback_rows = cur.fetchall()
+                                rows.extend(fallback_rows)
+                            except Exception:
+                                pass
+
+                elif system_id == "S5":
+                    norm_q = normalize_arabic(raw_query, normalize_teh=True)
+                    tokens = [t for t in norm_q.split() if t not in stopwords and len(t) > 1]
+                    if not tokens:
+                        tokens = [t for t in norm_q.split() if t]
+
+                    # Tier 1: Continuous normalized phrase search via GIN
+                    if len(norm_q.split()) > 1:
+                        sql_s5_phrase = """
+                            WITH candidates AS (
+                                SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
+                                FROM docs
+                                WHERE s5_trgm_text LIKE %s
+                                LIMIT 50
+                            )
+                            SELECT id, doc_id, title, body_sample,
+                                   word_similarity(%s, s5_trgm_text) AS score
+                            FROM candidates
+                            ORDER BY score DESC, id ASC
+                            LIMIT %s;
+                        """
+                        cur.execute(sql_s5_phrase, (f"%{norm_q}%", norm_q, limit))
+                        rows = list(cur.fetchall())
+
+                    # Tier 2: Multi-term LIKE ANY fallback for non-adjacent words or remaining slots
+                    if len(rows) < limit and tokens:
+                        needed = limit - len(rows)
+                        existing_ids = [r[0] for r in rows]
+                        like_tokens = [f"%{t}%" for t in tokens]
+                        if existing_ids:
+                            sql_s5_fallback = """
+                                WITH candidates AS (
+                                    SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
+                                    FROM docs
+                                    WHERE s5_trgm_text LIKE ANY(%s)
+                                      AND NOT (id = ANY(%s))
+                                    LIMIT 50
+                                )
+                                SELECT id, doc_id, title, body_sample,
+                                       word_similarity(%s, s5_trgm_text) AS score
+                                FROM candidates
+                                ORDER BY score DESC, id ASC
+                                LIMIT %s;
+                            """
+                            cur.execute(sql_s5_fallback, (like_tokens, existing_ids, norm_q, needed))
+                        else:
+                            sql_s5_fallback = """
+                                WITH candidates AS (
+                                    SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
+                                    FROM docs
+                                    WHERE s5_trgm_text LIKE ANY(%s)
+                                    LIMIT 50
+                                )
+                                SELECT id, doc_id, title, body_sample,
+                                       word_similarity(%s, s5_trgm_text) AS score
+                                FROM candidates
+                                ORDER BY score DESC, id ASC
+                                LIMIT %s;
+                            """
+                            cur.execute(sql_s5_fallback, (like_tokens, norm_q, needed))
+                        fallback_rows = cur.fetchall()
+                        rows.extend(fallback_rows)
+
     except (QueryCanceled, psycopg.OperationalError) as exc:
         latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
         err_text = str(exc)
         if "statement timeout" in err_text.lower() or isinstance(exc, QueryCanceled):
-            if system_id == "S5":
-                user_msg = "تجاوز استعلام المقاطع الثلاثية الحد الأقصى للمهلة (12 ثانية) نظراً لكثافة المقاطع الحرفية في 100,000 مقال."
-            else:
-                user_msg = f"تجاوز استعلام {sys_name} مهلة المعالجة (12 ثانية) لكثافة تكرار الجذر في 100,000 مقال."
+            user_msg = f"Search timed out for {sys_name} ({latency_ms} ms)."
         else:
-            user_msg = f"خطأ أثناء الاستعلام: {err_text}"
+            user_msg = f"Database query error: {err_text}"
         return {
             "system_id": system_id,
             "system_name": sys_name,
@@ -479,13 +551,13 @@ def execute_system_search(
             "results": [],
             "total_found": 0,
             "latency_ms": latency_ms,
-            "error": f"خطأ في قاعدة البيانات: {exc}",
+            "error": f"Database error: {exc}",
         }
 
     latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
 
     # Highlight terms
-    search_terms = raw_query.split() + transformed_query.split()
+    search_terms = raw_query.split() + effective_query.split()
 
     results: List[Dict[str, Any]] = []
     for rank, row in enumerate(rows, start=1):
@@ -508,6 +580,7 @@ def execute_system_search(
         "latency_ms": latency_ms,
         "error": None,
     }
+
 
 
 # Cache for golden queries and benchmark metrics
