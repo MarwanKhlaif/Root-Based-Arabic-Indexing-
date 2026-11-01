@@ -299,6 +299,12 @@ function renderSearchResults(data) {
                   </svg>
                 </a>
               </h3>
+              ${r.matched_forms && r.matched_forms.length > 0 ? `
+                <div class="result-matched-forms">
+                  <span class="matched-forms-label">Matched:</span>
+                  ${r.matched_forms.map(f => `<span class="matched-form-tag">${escapeHtml(f)}</span>`).join('')}
+                </div>
+              ` : ''}
               <div class="result-snippet">
                 ${r.snippet}
               </div>

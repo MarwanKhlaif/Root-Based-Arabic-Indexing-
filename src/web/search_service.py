@@ -206,10 +206,12 @@ def transform_query(raw_query: str) -> Dict[str, Any]:
     # S3: ISRI Stemmer
     s3_query = stem_isri(normalized) if normalized else ""
     s3_tokens = s3_query.split() if s3_query else []
+    s3_unique = list(dict.fromkeys(s3_tokens))
 
     # S4: Khoja Stemmer
     s4_query = stem_khoja(normalized) if normalized else ""
     s4_tokens = s4_query.split() if s4_query else []
+    s4_unique = list(dict.fromkeys(s4_tokens))
 
     # S5: Character Trigrams
     s5_trigrams = generate_trigrams(normalized)
@@ -242,13 +244,13 @@ def transform_query(raw_query: str) -> Dict[str, Any]:
                 **SYSTEM_METADATA["S3"],
                 "transformed_query": s3_query,
                 "tokens": s3_tokens,
-                "display_tokens": s3_tokens,
+                "display_tokens": s3_unique if s3_unique else s3_tokens,
             },
             "S4": {
                 **SYSTEM_METADATA["S4"],
                 "transformed_query": s4_query,
                 "tokens": s4_tokens,
-                "display_tokens": s4_tokens,
+                "display_tokens": s4_unique if s4_unique else s4_tokens,
             },
             "S5": {
                 **SYSTEM_METADATA["S5"],
@@ -277,8 +279,8 @@ def highlight_snippet(
     if not clean_text:
         return ""
 
-    # Filter meaningful keywords
-    valid_keywords = [re.escape(k) for k in keywords if k and len(k) >= 2]
+    # Filter meaningful keywords, sorted by length descending so longer words match first
+    valid_keywords = sorted([re.escape(k) for k in keywords if k and len(k) >= 2], key=len, reverse=True)
     if not valid_keywords:
         # Return first max_length chars escaped
         snippet = html.escape(clean_text[:max_length])
@@ -404,6 +406,12 @@ def execute_system_search(
                 cur.execute("SET random_page_cost = 1.5;")
                 cur.execute("SET statement_timeout = '12000';")  # 12s ceiling
 
+                norm_q = normalize_arabic(raw_query.strip(), normalize_teh=True)
+                raw_tokens = [t for t in norm_q.split() if t]
+                content_tokens = [t for t in raw_tokens if t not in stopwords and len(t) >= 2]
+                if not content_tokens:
+                    content_tokens = raw_tokens
+
                 if system_id in ["S0", "S1", "S2", "S3", "S4"]:
                     config_map = {
                         "S0": ("s0_tsvector", "simple"),
@@ -414,162 +422,115 @@ def execute_system_search(
                     }
                     col_name, cfg_name = config_map[system_id]
 
-                    # Prepare Tier 1 input: map Arabic 'أو' / 'او' to 'or' for websearch_to_tsquery
-                    web_input = effective_query.replace(" أو ", " or ").replace(" او ", " or ")
+                    # Derive stems based on system
+                    if system_id in ["S0", "S1"]:
+                        stems = content_tokens
+                    elif system_id == "S2":
+                        stems = list(dict.fromkeys([stem_larkey(t) for t in content_tokens if t]))
+                    elif system_id == "S3":
+                        stems = list(dict.fromkeys([stem_isri(t) for t in content_tokens if t]))
+                    else:  # S4
+                        stems = list(dict.fromkeys([stem_khoja(t) for t in content_tokens if t]))
 
-                    # Tier 1: Exact phrase and conjunctive websearch with bounded candidate CTE
-                    sql_tier1 = f"""
-                        WITH candidates AS (
-                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, {col_name}
+                    stems = [re.sub(r"[^\w\u0600-\u06FF]", "", t) for t in stems]
+                    stems = [t for t in stems if t]
+                    if not stems:
+                        stems = raw_tokens
+
+                    stems_set = set(stems)
+                    cfg_query = "simple" if (system_id == "S1" and not [t for t in raw_tokens if t not in stopwords]) else cfg_name
+
+                    ts_and_query = " & ".join(stems[:5])
+                    ts_or_query = " | ".join(stems[:6])
+
+                    title_phrase = f"%{norm_q}%"
+                    title_tokens = list(dict.fromkeys(raw_tokens + stems))
+                    title_patterns = [f"%{w}%" for w in title_tokens if len(w) >= 2][:8]
+
+                    sql_search = f"""
+                        WITH phrase_matches AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 3000) AS body_sample, {col_name}, 10.0::float4 AS boost
                             FROM docs
-                            WHERE {col_name} @@ websearch_to_tsquery('{cfg_name}', %s)
-                            LIMIT 100
+                            WHERE title ILIKE %s
+                            LIMIT 10
+                        ),
+                        title_matches AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 3000) AS body_sample, {col_name}, 5.0::float4 AS boost
+                            FROM docs
+                            WHERE title ILIKE ANY(%s)
+                            LIMIT 25
+                        ),
+                        and_matches AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 3000) AS body_sample, {col_name}, 2.0::float4 AS boost
+                            FROM docs
+                            WHERE {col_name} @@ to_tsquery('{cfg_query}', %s)
+                            LIMIT 30
+                        ),
+                        or_matches AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 3000) AS body_sample, {col_name}, 0.0::float4 AS boost
+                            FROM docs
+                            WHERE {col_name} @@ to_tsquery('{cfg_query}', %s)
+                            LIMIT 40
+                        ),
+                        combined AS (
+                            SELECT * FROM phrase_matches
+                            UNION SELECT * FROM title_matches
+                            UNION SELECT * FROM and_matches
+                            UNION SELECT * FROM or_matches
                         )
                         SELECT id, doc_id, title, body_sample,
-                               ts_rank({col_name}, websearch_to_tsquery('{cfg_name}', %s)) AS score
-                        FROM candidates
+                               (boost + ts_rank({col_name}, to_tsquery('{cfg_query}', %s))) AS score
+                        FROM combined
                         ORDER BY score DESC, id ASC
                         LIMIT %s;
                     """
-                    cur.execute(sql_tier1, (web_input, web_input, limit))
+                    cur.execute(sql_search, (title_phrase, title_patterns, ts_and_query, ts_or_query, ts_or_query, limit))
                     rows = list(cur.fetchall())
 
-                    # Tier 2: Flexible OR fallback if fewer than limit results
-                    if len(rows) < limit:
-                        raw_tokens = list(dict.fromkeys(effective_query.split()))
-                        content_tokens = [t for t in raw_tokens if t not in stopwords and len(t) > 1]
-                        selected_tokens = sorted(content_tokens, key=len, reverse=True)[:5] if content_tokens else raw_tokens[:4]
-                        clean_tokens = [re.sub(r"[^\w\u0600-\u06FF]", "", t) for t in selected_tokens]
-                        clean_tokens = [t for t in clean_tokens if t]
-
-                        if clean_tokens and (len(clean_tokens) > 1 or not rows):
-                            or_q = " | ".join(clean_tokens)
-                            existing_ids = [r[0] for r in rows]
-                            needed = limit - len(rows)
-                            cfg_tier2 = "simple" if (cfg_name == "arabic_simple" and not content_tokens) else cfg_name
-                            try:
-                                if existing_ids:
-                                    sql_tier2 = f"""
-                                        WITH candidates AS (
-                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, {col_name}
-                                            FROM docs
-                                            WHERE {col_name} @@ to_tsquery('{cfg_tier2}', %s)
-                                              AND NOT (id = ANY(%s))
-                                            LIMIT 100
-                                        )
-                                        SELECT id, doc_id, title, body_sample,
-                                               ts_rank({col_name}, to_tsquery('{cfg_tier2}', %s)) AS score
-                                        FROM candidates
-                                        ORDER BY score DESC, id ASC
-                                        LIMIT %s;
-                                    """
-                                    cur.execute(sql_tier2, (or_q, existing_ids, or_q, needed))
-                                else:
-                                    sql_tier2 = f"""
-                                        WITH candidates AS (
-                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, {col_name}
-                                            FROM docs
-                                            WHERE {col_name} @@ to_tsquery('{cfg_tier2}', %s)
-                                            LIMIT 100
-                                        )
-                                        SELECT id, doc_id, title, body_sample,
-                                               ts_rank({col_name}, to_tsquery('{cfg_tier2}', %s)) AS score
-                                        FROM candidates
-                                        ORDER BY score DESC, id ASC
-                                        LIMIT %s;
-                                    """
-                                    cur.execute(sql_tier2, (or_q, or_q, needed))
-                                fallback_rows = cur.fetchall()
-                                rows.extend(fallback_rows)
-                            except Exception as exc:
-                                conn.rollback()
-                                logger.warning(
-                                    "Tier 2 fallback search failed for system %s on query %r: %s",
-                                    system_id,
-                                    or_q,
-                                    exc,
-                                )
-
                 elif system_id == "S5":
-                    norm_q = normalize_arabic(raw_query, normalize_teh=True)
                     clean_phrase = re.sub(r"[%_\\]", " ", norm_q).strip()
                     clean_phrase = " ".join(clean_phrase.split())
-                    all_tokens = clean_phrase.split() if clean_phrase else norm_q.split()
+                    s5_tokens = [re.sub(r"[^\w\u0600-\u06FF]", "", t) for t in clean_phrase.split()]
+                    s5_tokens = [t for t in s5_tokens if t and len(t) >= 2]
+                    if not s5_tokens:
+                        s5_tokens = raw_tokens
 
-                    # Filter stopwords for token selection
-                    tokens = [t for t in all_tokens if t not in stopwords and len(t) > 1]
-                    if not tokens:
-                        tokens = [t for t in all_tokens if t]
+                    title_phrase = f"%{clean_phrase}%"
+                    title_pats = [f"%{t}%" for t in s5_tokens[:6]]
+                    like_tokens = [f"%{t}%" for t in s5_tokens[:4]]
 
-                    # Tier 1: Continuous normalized phrase search via GIN
-                    if len(all_tokens) > 1 and clean_phrase:
-                        sql_s5_phrase = """
-                            WITH candidates AS (
-                                SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
-                                FROM docs
-                                WHERE s5_trgm_text LIKE %s
-                                LIMIT 50
-                            )
-                            SELECT id, doc_id, title, body_sample,
-                                   word_similarity(%s, s5_trgm_text) AS score
-                            FROM candidates
-                            ORDER BY score DESC, id ASC
-                            LIMIT %s;
-                        """
-                        cur.execute(sql_s5_phrase, (f"%{clean_phrase}%", clean_phrase, limit))
-                        rows = list(cur.fetchall())
-
-                    # Tier 2: Multi-term LIKE ANY fallback for non-adjacent words or remaining slots
-                    if len(rows) < limit and tokens:
-                        needed = limit - len(rows)
-                        existing_ids = [r[0] for r in rows]
-                        s5_content = [t for t in tokens if t not in stopwords and len(t) > 1]
-                        s5_top = sorted(s5_content, key=len, reverse=True)[:4] if s5_content else tokens[:4]
-                        sanitized_tokens = [re.sub(r"[%_\\]", "", t) for t in s5_top]
-                        like_tokens = [f"%{t}%" for t in sanitized_tokens if t]
-
-                        if like_tokens:
-                            try:
-                                if existing_ids:
-                                    sql_s5_fallback = """
-                                        WITH candidates AS (
-                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
-                                            FROM docs
-                                            WHERE s5_trgm_text LIKE ANY(%s)
-                                              AND NOT (id = ANY(%s))
-                                            LIMIT 50
-                                        )
-                                        SELECT id, doc_id, title, body_sample,
-                                               word_similarity(%s, s5_trgm_text) AS score
-                                        FROM candidates
-                                        ORDER BY score DESC, id ASC
-                                        LIMIT %s;
-                                    """
-                                    cur.execute(sql_s5_fallback, (like_tokens, existing_ids, clean_phrase or norm_q, needed))
-                                else:
-                                    sql_s5_fallback = """
-                                        WITH candidates AS (
-                                            SELECT id, doc_id, title, substring(body from 1 for 600) AS body_sample, s5_trgm_text
-                                            FROM docs
-                                            WHERE s5_trgm_text LIKE ANY(%s)
-                                            LIMIT 50
-                                        )
-                                        SELECT id, doc_id, title, body_sample,
-                                               word_similarity(%s, s5_trgm_text) AS score
-                                        FROM candidates
-                                        ORDER BY score DESC, id ASC
-                                        LIMIT %s;
-                                    """
-                                    cur.execute(sql_s5_fallback, (like_tokens, clean_phrase or norm_q, needed))
-                                fallback_rows = cur.fetchall()
-                                rows.extend(fallback_rows)
-                            except Exception as exc:
-                                conn.rollback()
-                                logger.warning(
-                                    "Tier 2 fallback search failed for system S5 on query %r: %s",
-                                    clean_phrase or norm_q,
-                                    exc,
-                                )
+                    sql_s5 = """
+                        WITH phrase_c AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 3000) AS body_sample, s5_trgm_text, 5.0::float4 AS boost
+                            FROM docs
+                            WHERE title ILIKE %s
+                            LIMIT 10
+                        ),
+                        title_c AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 3000) AS body_sample, s5_trgm_text, 3.0::float4 AS boost
+                            FROM docs
+                            WHERE title ILIKE ANY(%s)
+                            LIMIT 20
+                        ),
+                        trgm_c AS (
+                            SELECT id, doc_id, title, substring(body from 1 for 3000) AS body_sample, s5_trgm_text, 0.0::float4 AS boost
+                            FROM docs
+                            WHERE s5_trgm_text LIKE ANY(%s)
+                            LIMIT 40
+                        ),
+                        combined AS (
+                            SELECT * FROM phrase_c
+                            UNION SELECT * FROM title_c
+                            UNION SELECT * FROM trgm_c
+                        )
+                        SELECT id, doc_id, title, body_sample,
+                               (boost + word_similarity(%s, s5_trgm_text)) AS score
+                        FROM combined
+                        ORDER BY score DESC, id ASC
+                        LIMIT %s;
+                    """
+                    cur.execute(sql_s5, (title_phrase, title_pats, like_tokens, clean_phrase or norm_q, limit))
+                    rows = list(cur.fetchall())
 
     except (QueryCanceled, psycopg.OperationalError) as exc:
         latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
@@ -621,19 +582,56 @@ def execute_system_search(
     )
     rows = unique_rows[:limit]
 
-    # Highlight terms
-    search_terms = raw_query.split() + effective_query.split()
-
+    # Build matched forms for each result and format snippet
     results: List[Dict[str, Any]] = []
+    norm_q = normalize_arabic(raw_query.strip(), normalize_teh=True)
+    raw_tokens = [t for t in norm_q.split() if t]
+    content_tokens = [t for t in raw_tokens if t not in stopwords and len(t) >= 2] or raw_tokens
+
+    if system_id in ["S0", "S1"]:
+        stems_set = set(content_tokens)
+    elif system_id == "S2":
+        stems_set = set(stem_larkey(t) for t in content_tokens if t)
+    elif system_id in ["S3", "S4"]:
+        stems_set = set(stem_isri(t) for t in content_tokens if t)
+    else:
+        stems_set = set(content_tokens)
+
     for rank, row in enumerate(rows, start=1):
         doc_pk, doc_id, title, body_sample, score = row
+
+        # Extract morphological forms matched in body_sample
+        matched_forms: Set[str] = set()
+        if body_sample:
+            for word in body_sample.split():
+                cw = word.strip(".,:;()[]\"'«»-")
+                if not cw or len(cw) < 2:
+                    continue
+                if system_id in ["S3", "S4"]:
+                    if stem_isri(cw) in stems_set:
+                        matched_forms.add(cw)
+                elif system_id == "S2":
+                    if stem_larkey(cw) in stems_set:
+                        matched_forms.add(cw)
+                elif system_id == "S5":
+                    if any(t in cw for t in raw_tokens if len(t) >= 2):
+                        matched_forms.add(cw)
+                else:
+                    if cw in stems_set or cw in raw_tokens:
+                        matched_forms.add(cw)
+
+        # Highlight terms: raw tokens + stems + all detected morphological matches
+        highlight_keywords = list(set(raw_tokens) | stems_set | matched_forms)
+        snippet = highlight_snippet(body_sample, highlight_keywords)
+
         results.append({
             "rank": rank,
             "id": doc_pk,
             "doc_id": doc_id,
             "title": title,
             "score": round(float(score), 4) if score is not None else 0.0,
-            "snippet": highlight_snippet(body_sample, search_terms),
+            "snippet": snippet,
+            "matched_forms": sorted(matched_forms)[:6],
             "url": f"https://ar.wikipedia.org/wiki/{title.replace(' ', '_')}" if title else None,
         })
 

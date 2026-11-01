@@ -669,6 +669,34 @@ body.macos-theme {
   flex-shrink: 0;
 }
 
+.result-matched-forms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 0.76rem;
+}
+
+.matched-forms-label {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  margin-inline-end: 2px;
+}
+
+.matched-form-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  background: var(--surface-highest);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  font-family: var(--font-arabic);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 .result-snippet {
   font-size: 0.84rem;
   line-height: 1.6;

@@ -373,4 +373,27 @@ class TestFastAPIEndpoints:
         assert "--s4-color: #30d158" not in css
         assert "--s5-color: #ffd60a" not in css
 
+    def test_arabic_morphological_derivation_search(self, client):
+        """
+        Verify that Arabic morphological family search (e.g. عمل يعمل العمل الأعمال عامل عمال)
+        retrieves highly relevant articles and captures derived forms across all systems.
+        """
+        response = client.post(
+            "/api/search",
+            json={"query": "عمل يعمل العمل الأعمال عامل عمال", "limit": 5},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "systems" in data
+        for sys_id in ["S0", "S1", "S2", "S3", "S4", "S5"]:
+            assert sys_id in data["systems"]
+            sys_res = data["systems"][sys_id]
+            assert len(sys_res["results"]) > 0
+            assert sys_res["latency_ms"] < 2500
+            first_res = sys_res["results"][0]
+            assert "<mark" in first_res["snippet"]
+            assert "score" in first_res
+            assert "matched_forms" in first_res
+
+
 
