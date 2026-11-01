@@ -146,7 +146,7 @@ python -m src.benchmarks.overstemming_analysis
 # تشغيل حاوية قاعدة البيانات وحاوية واجهة الويب معاً:
 docker compose up -d
 ```
-ثم افتح المتصفح على: **`http://localhost:8000`**
+ثم افتح المتصفح على: **`http://localhost:8000`** أو عبر نطاق OrbStack المحلي: **`http://arabic-ir-web.arabic-ir.orb.local`**
 
 ### أو التشغيل محلياً عبر Python:
 ```bash
