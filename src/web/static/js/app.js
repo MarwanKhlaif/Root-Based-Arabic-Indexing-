@@ -1,7 +1,7 @@
 /**
- * Arabic IR Web Interface - Frontend Application Engine (Anti-Slop Modernized)
+ * Arabic IR Web Interface - Frontend Application Engine (Apple macOS HIG)
  * Handles segmented tabs, parallel multi-system search, instant morphological playground,
- * golden query execution, and Chart.js telemetry visualizations.
+ * golden query execution, and high-precision Chart.js telemetry visualizations.
  */
 
 let currentViewMode = 'side'; // 'side' or 'tabs'
@@ -9,14 +9,14 @@ let lastSearchResults = null;
 let allGoldenQueries = [];
 let charts = {};
 
-// Color map for systems matching CSS identity tokens
+// Apple HIG Dark Mode System Palette for S0–S5
 const SYSTEM_COLORS = {
-  S0: { hex: '#94a3b8', bg: 'rgba(148, 163, 184, 0.08)' },
-  S1: { hex: '#38bdf8', bg: 'rgba(56, 189, 248, 0.08)' },
-  S2: { hex: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.08)' },
-  S3: { hex: '#a855f7', bg: 'rgba(168, 85, 247, 0.08)' },
-  S4: { hex: '#34d399', bg: 'rgba(52, 211, 153, 0.08)' },
-  S5: { hex: '#fbbf24', bg: 'rgba(251, 191, 36, 0.08)' },
+  S0: { hex: '#8e8e93', bg: 'rgba(142, 142, 147, 0.12)' }, // System Gray
+  S1: { hex: '#64d2ff', bg: 'rgba(100, 210, 255, 0.12)' }, // System Cyan
+  S2: { hex: '#63e6e2', bg: 'rgba(99, 230, 226, 0.12)' }, // System Mint / Teal
+  S3: { hex: '#bf5af2', bg: 'rgba(191, 90, 242, 0.12)' }, // System Purple
+  S4: { hex: '#30d158', bg: 'rgba(48, 209, 88, 0.12)' },  // System Green
+  S5: { hex: '#ffd60a', bg: 'rgba(255, 214, 10, 0.12)' }, // System Yellow
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -46,16 +46,20 @@ function handleSystemToggle() {
 }
 
 // =============================================================================
-// 1. TABS MANAGEMENT
+// 1. TABS MANAGEMENT (macOS Segmented Control)
 // =============================================================================
 function initTabs() {
   const tabButtons = document.querySelectorAll('.tab-btn');
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      tabButtons.forEach(b => b.classList.remove('active'));
+      tabButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
 
       btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
       const targetId = btn.getAttribute('data-tab');
       const pane = document.getElementById(targetId);
       if (pane) {
@@ -66,7 +70,7 @@ function initTabs() {
       if (targetId === 'tab-benchmarks') {
         setTimeout(() => {
           Object.values(charts).forEach(c => c && c.resize && c.resize());
-        }, 50);
+        }, 60);
       }
     });
   });
@@ -120,13 +124,13 @@ async function triggerSearch() {
   const query = input.value.trim();
 
   if (!query) {
-    alert('يرجى كتابة كلمة أو استعلام للبحث');
+    input.focus();
     return;
   }
 
   btn.disabled = true;
   btn.innerHTML = `
-    <svg class="ui-icon" style="animation: spin 1s linear infinite;" viewBox="0 0 24 24">
+    <svg class="ui-icon" style="animation: spin 0.8s linear infinite;" viewBox="0 0 24 24">
       <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
     </svg>
     <span>جاري البحث...</span>
@@ -155,7 +159,6 @@ async function triggerSearch() {
     }
   } catch (err) {
     console.error('Search error:', err);
-    alert('حدث خطأ أثناء تنفيذ البحث: ' + err.message);
   } finally {
     btn.disabled = false;
     btn.innerHTML = `
@@ -207,7 +210,7 @@ function renderTransformationStrip(data) {
           <span class="sys-id-tag">${sys.id}: ${(sys.name || sysId).split('(')[0].trim()}</span>
           <span class="sys-level-desc">${(sys.level || '').split('/')[0].trim()}</span>
         </div>
-        <div class="transform-tokens-output" title="${escapeHtml(tokenText)}">
+        <div class="transform-tokens-output tabular" title="${escapeHtml(tokenText)}">
           ${escapeHtml(tokenText)}
         </div>
       </div>
@@ -301,13 +304,13 @@ function renderTabbedResults(data, container) {
     navHtml += `
       <button class="filter-pill ${isActive}" onclick="switchResultTab('${sysId}', this)">
         <span>${sysId} (${sysData.total_found || 0})</span>
-        <span class="tabular" style="font-size:0.75rem; opacity:0.8;">${sysData.latency_ms}ms</span>
+        <span class="tabular" style="font-size:0.75rem; opacity:0.85;">${sysData.latency_ms}ms</span>
       </button>
     `;
 
     contentHtml += `
       <div id="tab-res-${sysId}" class="result-tab-content" style="display: ${index === 0 ? 'block' : 'none'};">
-        <div style="margin-bottom:1rem; padding:0.85rem; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+        <div style="margin-bottom:1rem; padding:0.85rem; background:var(--bg-surface-elevated); border-radius:var(--radius-md); border:0.5px solid var(--border-subtle);">
           <div style="font-weight:700; color:var(--${sysId.toLowerCase()}-color); font-size:0.95rem;">${meta.name || sysId}</div>
           <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.25rem;">${meta.description || ''}</div>
         </div>
@@ -321,7 +324,7 @@ function renderTabbedResults(data, container) {
   navHtml += '</div>';
 
   container.innerHTML = `
-    <div class="control-console" style="margin-bottom:0;">
+    <div class="control-console mac-card" style="margin-bottom:0;">
       ${navHtml}
       ${contentHtml}
     </div>
@@ -329,7 +332,7 @@ function renderTabbedResults(data, container) {
 }
 
 function switchResultTab(sysId, btn) {
-  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#results-tabbed-container .filter-pill').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.result-tab-content').forEach(c => c.style.display = 'none');
 
   btn.classList.add('active');
@@ -379,7 +382,7 @@ function renderArticlesList(results, sysId, error) {
       <div class="article-snippet">
         ${r.snippet}
       </div>
-      ${r.rationale ? `<div style="font-size:0.72rem; color:var(--success); border-top:1px dashed var(--border-subtle); padding-top:0.35rem; margin-top:0.25rem;">معيار الصلة: ${escapeHtml(r.rationale)}</div>` : ''}
+      ${r.rationale ? `<div style="font-size:0.72rem; color:var(--success); border-top:0.5px dashed var(--border-subtle); padding-top:0.35rem; margin-top:0.25rem;">معيار الصلة: ${escapeHtml(r.rationale)}</div>` : ''}
     </div>
   `).join('');
 }
@@ -414,7 +417,7 @@ function initPlayground() {
 
   textarea.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runUpdate, 200);
+    debounceTimer = setTimeout(runUpdate, 180);
   });
 
   // Initial trigger
@@ -434,23 +437,23 @@ function renderPlaygroundCards(data) {
     if (sysId === 'S5') {
       const trigrams = sys.trigrams || [];
       content = `
-        <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.4rem;">
+        <div style="font-size:0.76rem; color:var(--text-muted); margin-bottom:0.4rem;">
           عدد المقاطع الكلي: <strong class="tabular">${trigrams.length}</strong>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">
-          ${trigrams.map(t => `<span class="tabular" style="font-size:0.78rem; padding:0.15rem 0.4rem; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:3px;">${escapeHtml(t.replace(/ /g, '␣'))}</span>`).join('')}
+          ${trigrams.map(t => `<span class="tabular" style="font-size:0.78rem; padding:0.15rem 0.45rem; background:rgba(0,0,0,0.25); border:0.5px solid var(--border-subtle); border-radius:3px;">${escapeHtml(t.replace(/ /g, '␣'))}</span>`).join('')}
         </div>
       `;
     } else {
       const tokens = sys.display_tokens || [];
       content = `
         <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
-          ${tokens.length > 0 ? tokens.map(t => `<span style="font-size:0.85rem; font-weight:600; padding:0.2rem 0.5rem; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:4px;">${escapeHtml(t)}</span>`).join('') : '<span style="color:var(--text-muted); font-size:0.8rem;">(لا توجد كلمات بعد المعالجة)</span>'}
+          ${tokens.length > 0 ? tokens.map(t => `<span style="font-size:0.85rem; font-weight:600; padding:0.2rem 0.5rem; background:rgba(0,0,0,0.25); border:0.5px solid var(--border-subtle); border-radius:4px;">${escapeHtml(t)}</span>`).join('') : '<span style="color:var(--text-muted); font-size:0.8rem;">(لا توجد كلمات بعد المعالجة)</span>'}
         </div>
       `;
       if (sysId === 'S1' && sys.removed_stopwords && sys.removed_stopwords.length > 0) {
         content += `
-          <div style="margin-top:0.6rem; font-size:0.75rem; color:var(--danger);">
+          <div style="margin-top:0.55rem; font-size:0.74rem; color:var(--danger);">
             كلمات التوقف المستبعدة: <strong class="tabular">${sys.removed_stopwords.map(escapeHtml).join('، ')}</strong>
           </div>
         `;
@@ -458,14 +461,14 @@ function renderPlaygroundCards(data) {
     }
 
     html += `
-      <div class="transform-card" style="border-top: 3px solid var(--${sysId.toLowerCase()}-color);">
+      <div class="transform-card mac-card" style="border-top: 3px solid var(--${sysId.toLowerCase()}-color);">
         <div class="transform-card-head">
           <span class="sys-id-tag" style="background:var(--${sysId.toLowerCase()}-bg); color:var(--${sysId.toLowerCase()}-color);">${sys.id}: ${sys.name.split('(')[0].trim()}</span>
           <span class="sys-level-desc">${sys.level.split('/')[0].trim()}</span>
         </div>
-        <div style="font-size:0.8rem; color:var(--text-secondary); margin:0.35rem 0 0.65rem 0;">${sys.description}</div>
-        <div style="border-top:1px solid var(--border-subtle); padding-top:0.5rem;">
-          <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:0.35rem;">المخرجات الصرفية:</div>
+        <div style="font-size:0.78rem; color:var(--text-secondary); margin:0.35rem 0 0.65rem 0;">${sys.description}</div>
+        <div style="border-top:0.5px solid var(--border-subtle); padding-top:0.5rem;">
+          <div style="font-size:0.74rem; font-weight:700; color:var(--text-muted); margin-bottom:0.35rem;">المخرجات الصرفية:</div>
           ${content}
         </div>
       </div>
@@ -549,12 +552,12 @@ function renderGoldenTable(queries) {
 
   tbody.innerHTML = queries.map(q => `
     <tr>
-      <td><span class="tabular font-mono" style="font-weight:700;">${q.query_id}</span></td>
-      <td><strong style="color:var(--accent-primary-hover); font-size:1rem;">${escapeHtml(q.query_term)}</strong></td>
+      <td><span class="tabular" style="font-weight:700; color:var(--text-muted);">${q.query_id}</span></td>
+      <td><strong style="color:var(--accent-primary); font-size:0.96rem;">${escapeHtml(q.query_term)}</strong></td>
       <td><code class="tabular">${escapeHtml(q.root || '-')}</code></td>
-      <td><span class="tabular" style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(q.root_type || '-')}</span></td>
-      <td><span style="font-size:0.8rem;">${escapeHtml(q.category_name_ar)}</span></td>
-      <td style="font-size:0.78rem; color:var(--text-secondary);">${(q.expected_surface_forms || []).slice(0, 5).map(escapeHtml).join('، ')}</td>
+      <td><span class="tabular" style="font-size:0.74rem; color:var(--text-muted);">${escapeHtml(q.root_type || '-')}</span></td>
+      <td><span style="font-size:0.78rem;">${escapeHtml(q.category_name_ar)}</span></td>
+      <td style="font-size:0.76rem; color:var(--text-secondary);">${(q.expected_surface_forms || []).slice(0, 5).map(escapeHtml).join('، ')}</td>
       <td>
         <button class="btn-table-action" onclick="applyQueryToSearch('${escapeHtml(q.query_term)}')">
           <svg class="ui-icon-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -573,7 +576,7 @@ function applyQueryToSearch(term) {
 }
 
 // =============================================================================
-// 6. BENCHMARK METRICS & CHARTS (DARK/OBSIDIAN THEME)
+// 6. BENCHMARK METRICS & CHARTS (macOS Dark Palette)
 // =============================================================================
 async function loadBenchmarkData() {
   try {
@@ -595,8 +598,8 @@ function renderMacroMetricsTable(systems) {
   tbody.innerHTML = systems.map(s => `
     <tr>
       <td><strong style="color:var(--${s.system_id.toLowerCase()}-color);">${s.system_id}: ${s.system_name.split('(')[0].trim()}</strong></td>
-      <td style="font-size:0.8rem; color:var(--text-secondary);">${s.morphological_level.split('/')[0].trim()}</td>
-      <td><strong class="tabular" style="color:var(--accent-primary-hover);">${Number(s.p_at_10).toFixed(4)}</strong></td>
+      <td style="font-size:0.78rem; color:var(--text-secondary);">${s.morphological_level.split('/')[0].trim()}</td>
+      <td><strong class="tabular" style="color:var(--accent-primary);">${Number(s.p_at_10).toFixed(4)}</strong></td>
       <td class="tabular">${Number(s.map).toFixed(4)}</td>
       <td class="tabular">${Number(s.ndcg_at_10).toFixed(4)}</td>
       <td><strong class="tabular" style="color:var(--success);">${Number(s.recall_at_100).toFixed(4)}</strong></td>
@@ -612,37 +615,43 @@ function renderCharts(systems) {
   if (typeof Chart === 'undefined') return;
 
   const labels = systems.map(s => s.system_id);
-  const colors = systems.map(s => SYSTEM_COLORS[s.system_id]?.hex || '#3b82f6');
+  const colors = systems.map(s => SYSTEM_COLORS[s.system_id]?.hex || '#0a84ff');
 
-  // Chart Global Dark Theme Options
-  const darkChartOptions = {
+  // Apple macOS Dark Mode Chart Theme
+  const appleChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 600,
+      easing: 'easeOutQuart',
+    },
     plugins: {
       legend: {
         labels: {
-          color: '#94a3b8',
-          font: { family: "'Cairo', sans-serif", size: 12 }
+          color: 'rgba(235, 235, 245, 0.65)',
+          font: { family: '-apple-system, BlinkMacSystemFont, "SF Pro Arabic", "Cairo", sans-serif', size: 12 }
         }
       },
       tooltip: {
-        backgroundColor: '#161c28',
-        titleColor: '#f8fafc',
-        bodyColor: '#94a3b8',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        borderWidth: 1,
+        backgroundColor: 'rgba(28, 28, 32, 0.92)',
+        titleColor: 'rgba(255, 255, 255, 0.95)',
+        bodyColor: 'rgba(235, 235, 245, 0.75)',
+        borderColor: 'rgba(255, 255, 255, 0.14)',
+        borderWidth: 0.5,
         padding: 10,
-        cornerRadius: 6,
+        cornerRadius: 8,
+        titleFont: { family: '-apple-system, BlinkMacSystemFont, "SF Pro Arabic", "Cairo", sans-serif', size: 12, weight: '600' },
+        bodyFont: { family: '"SF Mono", "JetBrains Mono", monospace', size: 11 }
       }
     },
     scales: {
       x: {
         grid: { color: 'rgba(255, 255, 255, 0.05)' },
-        ticks: { color: '#94a3b8', font: { family: "'JetBrains Mono', monospace", size: 11 } }
+        ticks: { color: 'rgba(235, 235, 245, 0.65)', font: { family: '"SF Mono", "JetBrains Mono", monospace', size: 11 } }
       },
       y: {
         grid: { color: 'rgba(255, 255, 255, 0.05)' },
-        ticks: { color: '#94a3b8', font: { family: "'JetBrains Mono', monospace", size: 11 } }
+        ticks: { color: 'rgba(235, 235, 245, 0.65)', font: { family: '"SF Mono", "JetBrains Mono", monospace', size: 11 } }
       }
     }
   };
@@ -659,26 +668,26 @@ function renderCharts(systems) {
           {
             label: 'الدقة P@10',
             data: systems.map(s => s.p_at_10),
-            backgroundColor: 'rgba(59, 130, 246, 0.85)',
-            borderColor: '#3b82f6',
-            borderWidth: 1,
-            borderRadius: 4,
+            backgroundColor: 'rgba(10, 132, 255, 0.85)',
+            borderColor: '#0a84ff',
+            borderWidth: 0.5,
+            borderRadius: 5,
           },
           {
             label: 'الاسترجاع Recall@100',
             data: systems.map(s => s.recall_at_100),
-            backgroundColor: 'rgba(16, 185, 129, 0.85)',
-            borderColor: '#10b981',
-            borderWidth: 1,
-            borderRadius: 4,
+            backgroundColor: 'rgba(48, 209, 88, 0.85)',
+            borderColor: '#30d158',
+            borderWidth: 0.5,
+            borderRadius: 5,
           }
         ]
       },
       options: {
-        ...darkChartOptions,
+        ...appleChartOptions,
         scales: {
-          ...darkChartOptions.scales,
-          y: { ...darkChartOptions.scales.y, beginAtZero: true, max: 1.0 }
+          ...appleChartOptions.scales,
+          y: { ...appleChartOptions.scales.y, beginAtZero: true, max: 1.0 }
         }
       }
     });
@@ -697,15 +706,15 @@ function renderCharts(systems) {
           data: systems.map(s => s.index_size_mb),
           backgroundColor: colors.map(c => c + 'd0'),
           borderColor: colors,
-          borderWidth: 1,
-          borderRadius: 4,
+          borderWidth: 0.5,
+          borderRadius: 5,
         }]
       },
       options: {
-        ...darkChartOptions,
+        ...appleChartOptions,
         scales: {
-          ...darkChartOptions.scales,
-          y: { ...darkChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميغابايت', color: '#64748b' } }
+          ...appleChartOptions.scales,
+          y: { ...appleChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميغابايت', color: 'rgba(235, 235, 245, 0.4)' } }
         }
       }
     });
@@ -723,26 +732,26 @@ function renderCharts(systems) {
           {
             label: 'الزمن الدافئ Warm (ms)',
             data: systems.map(s => s.warm_latency_ms),
-            backgroundColor: 'rgba(45, 212, 191, 0.85)',
-            borderColor: '#2dd4bf',
-            borderWidth: 1,
-            borderRadius: 4,
+            backgroundColor: 'rgba(99, 230, 226, 0.85)',
+            borderColor: '#63e6e2',
+            borderWidth: 0.5,
+            borderRadius: 5,
           },
           {
             label: 'الزمن البارد Cold (ms)',
             data: systems.map(s => s.cold_latency_ms),
-            backgroundColor: 'rgba(244, 63, 94, 0.75)',
-            borderColor: '#f43f5e',
-            borderWidth: 1,
-            borderRadius: 4,
+            backgroundColor: 'rgba(255, 69, 58, 0.75)',
+            borderColor: '#ff453a',
+            borderWidth: 0.5,
+            borderRadius: 5,
           }
         ]
       },
       options: {
-        ...darkChartOptions,
+        ...appleChartOptions,
         scales: {
-          ...darkChartOptions.scales,
-          y: { ...darkChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميلي ثانية', color: '#64748b' } }
+          ...appleChartOptions.scales,
+          y: { ...appleChartOptions.scales.y, beginAtZero: true, title: { display: true, text: 'ميلي ثانية', color: 'rgba(235, 235, 245, 0.4)' } }
         }
       }
     });
@@ -760,30 +769,30 @@ function renderCharts(systems) {
           {
             label: 'nDCG@10',
             data: systems.map(s => s.ndcg_at_10),
-            borderColor: '#a855f7',
-            backgroundColor: 'rgba(168, 85, 247, 0.12)',
+            borderColor: '#bf5af2',
+            backgroundColor: 'rgba(191, 90, 242, 0.12)',
             fill: true,
             tension: 0.35,
-            pointBackgroundColor: '#a855f7',
+            pointBackgroundColor: '#bf5af2',
             pointRadius: 4,
           },
           {
             label: 'MAP',
             data: systems.map(s => s.map),
-            borderColor: '#fbbf24',
-            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+            borderColor: '#ffd60a',
+            backgroundColor: 'rgba(255, 214, 10, 0.1)',
             fill: true,
             tension: 0.35,
-            pointBackgroundColor: '#fbbf24',
+            pointBackgroundColor: '#ffd60a',
             pointRadius: 4,
           }
         ]
       },
       options: {
-        ...darkChartOptions,
+        ...appleChartOptions,
         scales: {
-          ...darkChartOptions.scales,
-          y: { ...darkChartOptions.scales.y, beginAtZero: true, max: 1.0 }
+          ...appleChartOptions.scales,
+          y: { ...appleChartOptions.scales.y, beginAtZero: true, max: 1.0 }
         }
       }
     });

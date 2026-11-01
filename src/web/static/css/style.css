@@ -1,90 +1,102 @@
 /* ==============================================================================
-   ARABIC IR RESEARCH WORKBENCH - PRODUCTION DESIGN SYSTEM (ANTI-SLOP)
-   Archetype: Technical Dense Research Console (PostgreSQL 16 FTS Engine)
-   RTL First | Strict 8-pt Rhythm | Tabular Monospace Telemetry | WCAG 2.1 AA
+   ARABIC IR RESEARCH WORKBENCH - APPLE HUMAN INTERFACE GUIDELINES (macOS HIG)
+   Archetype: Native macOS Sonoma / Sequoia High-Precision Research Console
+   Typography: SF Pro Arabic / Cairo + SF Mono | Liquid Glass Vibrancy | WCAG 2.1 AA
    ============================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Surfaces & Canvas (Obsidian Technical Theme) */
-  --bg-canvas: #090b0f;
-  --bg-surface: #10141d;
-  --bg-surface-elevated: #161c28;
-  --bg-surface-hover: #1c2435;
-  --bg-surface-active: #232d42;
-  --bg-surface-subtle: rgba(255, 255, 255, 0.03);
+  /* ----------------------------------------------------------------------------
+     1. COLOR PALETTE (Apple Dark Appearance Semantic Tokens)
+     ---------------------------------------------------------------------------- */
+  /* macOS Dark Canvas & Surfaces */
+  --bg-canvas: #141416;
+  --bg-window: #1c1c1e;
+  --bg-surface: #242428;
+  --bg-surface-elevated: #2c2c32;
+  --bg-surface-hover: #36363d;
+  --bg-surface-active: #3f3f47;
+  --bg-surface-subtle: rgba(255, 255, 255, 0.04);
 
-  /* Hairline Containment Borders */
+  /* Translucent Functional Layer (Liquid Glass / NSVisualEffectView) */
+  --glass-bg: rgba(28, 28, 32, 0.82);
+  --glass-blur: blur(24px) saturate(190%);
+  --glass-border: rgba(255, 255, 255, 0.12);
+
+  /* Hairline Borders & Dividers */
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-default: rgba(255, 255, 255, 0.14);
-  --border-hover: rgba(255, 255, 255, 0.24);
-  --border-focus: #3b82f6;
+  --border-hover: rgba(255, 255, 255, 0.26);
+  --border-focus: #0a84ff;
 
   /* Typography & Hierarchy */
-  --font-sans: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Arabic", "SF Pro Text", "SF Pro Display", "Cairo", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, "JetBrains Mono", monospace;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-inverse: #090b0f;
+  /* Dynamic System Text Labels (macOS Dark) */
+  --text-primary: rgba(255, 255, 255, 0.94);
+  --text-secondary: rgba(235, 235, 245, 0.62);
+  --text-muted: rgba(235, 235, 245, 0.38);
+  --text-quaternary: rgba(235, 235, 245, 0.18);
+  --text-inverse: #141416;
 
-  /* Core Accent: Electric Precision Cobalt */
-  --accent-primary: #2563eb;
-  --accent-primary-hover: #3b82f6;
-  --accent-primary-active: #1d4ed8;
-  --accent-primary-subtle: rgba(37, 99, 235, 0.12);
+  /* Primary Accent: Apple System Blue (Dark) */
+  --accent-primary: #0a84ff;
+  --accent-primary-hover: #3395ff;
+  --accent-primary-active: #0071e3;
+  --accent-primary-subtle: rgba(10, 132, 255, 0.14);
 
-  /* System Identity Tokens (S0 to S5) */
-  --s0-color: #94a3b8;
-  --s0-bg: rgba(148, 163, 184, 0.08);
-  --s0-border: rgba(148, 163, 184, 0.25);
+  /* System Identity Tokens (S0 to S5) - SF Pro Vibrant Palette */
+  --s0-color: #8e8e93; /* System Gray */
+  --s0-bg: rgba(142, 142, 147, 0.12);
+  --s0-border: rgba(142, 142, 147, 0.28);
 
-  --s1-color: #38bdf8;
-  --s1-bg: rgba(56, 189, 248, 0.08);
-  --s1-border: rgba(56, 189, 248, 0.25);
+  --s1-color: #64d2ff; /* System Cyan */
+  --s1-bg: rgba(100, 210, 255, 0.12);
+  --s1-border: rgba(100, 210, 255, 0.28);
 
-  --s2-color: #2dd4bf;
-  --s2-bg: rgba(45, 212, 191, 0.08);
-  --s2-border: rgba(45, 212, 191, 0.25);
+  --s2-color: #63e6e2; /* System Mint / Teal */
+  --s2-bg: rgba(99, 230, 226, 0.12);
+  --s2-border: rgba(99, 230, 226, 0.28);
 
-  --s3-color: #a855f7;
-  --s3-bg: rgba(168, 85, 247, 0.08);
-  --s3-border: rgba(168, 85, 247, 0.25);
+  --s3-color: #bf5af2; /* System Purple */
+  --s3-bg: rgba(191, 90, 242, 0.12);
+  --s3-border: rgba(191, 90, 242, 0.28);
 
-  --s4-color: #34d399;
-  --s4-bg: rgba(52, 211, 153, 0.08);
-  --s4-border: rgba(52, 211, 153, 0.25);
+  --s4-color: #30d158; /* System Green */
+  --s4-bg: rgba(48, 209, 88, 0.12);
+  --s4-border: rgba(48, 209, 88, 0.28);
 
-  --s5-color: #fbbf24;
-  --s5-bg: rgba(251, 191, 36, 0.08);
-  --s5-border: rgba(251, 191, 36, 0.25);
+  --s5-color: #ffd60a; /* System Yellow */
+  --s5-bg: rgba(255, 214, 10, 0.12);
+  --s5-border: rgba(255, 214, 10, 0.28);
 
   /* Semantic Feedback Statuses */
-  --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.1);
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.1);
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
+  --success: #30d158;
+  --success-bg: rgba(48, 209, 88, 0.12);
+  --warning: #ff9f0a;
+  --warning-bg: rgba(255, 159, 10, 0.12);
+  --danger: #ff453a;
+  --danger-bg: rgba(255, 69, 58, 0.12);
 
-  /* Spatial Rhythm & Radii Formula: R_inner = R_outer - Padding */
+  /* Apple Smooth Geometry (Concentric Radii) */
   --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 10px;
+  --radius-md: 9px;
   --radius-lg: 14px;
   --radius-xl: 18px;
 
-  /* Shadows: Discrete 1px edge reflections instead of heavy blurry drop-shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.6);
+  /* Apple Subtle Depth Shadows & Specular Hairlines */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 3px 10px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 10px 25px -4px rgba(0, 0, 0, 0.5);
+  --highlight-hairline: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
-  /* Snappy Transitions: High-tension ease-out */
-  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
-  --duration-fast: 120ms;
-  --duration-normal: 180ms;
+  /* Apple Fluid Motion (Spring / Cubic-Bezier Curve) */
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 140ms;
+  --duration-normal: 220ms;
 }
 
 /* ==============================================================================
@@ -97,10 +109,11 @@
 }
 
 html {
-  font-size: 15px;
+  font-size: 14.5px;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -109,25 +122,26 @@ body {
   color: var(--text-primary);
   direction: rtl;
   text-align: right;
-  line-height: 1.6;
+  line-height: 1.55;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Tabular Numbers Utility */
+/* High-Density Tabular Numbers */
 .tabular, .mono-nums, code, pre {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   direction: ltr;
   display: inline-block;
+  letter-spacing: -0.01em;
 }
 
-/* SVG Icon Primitive */
+/* Authentic SF Symbols & Geometric Vectors */
 .ui-icon {
   width: 1.15rem;
   height: 1.15rem;
-  stroke-width: 1.75;
+  stroke-width: 1.65;
   stroke: currentColor;
   fill: none;
   stroke-linecap: round;
@@ -140,16 +154,16 @@ body {
 .ui-icon-sm {
   width: 0.95rem;
   height: 0.95rem;
-  stroke-width: 1.75;
+  stroke-width: 1.65;
 }
 
 .ui-icon-lg {
-  width: 1.5rem;
-  height: 1.5rem;
-  stroke-width: 1.75;
+  width: 1.45rem;
+  height: 1.45rem;
+  stroke-width: 1.65;
 }
 
-/* Layout Container */
+/* Content Container */
 .container {
   width: 100%;
   max-width: 1440px;
@@ -157,21 +171,33 @@ body {
   padding: 0 1.5rem;
 }
 
-/* Focus Visibility Ring */
+/* macOS Subtle Focus Ring */
 :focus-visible {
-  outline: 2px solid var(--accent-primary-hover);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.45);
 }
 
 /* ==============================================================================
-   HEADER & ACADEMIC MONOGRAPH STATUS
+   macOS WINDOW FRAME & UNIFIED TOOLBAR (LIQUID GLASS)
    ============================================================================== */
-header.app-header {
-  background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
-  padding: 1rem 0;
-  position: relative;
-  z-index: 40;
+.mac-window-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-canvas);
+}
+
+/* Top Unified Toolbar */
+header.app-header.mac-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 0.5px solid var(--glass-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  padding: 0.75rem 0;
 }
 
 .header-inner {
@@ -179,35 +205,75 @@ header.app-header {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 1rem;
 }
 
+/* Authentic macOS Traffic Lights (Close / Minimize / Zoom) */
+.mac-traffic-lights {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 0.4rem;
+  user-select: none;
+}
+
+.mac-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  transition: transform var(--duration-fast) var(--ease-apple),
+              filter var(--duration-fast) var(--ease-apple);
+}
+
+.mac-close {
+  background: #ff5f56;
+  border: 0.5px solid rgba(0, 0, 0, 0.22);
+}
+
+.mac-minimize {
+  background: #ffbd2e;
+  border: 0.5px solid rgba(0, 0, 0, 0.22);
+}
+
+.mac-zoom {
+  background: #27c93f;
+  border: 0.5px solid rgba(0, 0, 0, 0.22);
+}
+
+.mac-traffic-lights:hover .mac-dot {
+  filter: brightness(1.08);
+}
+
+/* Proxy Icon */
 .brand-mark {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-md);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-default);
+  border: 0.5px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-primary-hover);
+  color: var(--accent-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 .brand-titles h1 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   line-height: 1.3;
 }
 
@@ -215,39 +281,42 @@ header.app-header {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 600;
-  padding: 0.15rem 0.45rem;
+  padding: 0.15rem 0.5rem;
   border-radius: var(--radius-xs);
   background: var(--accent-primary-subtle);
-  color: var(--accent-primary-hover);
-  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: var(--accent-primary);
+  border: 0.5px solid rgba(10, 132, 255, 0.35);
   letter-spacing: 0.02em;
 }
 
 .brand-meta {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.2rem;
+  margin-top: 0.15rem;
 }
 
 .meta-divider {
-  color: var(--border-default);
+  color: var(--text-muted);
+  font-size: 0.75rem;
 }
 
-/* Live DB Status Pill */
+/* macOS Capsule Status Pill */
 .status-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
-  font-size: 0.8rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid var(--border-default);
+  font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
 }
 
 .status-dot {
@@ -255,62 +324,74 @@ header.app-header {
   height: 0.55rem;
   border-radius: 50%;
   background-color: var(--text-muted);
-  transition: background-color var(--duration-normal) var(--ease-snappy);
+  transition: all var(--duration-normal) var(--ease-apple);
 }
 
 .status-dot.online {
   background-color: var(--success);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 8px rgba(48, 209, 88, 0.6);
 }
 
 .status-dot.offline {
   background-color: var(--danger);
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 8px rgba(255, 69, 58, 0.6);
 }
 
 /* ==============================================================================
-   SEGMENTED NAVIGATION BAR (TABS)
+   macOS SEGMENTED TAB BAR NAVIGATION (FUNCTIONAL LAYER)
    ============================================================================== */
-nav.app-nav {
-  background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
+nav.app-nav.mac-segmented-bar {
+  background: rgba(24, 24, 28, 0.72);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 0.5px solid var(--glass-border);
   position: sticky;
-  top: 0;
-  z-index: 30;
+  top: 3.8rem;
+  z-index: 45;
+  padding: 0.45rem 0;
 }
 
-.nav-track {
+.nav-track-wrapper {
   display: flex;
-  gap: 0.35rem;
+  align-items: center;
   overflow-x: auto;
   scrollbar-width: none;
-  padding: 0.35rem 0;
 }
 
-.nav-track::-webkit-scrollbar {
+.nav-track-wrapper::-webkit-scrollbar {
   display: none;
+}
+
+.mac-segmented-control {
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  gap: 2px;
 }
 
 .tab-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.65rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.84rem;
+  font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
-  border: 1px solid transparent;
+  border: 0.5px solid transparent;
   border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
-  transition: all var(--duration-fast) var(--ease-snappy);
+  transition: all var(--duration-fast) var(--ease-apple);
 }
 
 .tab-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-surface-elevated);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .tab-btn:active {
@@ -319,13 +400,14 @@ nav.app-nav {
 
 .tab-btn.active {
   color: var(--text-primary);
-  background: var(--bg-surface-elevated);
-  border-color: var(--border-default);
-  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), var(--highlight-hairline);
+  font-weight: 600;
 }
 
 .tab-btn.active .ui-icon {
-  color: var(--accent-primary-hover);
+  color: var(--accent-primary);
 }
 
 /* ==============================================================================
@@ -333,7 +415,7 @@ nav.app-nav {
    ============================================================================== */
 main.app-main {
   flex: 1;
-  padding: 1.75rem 0 3rem 0;
+  padding: 1.5rem 0 3rem 0;
 }
 
 .tab-pane {
@@ -342,24 +424,34 @@ main.app-main {
 
 .tab-pane.active {
   display: block;
-  animation: fadeIn var(--duration-normal) var(--ease-snappy);
+  animation: macPaneFadeIn var(--duration-normal) var(--ease-apple);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes macPaneFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* macOS Grouped Card Primitive */
+.mac-card {
+  background: var(--bg-surface);
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm), var(--highlight-hairline);
 }
 
 /* ==============================================================================
-   PAGE-LEVEL CONTROL BAR & SEARCH CONSOLE
+   PAGE-LEVEL CONTROL BAR & SEARCH CONSOLE (SPOTLIGHT STYLE)
    ============================================================================== */
 .control-console {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
   padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.25rem;
 }
 
 .console-header {
@@ -367,22 +459,24 @@ main.app-main {
   justify-content: space-between;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .console-title h2 {
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
 }
 
 .console-desc {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
+  margin-top: 0.15rem;
 }
 
-/* Primary Search Input Row */
+/* Spotlight Unified Search Input */
 .search-form-row {
   display: flex;
   gap: 0.75rem;
@@ -398,24 +492,26 @@ main.app-main {
 
 .input-affix-icon {
   position: absolute;
-  right: 1rem;
+  right: 1.1rem;
   color: var(--text-muted);
   pointer-events: none;
+  transition: color var(--duration-fast);
 }
 
 .main-search-input {
   width: 100%;
-  height: 3rem;
-  padding: 0 2.85rem 0 1rem;
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-default);
+  height: 2.85rem;
+  padding: 0 3rem 0 1rem;
+  background: rgba(0, 0, 0, 0.28);
+  border: 0.5px solid var(--border-default);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 500;
-  transition: border-color var(--duration-fast) var(--ease-snappy),
-              box-shadow var(--duration-fast) var(--ease-snappy);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: border-color var(--duration-fast) var(--ease-apple),
+              box-shadow var(--duration-fast) var(--ease-apple);
 }
 
 .main-search-input:hover {
@@ -424,46 +520,54 @@ main.app-main {
 
 .main-search-input:focus {
   outline: none;
-  border-color: var(--accent-primary-hover);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.main-search-input:focus + .input-affix-icon,
+.input-affix-wrapper:focus-within .input-affix-icon {
+  color: var(--accent-primary);
 }
 
 .main-search-input::placeholder {
   color: var(--text-muted);
+  font-weight: 400;
 }
 
-/* Primary Action Button */
-.btn-primary {
+/* Primary Apple Action Button */
+.btn-primary.mac-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  height: 3rem;
+  height: 2.85rem;
   padding: 0 1.5rem;
   background: var(--accent-primary);
   color: #ffffff;
-  border: 1px solid transparent;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
-  transition: all var(--duration-fast) var(--ease-snappy);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: all var(--duration-fast) var(--ease-apple);
 }
 
-.btn-primary:hover {
+.btn-primary.mac-btn-primary:hover {
   background: var(--accent-primary-hover);
+  box-shadow: 0 2px 6px rgba(10, 132, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.btn-primary:active {
+.btn-primary.mac-btn-primary:active {
   transform: scale(0.98);
   background: var(--accent-primary-active);
 }
 
-.btn-primary:disabled {
-  opacity: 0.6;
+.btn-primary.mac-btn-primary:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -475,8 +579,8 @@ main.app-main {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.9rem;
+  border-top: 0.5px solid var(--border-subtle);
 }
 
 .system-selector-group {
@@ -487,27 +591,27 @@ main.app-main {
 }
 
 .group-label {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-left: 0.35rem;
-  text-transform: uppercase;
 }
 
+/* macOS Toggle Capsule Pills */
 .sys-toggle-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.65rem;
+  gap: 0.45rem;
+  padding: 0.32rem 0.65rem;
   border-radius: var(--radius-sm);
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
-  font-size: 0.8rem;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid var(--border-subtle);
+  font-size: 0.78rem;
+  font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   user-select: none;
-  transition: all var(--duration-fast) var(--ease-snappy);
+  transition: all var(--duration-fast) var(--ease-apple);
 }
 
 .sys-toggle-pill input[type="checkbox"] {
@@ -525,44 +629,46 @@ main.app-main {
 .sys-toggle-pill:hover {
   border-color: var(--border-hover);
   color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .sys-toggle-pill:has(input:checked) {
   border-color: var(--border-default);
-  background: var(--bg-surface-hover);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
 }
 
-.sys-toggle-pill[data-sys="S0"]:has(input:checked) .sys-indicator-dot { background: var(--s0-color); }
-.sys-toggle-pill[data-sys="S1"]:has(input:checked) .sys-indicator-dot { background: var(--s1-color); }
-.sys-toggle-pill[data-sys="S2"]:has(input:checked) .sys-indicator-dot { background: var(--s2-color); }
-.sys-toggle-pill[data-sys="S3"]:has(input:checked) .sys-indicator-dot { background: var(--s3-color); }
-.sys-toggle-pill[data-sys="S4"]:has(input:checked) .sys-indicator-dot { background: var(--s4-color); }
-.sys-toggle-pill[data-sys="S5"]:has(input:checked) .sys-indicator-dot { background: var(--s5-color); }
+.sys-toggle-pill[data-sys="S0"]:has(input:checked) .sys-indicator-dot { background: var(--s0-color); box-shadow: 0 0 6px var(--s0-color); }
+.sys-toggle-pill[data-sys="S1"]:has(input:checked) .sys-indicator-dot { background: var(--s1-color); box-shadow: 0 0 6px var(--s1-color); }
+.sys-toggle-pill[data-sys="S2"]:has(input:checked) .sys-indicator-dot { background: var(--s2-color); box-shadow: 0 0 6px var(--s2-color); }
+.sys-toggle-pill[data-sys="S3"]:has(input:checked) .sys-indicator-dot { background: var(--s3-color); box-shadow: 0 0 6px var(--s3-color); }
+.sys-toggle-pill[data-sys="S4"]:has(input:checked) .sys-indicator-dot { background: var(--s4-color); box-shadow: 0 0 6px var(--s4-color); }
+.sys-toggle-pill[data-sys="S5"]:has(input:checked) .sys-indicator-dot { background: var(--s5-color); box-shadow: 0 0 6px var(--s5-color); }
 
-/* View Mode Segmented Switch */
-.view-mode-switch {
+/* View Mode Segmented Mini Switch */
+.view-mode-switch.mac-segmented-mini {
   display: inline-flex;
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.3);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-sm);
-  padding: 0.2rem;
-  gap: 0.2rem;
+  padding: 2px;
+  gap: 2px;
 }
 
 .view-mode-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
   border: none;
   border-radius: var(--radius-xs);
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-snappy);
+  transition: all var(--duration-fast) var(--ease-apple);
 }
 
 .view-mode-btn:hover {
@@ -570,62 +676,61 @@ main.app-main {
 }
 
 .view-mode-btn.active {
-  background: var(--bg-surface-hover);
+  background: rgba(255, 255, 255, 0.15);
   color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  font-weight: 600;
 }
 
-/* Preset Golden Selector */
-.golden-preset-select {
+/* macOS Styled Select Box */
+.golden-preset-select.mac-select {
   height: 2.15rem;
   padding: 0 0.85rem;
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-default);
+  background: rgba(0, 0, 0, 0.28);
+  border: 0.5px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
+  transition: border-color var(--duration-fast);
 }
 
-.golden-preset-select:focus {
+.golden-preset-select.mac-select:focus {
   outline: none;
-  border-color: var(--accent-primary-hover);
+  border-color: var(--accent-primary);
 }
 
-/* Demo Mode Notice */
+/* Demo Notice Banner */
 .demo-badge-banner {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.85rem;
+  padding: 0.45rem 0.85rem;
   border-radius: var(--radius-sm);
   background: var(--warning-bg);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  border: 0.5px solid rgba(255, 159, 10, 0.3);
   color: var(--warning);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   margin-top: 0.75rem;
 }
 
 /* ==============================================================================
-   MORPHOLOGICAL TRANSFORMATION STRIP
+   MORPHOLOGICAL TRANSFORMATION STRIP (APPLE FROSTED CARDS)
    ============================================================================== */
 .transformation-console {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
+  padding: 1.15rem;
+  margin-bottom: 1.25rem;
 }
 
 .console-subhead {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 0.85rem;
 }
@@ -638,17 +743,18 @@ main.app-main {
 
 .transform-card {
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
+  border: 0.5px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0.85rem 1rem;
+  padding: 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
+  box-shadow: var(--shadow-sm);
   transition: border-color var(--duration-fast);
 }
 
 .transform-card:hover {
-  border-color: var(--border-default);
+  border-color: var(--border-hover);
 }
 
 .transform-card-head {
@@ -659,9 +765,9 @@ main.app-main {
 
 .sys-id-tag {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 0.1rem 0.35rem;
+  padding: 0.12rem 0.4rem;
   border-radius: var(--radius-xs);
 }
 
@@ -673,17 +779,17 @@ main.app-main {
 .transform-card[data-sys="S5"] .sys-id-tag { background: var(--s5-bg); color: var(--s5-color); }
 
 .sys-level-desc {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
 }
 
 .transform-tokens-output {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--text-primary);
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.28);
+  border: 0.5px solid var(--border-subtle);
   padding: 0.4rem 0.6rem;
   border-radius: var(--radius-xs);
   overflow-x: auto;
@@ -701,7 +807,7 @@ main.app-main {
 }
 
 .results-grid-container.six-cols {
-  grid-template-columns: repeat(6, minmax(220px, 1fr));
+  grid-template-columns: repeat(6, minmax(215px, 1fr));
 }
 
 @media (max-width: 1400px) {
@@ -718,17 +824,17 @@ main.app-main {
 
 .system-column-card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 0.5px solid var(--border-default);
   border-radius: var(--radius-lg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), var(--highlight-hairline);
 }
 
 .column-header {
-  padding: 0.9rem 1rem;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.85rem 1rem;
+  border-bottom: 0.5px solid var(--border-subtle);
   background: var(--bg-surface-elevated);
 }
 
@@ -736,30 +842,30 @@ main.app-main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
 
 .column-sys-title {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .column-metrics-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
 }
 
 .latency-metric {
   font-family: var(--font-mono);
   font-weight: 600;
-  color: var(--accent-primary-hover);
+  color: var(--accent-primary);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -777,19 +883,20 @@ main.app-main {
 /* Article Result Item Card */
 .article-item {
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
+  border: 0.5px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
-  transition: all var(--duration-fast) var(--ease-snappy);
+  transition: all var(--duration-fast) var(--ease-apple);
 }
 
 .article-item:hover {
   border-color: var(--border-default);
   background: var(--bg-surface-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .article-top-row {
@@ -800,24 +907,24 @@ main.app-main {
 
 .article-rank-badge {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 0.1rem 0.4rem;
   border-radius: var(--radius-xs);
-  background: var(--bg-surface);
+  background: rgba(0, 0, 0, 0.3);
   color: var(--text-muted);
-  border: 1px solid var(--border-subtle);
+  border: 0.5px solid var(--border-subtle);
 }
 
 .article-score-metric {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
 .article-title-link {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--text-primary);
   text-decoration: none;
@@ -825,34 +932,35 @@ main.app-main {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  transition: color var(--duration-fast);
 }
 
 .article-title-link:hover {
-  color: var(--accent-primary-hover);
+  color: var(--accent-primary);
 }
 
 .article-snippet {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   line-height: 1.55;
 }
 
 .article-snippet mark {
-  background: rgba(245, 158, 11, 0.25);
-  color: #fef08a;
+  background: rgba(255, 214, 10, 0.22);
+  color: #fff9c4;
   border-radius: 2px;
   padding: 0.05rem 0.25rem;
   font-weight: 600;
 }
 
-/* System Error & Timeout Card */
+/* System Error & Empty States */
 .system-error-card {
-  padding: 1rem;
+  padding: 0.85rem;
   border-radius: var(--radius-md);
   background: var(--danger-bg);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 0.5px solid rgba(255, 69, 58, 0.3);
   color: var(--danger);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   line-height: 1.5;
 }
 
@@ -860,32 +968,28 @@ main.app-main {
   padding: 2.5rem 1rem;
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
 }
 
 /* ==============================================================================
-   BENCHMARK KPI CARDS & CHARTS
+   BENCHMARK KPI TELEMETRY CARDS & CHARTS
    ============================================================================== */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .kpi-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
 
 .kpi-title {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
 }
@@ -899,7 +1003,7 @@ main.app-main {
 }
 
 .kpi-sub {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
 }
 
@@ -907,15 +1011,11 @@ main.app-main {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
   gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .chart-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
 }
 
 .chart-panel-header {
@@ -923,13 +1023,13 @@ main.app-main {
 }
 
 .chart-panel-title {
-  font-size: 0.95rem;
+  font-size: 0.94rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .chart-panel-desc {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
 }
 
@@ -939,13 +1039,13 @@ main.app-main {
 }
 
 /* ==============================================================================
-   HIGH-DENSITY DATA TABLES (GOLDEN QUERIES & BENCHMARK MATRIX)
+   macOS HIGH-DENSITY SYSTEM DATA TABLES
    ============================================================================== */
-.data-table-container {
+.data-table-container.mac-table-wrapper {
   width: 100%;
   overflow-x: auto;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+  border: 0.5px solid var(--border-default);
   background: var(--bg-surface);
 }
 
@@ -953,22 +1053,23 @@ main.app-main {
   width: 100%;
   border-collapse: collapse;
   text-align: right;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
 }
 
 .data-table th {
   background: var(--bg-surface-elevated);
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.78rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border-default);
+  font-size: 0.76rem;
+  padding: 0.65rem 0.95rem;
+  border-bottom: 0.5px solid var(--border-default);
   white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 .data-table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.7rem 0.95rem;
+  border-bottom: 0.5px solid var(--border-subtle);
   color: var(--text-primary);
   vertical-align: middle;
 }
@@ -985,15 +1086,15 @@ main.app-main {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.3rem 0.65rem;
+  padding: 0.28rem 0.65rem;
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-default);
+  border: 0.5px solid var(--border-default);
   border-radius: var(--radius-xs);
   color: var(--text-primary);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--duration-fast);
+  transition: all var(--duration-fast) var(--ease-apple);
 }
 
 .btn-table-action:hover {
@@ -1006,7 +1107,7 @@ main.app-main {
   transform: scale(0.97);
 }
 
-/* Category Filter Buttons */
+/* Filter Capsule Buttons */
 .filter-pills-row {
   display: flex;
   gap: 0.4rem;
@@ -1017,64 +1118,62 @@ main.app-main {
 .filter-pill {
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-sm);
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid var(--border-subtle);
   color: var(--text-secondary);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all var(--duration-fast);
+  transition: all var(--duration-fast) var(--ease-apple);
 }
 
 .filter-pill:hover {
-  border-color: var(--border-default);
+  border-color: var(--border-hover);
   color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .filter-pill.active {
   background: var(--accent-primary-subtle);
-  border-color: rgba(37, 99, 235, 0.4);
-  color: var(--accent-primary-hover);
+  border-color: rgba(10, 132, 255, 0.4);
+  color: var(--accent-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ==============================================================================
-   OVER-STEMMING & FALLOUT ANALYSIS CARDS
+   OVER-STEMMING & FALLOUT ANALYSIS (MATHEMATICAL CALLOUTS)
    ============================================================================== */
-.math-callout-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-right: 4px solid var(--accent-primary);
-  border-radius: var(--radius-md);
+.math-callout-card.mac-callout {
   padding: 1.25rem;
-  margin-bottom: 1.5rem;
+  border-right: 3px solid var(--accent-primary);
+  margin-bottom: 1.25rem;
 }
 
 .math-formula {
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   direction: ltr;
   text-align: right;
   color: var(--text-primary);
   margin: 0.5rem 0;
+  letter-spacing: 0.02em;
 }
 
 .case-study-item {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
   padding: 1.25rem;
   margin-bottom: 1rem;
 }
 
 .case-study-header {
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.45rem;
 }
 
 .case-study-narrative {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 0.85rem;
@@ -1085,7 +1184,7 @@ main.app-main {
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
+  border: 0.5px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 0.85rem;
 }
@@ -1097,28 +1196,69 @@ main.app-main {
 }
 
 .comparison-col-title {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
 
 .comparison-col-desc {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-secondary);
 }
 
-/* ==============================================================================
-   FOOTER
-   ============================================================================== */
-footer.app-footer {
-  border-top: 1px solid var(--border-subtle);
-  background: var(--bg-surface);
-  padding: 1.5rem 0;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  text-align: center;
+/* Textarea in Playground */
+.mac-textarea {
+  width: 100%;
+  height: auto;
+  padding: 0.75rem 1rem;
+  resize: vertical;
+  line-height: 1.6;
 }
 
-footer.app-footer p + p {
-  margin-top: 0.25rem;
+/* ==============================================================================
+   macOS MINIMALIST STATUS FOOTER
+   ============================================================================== */
+footer.app-footer.mac-footer {
+  border-top: 0.5px solid var(--border-subtle);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  padding: 1rem 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.footer-specs {
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+}
+
+/* ==============================================================================
+   ACCESSIBILITY OVERRIDES (REDUCED MOTION & TRANSPARENCY)
+   ============================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  header.app-header.mac-toolbar,
+  nav.app-nav.mac-segmented-bar,
+  footer.app-footer.mac-footer {
+    background: #1c1c1e !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
