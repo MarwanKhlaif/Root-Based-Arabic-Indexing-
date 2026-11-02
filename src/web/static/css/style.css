@@ -1,72 +1,60 @@
 /* ==========================================================================
-   Wikipedia / MediaWiki Encyclopedic Design System
-   Authentic Wikipedia Vector 2022 Aesthetic
-   Clean White / Light Gray Surfaces, Wikipedia Typography, Vector Tabs & Wikitables
+   Clean Modern Information Retrieval Interface
+   Borderless, Fluid, Typography-First Design (Monochrome / High Legibility)
+   Large Arabic Typography, Seamless Surfaces, Zero Heavy Box Outlines
    ========================================================================== */
 
 :root {
-  /* Wikipedia Canvas & Surface Palette */
-  --wiki-bg-canvas: #f6f6f6;
-  --wiki-bg-surface: #ffffff;
-  --wiki-bg-secondary: #f8f9fa;
-  --wiki-bg-header: #eaecf0;
-  --wiki-bg-hover: #eaf3ff;
-  --wiki-bg-active: #d5e8ff;
+  /* Minimal Monochrome Palette */
+  --bg-canvas: #ffffff;
+  --bg-subtle: #f9f9fb;
+  --bg-muted: #f4f4f5;
+  --bg-hover: #ececee;
+  --bg-dark: #18181b;
+  --bg-dark-hover: #27272a;
 
-  /* MediaWiki Borders */
-  --wiki-border-base: #a2a9b1;
-  --wiki-border-subtle: #c8ccd1;
-  --wiki-border-hairline: #eaecf0;
-  --wiki-border-focus: #36c;
+  /* Subtle Hairlines (Used sparingly, no heavy borders) */
+  --divider-subtle: #f0f0f2;
+  --divider-default: #e4e4e7;
+  --divider-dark: #27272a;
 
-  /* Typography Colors */
-  --wiki-text-primary: #202122;
-  --wiki-text-secondary: #54595d;
-  --wiki-text-muted: #72777d;
-  --wiki-text-inverse: #ffffff;
+  /* High Contrast Typography */
+  --text-primary: #09090b;
+  --text-secondary: #3f3f46;
+  --text-muted: #71717a;
+  --text-quaternary: #a1a1aa;
+  --text-inverse: #ffffff;
 
-  /* Classic Wikipedia Hyperlinks */
-  --wiki-link: #0645ad;
-  --wiki-link-visited: #0b0080;
-  --wiki-link-hover: #0b0080;
+  /* Button Actions */
+  --btn-bg: #18181b;
+  --btn-text: #ffffff;
+  --btn-hover: #27272a;
 
-  /* Wikipedia Progressive Action Blue (Vector 2022 Button) */
-  --wiki-btn-primary-bg: #36c;
-  --wiki-btn-primary-hover: #447ff5;
-  --wiki-btn-primary-active: #2a4b8d;
-  --wiki-btn-primary-text: #ffffff;
-
-  /* Neutral Action Button */
-  --wiki-btn-neutral-bg: #f8f9fa;
-  --wiki-btn-neutral-hover: #ffffff;
-  --wiki-btn-neutral-active: #eaecf0;
-  --wiki-btn-neutral-text: #202122;
-
-  /* Wikipedia Search Highlight (Cream/Yellow with subtle border) */
-  --wiki-mark-bg: #fff3c4;
-  --wiki-mark-text: #202122;
-  --wiki-mark-border: #edd38c;
+  /* Mark / Highlighting */
+  --mark-bg: #e4e4e7;
+  --mark-text: #09090b;
 
   /* Status Colors */
-  --wiki-status-online: #00af89;
-  --wiki-status-offline: #d33;
+  --status-online: #16a34a;
+  --status-offline: #dc2626;
 
-  /* Font Stacks */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Amiri", "Traditional Arabic", "Scheherazade New", Tahoma, Arial, sans-serif;
-  --font-serif: "Linux Libertine", "Amiri", Georgia, "Times New Roman", Times, serif;
-  --font-mono: "SF Mono", "Menlo", "Monaco", "Consolas", ui-monospace, monospace;
+  /* Large, Beautiful Arabic & Latin Typography */
+  --font-arabic: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", "Amiri", "Traditional Arabic", Tahoma, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", sans-serif;
+  --font-serif: "Amiri", "Traditional Arabic", Georgia, Times, serif;
+  --font-mono: "SF Mono", "Menlo", "Consolas", ui-monospace, monospace;
 
-  /* MediaWiki Geometry */
-  --radius-xs: 2px;
-  --radius-sm: 2px;
-  --radius-md: 3px;
-  --radius-pill: 20px;
-  --duration-fast: 120ms;
-  --ease-wiki: cubic-bezier(0.2, 0, 0, 1);
+  /* Smooth Geometry & Transitions */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-pill: 9999px;
+  --duration-fast: 140ms;
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
-   Base Styles & Reset
+   Base Styles & Reset (Enlarged Font Scale)
    ========================================================================== */
 
 *, *::before, *::after {
@@ -76,25 +64,25 @@
 }
 
 html {
-  font-family: var(--font-sans);
-  background-color: var(--wiki-bg-canvas);
-  color: var(--wiki-text-primary);
-  font-size: 15px;
-  line-height: 1.6;
+  font-family: var(--font-arabic);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-size: 18px; /* Substantially enlarged base scale for high legibility */
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body.wiki-theme {
+body.clean-theme {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--wiki-bg-canvas);
-  color: var(--wiki-text-primary);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
   overflow-x: hidden;
 }
 
-.wiki-site-wrapper {
+.site-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -104,220 +92,179 @@ body.wiki-theme {
   width: 100%;
   max-width: 1720px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
 }
 
-/* Monospace & Tabular numbers */
+/* Tabular Numerals */
 .tabular {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
-   Wikipedia Vector Header & Navigation
+   Header (Clean, Flat, Borderless)
    ========================================================================== */
 
-.app-header.wiki-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--wiki-bg-surface);
-  border-bottom: 1px solid var(--wiki-border-base);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  padding: 10px 0;
+.app-header {
+  background: var(--bg-canvas);
+  padding: 24px 0 16px 0;
+  border-bottom: 1px solid var(--divider-subtle);
 }
 
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 14px;
-}
-
-.wiki-brand-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.wiki-logo-svg {
-  display: block;
 }
 
 .brand-titles {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
-.wiki-site-title {
+.site-title {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--wiki-text-primary);
-  line-height: 1.3;
+  gap: 12px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
 }
 
-.wiki-title-main {
-  font-family: var(--font-serif);
-  font-size: 1.25rem;
+.title-main {
   letter-spacing: -0.01em;
-}
-
-.wiki-title-sep {
-  color: var(--wiki-border-base);
-}
-
-.wiki-title-sub {
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--wiki-text-secondary);
 }
 
 .tech-badge {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 500;
-  padding: 1px 7px;
-  border-radius: var(--radius-xs);
-  background: var(--wiki-bg-secondary);
-  border: 1px solid var(--wiki-border-subtle);
-  color: var(--wiki-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  color: var(--text-secondary);
 }
 
 .brand-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.78rem;
-  color: var(--wiki-text-muted);
-  margin-top: 2px;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
 }
 
 .meta-divider {
-  color: var(--wiki-border-base);
+  color: var(--divider-default);
 }
 
-/* Wikipedia Live Engine Status Badge */
-.wiki-status-pill {
+/* Status Indicator */
+.status-pill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
-  border-radius: var(--radius-xs);
-  background: var(--wiki-bg-secondary);
-  border: 1px solid var(--wiki-border-subtle);
-  font-size: 0.8rem;
-  color: var(--wiki-text-secondary);
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: var(--wiki-status-online);
-  box-shadow: 0 0 4px rgba(0, 175, 137, 0.4);
+  background: var(--status-online);
 }
 
 .status-dot.offline {
-  background: var(--wiki-status-offline);
-  box-shadow: none;
+  background: var(--status-offline);
 }
 
 /* ==========================================================================
-   Wikipedia Main Body & Boxes
+   Main Application Body (Spacious & Flowing)
    ========================================================================== */
 
-.wiki-main {
+.app-main {
   flex: 1;
-  padding: 24px 24px;
+  padding: 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ==========================================================================
+   Search Section (Zero Boxes, Seamless Flat Input)
+   ========================================================================== */
+
+.search-section {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Wikipedia Content Box (Vector 2022 / Infobox aesthetic) */
-.wiki-box {
-  background: var(--wiki-bg-surface);
-  border: 1px solid var(--wiki-border-base);
-  border-radius: var(--radius-sm);
-  padding: 18px 22px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
-/* ==========================================================================
-   Search Console & Vector Search Bar
-   ========================================================================== */
-
-.console-header {
+.section-header {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 20px;
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--wiki-border-hairline);
 }
 
-.console-title h2 {
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
+.section-title h2 {
+  font-size: 1.35rem;
   font-weight: 700;
-  color: var(--wiki-text-primary);
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
-.console-desc {
-  font-size: 0.85rem;
-  color: var(--wiki-text-secondary);
-  margin-top: 3px;
+.section-desc {
+  font-size: 0.98rem;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
-/* Golden Query Quick Select (MediaWiki Dropdown) */
-.golden-preset-wrapper {
+/* Golden Query Quick Preset */
+.preset-wrapper {
   flex-shrink: 0;
 }
 
-.wiki-select {
+.preset-select {
   appearance: none;
-  background: var(--wiki-bg-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2354595d' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat left 10px center;
-  border: 1px solid var(--wiki-border-base);
-  border-radius: var(--radius-xs);
-  color: var(--wiki-text-primary);
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  padding: 7px 12px 7px 32px;
+  background: var(--bg-subtle) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat left 14px center;
+  border: none;
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-family: var(--font-arabic);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 10px 18px 10px 38px;
   cursor: pointer;
   outline: none;
-  transition: border-color var(--duration-fast) var(--ease-wiki);
+  transition: background-color var(--duration-fast) var(--ease-smooth);
 }
 
-.wiki-select:hover {
-  border-color: var(--wiki-text-secondary);
-  background-color: var(--wiki-bg-secondary);
+.preset-select:hover {
+  background-color: var(--bg-hover);
 }
 
-.wiki-select:focus-visible {
-  border-color: var(--wiki-border-focus);
-  box-shadow: inset 0 0 0 1px var(--wiki-border-focus);
+.preset-select:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
 }
 
-/* Vector Search Input Row */
+/* Search Form Row (Fluid, Large, Modern Flat Design) */
 .search-form-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .input-affix-wrapper {
@@ -327,81 +274,79 @@ body.wiki-theme {
 
 .input-affix-icon {
   position: absolute;
-  right: 14px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  stroke: var(--wiki-text-muted);
-  stroke-width: 2;
+  width: 22px;
+  height: 22px;
+  stroke: var(--text-muted);
+  stroke-width: 2.2;
   fill: none;
   pointer-events: none;
 }
 
-.main-search-input.wiki-search-input {
+.main-search-input {
   width: 100%;
-  background: var(--wiki-bg-surface);
-  border: 1px solid var(--wiki-border-base);
-  border-radius: var(--radius-xs);
-  color: var(--wiki-text-primary);
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  padding: 10px 44px 10px 16px;
+  background: var(--bg-muted);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-arabic);
+  font-size: 1.25rem;
+  font-weight: 500;
+  padding: 18px 56px 18px 24px;
   outline: none;
-  transition: border-color var(--duration-fast) var(--ease-wiki), box-shadow var(--duration-fast) var(--ease-wiki);
+  transition: background-color var(--duration-fast) var(--ease-smooth), box-shadow var(--duration-fast) var(--ease-smooth);
 }
 
-.main-search-input.wiki-search-input:hover {
-  border-color: var(--wiki-text-secondary);
+.main-search-input:hover {
+  background: var(--bg-hover);
 }
 
-.main-search-input.wiki-search-input:focus {
-  border-color: var(--wiki-border-focus);
-  box-shadow: inset 0 0 0 1px var(--wiki-border-focus);
+.main-search-input:focus {
+  background: var(--bg-canvas);
+  box-shadow: 0 0 0 2px var(--text-primary);
 }
 
-/* Progressive Wikipedia Primary Button */
-.btn-primary.wiki-btn-primary {
+/* Primary Search Button */
+.btn-primary {
   flex-shrink: 0;
-  background: var(--wiki-btn-primary-bg);
-  color: var(--wiki-btn-primary-text);
-  border: 1px solid var(--wiki-btn-primary-bg);
-  border-radius: var(--radius-xs);
-  font-family: var(--font-sans);
-  font-size: 0.92rem;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-arabic);
+  font-size: 1.15rem;
   font-weight: 700;
-  padding: 10px 24px;
+  padding: 18px 38px;
   cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-wiki), border-color var(--duration-fast) var(--ease-wiki);
+  transition: background-color var(--duration-fast) var(--ease-smooth), transform var(--duration-fast) var(--ease-smooth);
 }
 
-.btn-primary.wiki-btn-primary:hover {
-  background: var(--wiki-btn-primary-hover);
-  border-color: var(--wiki-btn-primary-hover);
+.btn-primary:hover {
+  background: var(--btn-hover);
 }
 
-.btn-primary.wiki-btn-primary:active {
-  background: var(--wiki-btn-primary-active);
-  border-color: var(--wiki-btn-primary-active);
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
-/* Vector Tabs System Selectors */
+/* System Selectors (Flat Soft Pills, No Hard Box Borders) */
 .controls-subgrid {
-  padding-top: 12px;
-  border-top: 1px solid var(--wiki-border-hairline);
+  padding-top: 6px;
 }
 
 .system-selector-group {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .group-label {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--wiki-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
   margin-left: 6px;
 }
 
@@ -420,137 +365,131 @@ body.wiki-theme {
 .sys-pill-label {
   display: inline-flex;
   align-items: center;
-  padding: 5px 12px;
-  border-radius: var(--radius-xs);
-  background: var(--wiki-bg-secondary);
-  border: 1px solid var(--wiki-border-subtle);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  border: none;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 500;
-  color: var(--wiki-text-secondary);
-  transition: all var(--duration-fast) var(--ease-wiki);
+  color: var(--text-secondary);
+  transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .sys-toggle-pill input[type="checkbox"]:hover + .sys-pill-label {
-  background: var(--wiki-bg-hover);
-  border-color: var(--wiki-border-base);
-  color: var(--wiki-link);
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .sys-toggle-pill input[type="checkbox"]:checked + .sys-pill-label {
-  background: var(--wiki-bg-surface);
-  border-color: var(--wiki-border-base);
-  border-bottom: 2px solid var(--wiki-btn-primary-bg);
-  color: var(--wiki-text-primary);
+  background: var(--bg-dark);
+  color: var(--text-inverse);
   font-weight: 700;
 }
 
 .sys-toggle-pill input[type="checkbox"]:focus-visible + .sys-pill-label {
-  outline: 2px solid var(--wiki-border-focus);
-  outline-offset: 1px;
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
 }
 
 /* ==========================================================================
-   Morphological Query Transformation Strip (Wikipedia TOC / Notice Style)
+   Morphological Query Transformation Strip (Flat, Borderless)
    ========================================================================== */
 
-.transformation-console {
-  padding: 14px 18px;
-  background: var(--wiki-bg-secondary);
+.transformation-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.console-subhead {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--wiki-text-secondary);
-  margin-bottom: 10px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--wiki-border-subtle);
+.section-subhead {
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
 }
 
 .transform-cards-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
+  gap: 14px;
 }
 
 .transform-card {
-  background: var(--wiki-bg-surface);
-  border: 1px solid var(--wiki-border-subtle);
-  border-radius: var(--radius-xs);
-  padding: 9px 11px;
+  background: var(--bg-subtle);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  gap: 6px;
 }
 
 .transform-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--wiki-border-hairline);
-  padding-bottom: 4px;
 }
 
 .transform-sys-id {
   font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--wiki-text-primary);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
 .transform-sys-name {
-  font-size: 0.72rem;
-  color: var(--wiki-text-muted);
+  font-size: 0.82rem;
+  color: var(--text-muted);
 }
 
 .transform-tokens {
-  font-family: var(--font-sans);
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--wiki-text-primary);
+  font-family: var(--font-arabic);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
   word-break: break-word;
-  margin-top: 2px;
+  line-height: 1.4;
 }
 
 /* ==========================================================================
-   6-Column Parallel Search Results Grid (Wikitable Columns)
+   6-Column Parallel Comparison Grid (Borderless Fluid Streams)
    ========================================================================== */
 
 .results-section {
   width: 100%;
   overflow-x: auto;
-  padding-bottom: 16px;
+  padding-bottom: 24px;
 }
 
 .results-grid-container.six-cols {
   display: grid;
-  grid-template-columns: repeat(6, minmax(250px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(6, minmax(270px, 1fr));
+  gap: 20px;
   align-items: start;
 }
 
-/* Wikipedia Column Box */
+/* Column Stream (Borderless, Clean) */
 .comparison-column {
-  background: var(--wiki-bg-surface);
-  border: 1px solid var(--wiki-border-base);
-  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   min-height: 480px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Wikipedia Table-Header Aesthetic */
+/* Column Stream Header */
 .col-header {
-  padding: 12px 14px;
-  background: var(--wiki-bg-header);
-  border-bottom: 1px solid var(--wiki-border-base);
+  padding: 16px 18px;
+  background: var(--bg-muted);
+  border: none;
+  border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .col-header-top {
@@ -561,24 +500,24 @@ body.wiki-theme {
 
 .col-sys-badge {
   font-family: var(--font-mono);
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 2px 7px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  padding: 2px 8px;
   border-radius: var(--radius-xs);
-  background: var(--wiki-text-primary);
-  color: var(--wiki-text-inverse);
+  background: var(--bg-dark);
+  color: var(--text-inverse);
 }
 
 .col-latency {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--wiki-text-secondary);
+  font-size: 0.82rem;
+  color: var(--text-muted);
 }
 
 .col-sys-title {
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--wiki-text-primary);
+  color: var(--text-primary);
   line-height: 1.35;
 }
 
@@ -586,35 +525,36 @@ body.wiki-theme {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  font-size: 0.72rem;
-  color: var(--wiki-text-secondary);
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .col-meta-tag {
   font-family: var(--font-mono);
-  padding: 1px 5px;
+  padding: 2px 7px;
   border-radius: var(--radius-xs);
-  background: var(--wiki-bg-surface);
-  border: 1px solid var(--wiki-border-subtle);
+  background: var(--bg-canvas);
 }
 
-/* Results List Inside Column */
+/* Results Stream Inside Column */
 .col-results-body {
-  padding: 0;
   display: flex;
   flex-direction: column;
+  gap: 0;
   flex: 1;
 }
 
-/* Individual Wikipedia Result Card */
+/* Individual Result Item (Borderless Flow with Soft Divider) */
 .result-card {
-  background: var(--wiki-bg-surface);
-  border-bottom: 1px solid var(--wiki-border-hairline);
-  padding: 14px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--divider-subtle);
+  border-radius: 0;
+  padding: 20px 6px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  transition: background-color var(--duration-fast) var(--ease-wiki);
+  gap: 8px;
+  transition: background-color var(--duration-fast) var(--ease-smooth);
 }
 
 .result-card:last-child {
@@ -622,7 +562,8 @@ body.wiki-theme {
 }
 
 .result-card:hover {
-  background-color: var(--wiki-bg-secondary);
+  background-color: var(--bg-subtle);
+  border-radius: var(--radius-xs);
 }
 
 .result-card-header {
@@ -634,156 +575,149 @@ body.wiki-theme {
 
 .result-rank-badge {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 1px 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 2px 7px;
   border-radius: var(--radius-xs);
-  background: var(--wiki-bg-secondary);
-  border: 1px solid var(--wiki-border-subtle);
-  color: var(--wiki-text-secondary);
+  background: var(--bg-muted);
+  color: var(--text-secondary);
 }
 
 .result-score-badge {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--wiki-text-muted);
+  font-size: 0.82rem;
+  color: var(--text-muted);
 }
 
-/* Wikipedia Article Title Link */
+/* Large, Prominent Result Title */
 .result-title {
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   font-weight: 700;
   line-height: 1.4;
 }
 
 .result-title a {
-  color: var(--wiki-link);
+  color: var(--text-primary);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  transition: color var(--duration-fast) var(--ease-wiki);
-}
-
-.result-title a:visited {
-  color: var(--wiki-link-visited);
+  gap: 6px;
+  transition: color var(--duration-fast) var(--ease-smooth);
 }
 
 .result-title a:hover {
-  color: var(--wiki-link-hover);
-  text-decoration: underline;
+  color: var(--text-muted);
 }
 
 .result-title a svg {
-  width: 12px;
-  height: 12px;
-  stroke: var(--wiki-text-muted);
-  stroke-width: 2;
+  width: 14px;
+  height: 14px;
+  stroke: var(--text-muted);
+  stroke-width: 2.2;
   fill: none;
   flex-shrink: 0;
 }
 
-/* Morphological Matched Forms (Wikipedia Tag Style) */
+/* Matched Forms Tag */
 .result-matched-forms {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   margin-top: 2px;
-  margin-bottom: 4px;
-  font-size: 0.75rem;
+  margin-bottom: 2px;
 }
 
 .matched-forms-label {
-  color: var(--wiki-text-muted);
+  color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   margin-inline-end: 2px;
 }
 
 .matched-form-tag {
   display: inline-block;
-  padding: 1px 6px;
-  background: var(--wiki-bg-header);
-  color: var(--wiki-text-primary);
-  border: 1px solid var(--wiki-border-subtle);
+  padding: 2px 8px;
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  border: none;
   border-radius: var(--radius-xs);
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-family: var(--font-arabic);
+  font-size: 0.88rem;
   line-height: 1.4;
 }
 
+/* Large, Comfortable Snippet Typography */
 .result-snippet {
-  font-size: 0.86rem;
-  line-height: 1.6;
-  color: var(--wiki-text-primary);
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--text-secondary);
 }
 
-/* Wikipedia Search Result Highlight */
+/* Mark Highlight (Clean & High Contrast) */
 mark,
 mark.snippet-highlight {
-  background-color: var(--wiki-mark-bg);
-  color: var(--wiki-mark-text);
-  border-bottom: 1px solid var(--wiki-mark-border);
-  border-radius: 1px;
-  padding: 0 3px;
+  background-color: var(--mark-bg);
+  color: var(--mark-text);
+  border: none;
+  border-radius: 3px;
+  padding: 1px 5px;
   font-weight: 700;
 }
 
 /* Result Error & Empty States */
 .col-empty-state,
 .col-error-state {
-  padding: 36px 16px;
+  padding: 40px 16px;
   text-align: center;
-  color: var(--wiki-text-muted);
-  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .col-error-state {
-  color: #b32424;
-  background: #fee7e6;
-  border: 1px solid #f88;
-  border-radius: var(--radius-xs);
-  margin: 12px;
-  padding: 12px;
+  color: #991b1b;
+  background: #fef2f2;
+  border-radius: var(--radius-sm);
+  margin: 12px 0;
+  padding: 14px;
 }
 
-/* Skeleton Loading (Clean MediaWiki Pulse) */
+/* Skeleton Loading */
 .skeleton-loader {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px;
+  gap: 14px;
+  padding: 12px 0;
 }
 
 .skeleton-card {
-  height: 100px;
-  border-radius: var(--radius-xs);
-  background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+  height: 110px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, #f4f4f5 25%, #e4e4e7 50%, #f4f4f5 75%);
   background-size: 200% 100%;
-  animation: wikiPulse 1.4s ease-in-out infinite;
+  animation: cleanPulse 1.4s ease-in-out infinite;
 }
 
-@keyframes wikiPulse {
+@keyframes cleanPulse {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
 /* ==========================================================================
-   Wikipedia Footer
+   Footer
    ========================================================================== */
 
-.app-footer.wiki-footer {
+.app-footer {
   margin-top: auto;
-  border-top: 1px solid var(--wiki-border-base);
-  background: var(--wiki-bg-secondary);
-  padding: 20px 0;
-  font-size: 0.8rem;
-  color: var(--wiki-text-muted);
+  border-top: 1px solid var(--divider-subtle);
+  background: var(--bg-canvas);
+  padding: 32px 0;
+  font-size: 0.92rem;
+  color: var(--text-muted);
 }
 
 .footer-inner {
@@ -791,7 +725,7 @@ mark.snippet-highlight {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
 }
 
 /* ==========================================================================
@@ -800,7 +734,7 @@ mark.snippet-highlight {
 
 @media (max-width: 1400px) {
   .results-grid-container.six-cols {
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
   }
   .transform-cards-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -817,7 +751,7 @@ mark.snippet-highlight {
   .search-form-row {
     flex-direction: column;
   }
-  .btn-primary.wiki-btn-primary {
+  .btn-primary {
     width: 100%;
   }
   .header-inner {

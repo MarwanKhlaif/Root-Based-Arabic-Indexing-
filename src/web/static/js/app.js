@@ -102,7 +102,7 @@ async function triggerSearch() {
 
   if (btn) {
     btn.disabled = true;
-    btn.textContent = 'Searching...';
+    btn.textContent = 'جاري البحث...';
   }
 
   const selectedSystems = getSelectedSystems();
@@ -128,7 +128,7 @@ async function triggerSearch() {
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = 'Search Wikipedia';
+      btn.textContent = 'بحث';
     }
   }
 }

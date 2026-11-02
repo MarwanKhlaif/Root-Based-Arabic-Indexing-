@@ -3,49 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ويكيبيديا: منظومة استرجاع المعلومات العربية | Full-Text Search Benchmark</title>
+  <title>منظومة الفهرسة النصية واسترجاع المعلومات | Full-Text Search Benchmark</title>
   
-  <!-- Wikipedia / MediaWiki Encyclopedic Design System -->
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="wiki-theme">
+<body class="clean-theme">
 
-  <!-- Main Wikipedia Container -->
-  <div class="wiki-site-wrapper">
+  <div class="site-wrapper">
 
-    <!-- Wikipedia Header & Navigation Bar -->
-    <header class="app-header wiki-header">
+    <!-- Header (Clean & Borderless) -->
+    <header class="app-header">
       <div class="container header-inner">
         
-        <!-- Leading: Wikipedia Brand Identity -->
         <div class="brand-wrapper">
-          <!-- Wikipedia Classic Logo Mark -->
-          <div class="wiki-brand-mark" aria-hidden="true" title="ويكيبيديا الموسوعة الحرة">
-            <svg class="ui-icon wiki-logo-svg" viewBox="0 0 100 100" width="38" height="38">
-              <circle cx="50" cy="50" r="46" fill="#f8f9fa" stroke="#a2a9b1" stroke-width="2.5"/>
-              <text x="50" y="68" font-family="'Linux Libertine', 'Amiri', Georgia, Times, serif" font-size="54" font-weight="bold" fill="#202122" text-anchor="middle">W</text>
-            </svg>
-          </div>
-
           <div class="brand-titles">
-            <h1 class="wiki-site-title">
-              <span class="wiki-title-main">ويكيبيديا</span>
-              <span class="wiki-title-sep">·</span>
-              <span class="wiki-title-sub">منظومة الفهرسة النصية واسترجاع المعلومات</span>
-              <span class="tech-badge">Full-Text Search · PostgreSQL 16 · GIN</span>
+            <h1 class="site-title">
+              <span class="title-main">منظومة الفهرسة النصية</span>
+              <span class="tech-badge">PostgreSQL 16 · GIN Index</span>
             </h1>
             <div class="brand-meta">
               <span>S0–S5 Configuration Benchmark</span>
               <span class="meta-divider" aria-hidden="true">·</span>
-              <span>100,000 Articles Wikipedia Corpus</span>
-              <span class="meta-divider" aria-hidden="true">·</span>
-              <span>Researcher: Marwan Khlaif</span>
+              <span>100,000 Articles Corpus</span>
             </div>
           </div>
         </div>
         
-        <!-- Trailing: Live PostgreSQL Engine Status Badge -->
-        <div class="wiki-status-pill" id="db-status-pill" title="PostgreSQL 16 Connection Status">
+        <!-- Live PostgreSQL Status Pill -->
+        <div class="status-pill" id="db-status-pill" title="PostgreSQL 16 Connection Status">
           <span class="status-dot" id="status-dot"></span>
           <span id="status-text" class="tabular">Checking PostgreSQL 16...</span>
         </div>
@@ -53,24 +38,24 @@
     </header>
 
     <!-- Main Comparison Interface -->
-    <main class="container wiki-main">
+    <main class="container app-main">
 
-      <!-- Wikipedia Search Console -->
-      <section class="control-console wiki-box" aria-label="Search Console">
-        <div class="console-header">
-          <div class="console-title">
+      <!-- Search Console (Borderless & Clean) -->
+      <section class="search-section" aria-label="Search Console">
+        <div class="section-header">
+          <div class="section-title">
             <h2>Multi-System Search Comparison (S0 – S5)</h2>
-            <p class="console-desc">Parallel real-time query execution across 6 PostgreSQL GIN index configurations on the Arabic Wikipedia Corpus.</p>
+            <p class="section-desc">Parallel real-time query execution across 6 PostgreSQL GIN index configurations.</p>
           </div>
           <!-- Golden Query Preset Quick Picker -->
-          <div class="golden-preset-wrapper">
-            <select id="golden-select" class="wiki-select" aria-label="Golden Queries (20 Presets)">
+          <div class="preset-wrapper">
+            <select id="golden-select" class="preset-select" aria-label="Golden Queries (20 Presets)">
               <option value="">Golden Queries (20 Presets)</option>
             </select>
           </div>
         </div>
 
-        <!-- Wikipedia Vector Search Input Row -->
+        <!-- Search Input Row -->
         <form id="search-form" class="search-form-row" onsubmit="event.preventDefault(); triggerSearch();">
           <div class="input-affix-wrapper">
             <svg class="ui-icon input-affix-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -80,20 +65,20 @@
             <input 
               type="text" 
               id="search-input" 
-              class="main-search-input wiki-search-input" 
-              placeholder="ابحث في مقالات ويكيبيديا (مثلاً: يكتبون في المكتبة، تاريخ بغداد، استخراج المعادن)..." 
+              class="main-search-input" 
+              placeholder="ابحث في المقالات (مثلاً: يكتبون في المكتبة، تاريخ بغداد، استخراج المعادن)..." 
               value="كتب" 
               autocomplete="off"
               spellcheck="false"
               aria-label="Search Query"
             >
           </div>
-          <button type="submit" class="btn-primary wiki-btn-primary" id="search-btn">
-            Search Wikipedia
+          <button type="submit" class="btn-primary" id="search-btn">
+            بحث
           </button>
         </form>
 
-        <!-- Vector System Tabs / Active Systems Group -->
+        <!-- System Selectors Filter -->
         <div class="controls-subgrid">
           <div class="system-selector-group" id="system-selectors">
             <span class="group-label">Active Systems:</span>
@@ -125,17 +110,17 @@
         </div>
       </section>
 
-      <!-- Morphological Query Representation Box (Wikipedia MediaWiki Notice/TOC Style) -->
-      <section class="transformation-console wiki-box" id="search-transform-strip" aria-label="Query Transformation Representation">
-        <div class="console-subhead">
+      <!-- Morphological Query Representation (Borderless) -->
+      <section class="transformation-section" id="search-transform-strip" aria-label="Query Transformation Representation">
+        <div class="section-subhead">
           <span>Morphological Query Representation Across S0–S5:</span>
         </div>
         <div class="transform-cards-grid" id="transform-badges-grid">
-          <!-- Dynamic Wikipedia query representations rendered by app.js -->
+          <!-- Dynamic query representations rendered by app.js -->
         </div>
       </section>
 
-      <!-- 6-Column Parallel Comparison Grid -->
+      <!-- 6-Column Parallel Comparison Grid (Borderless Streams) -->
       <section id="results-wrapper" class="results-section" aria-label="Parallel Search Results">
         <div id="results-side-by-side" class="results-grid-container six-cols">
           <!-- Dynamic comparison columns rendered by app.js -->
@@ -144,10 +129,10 @@
 
     </main>
 
-    <!-- Wikipedia Footer -->
-    <footer class="app-footer wiki-footer">
+    <!-- Clean Footer -->
+    <footer class="app-footer">
       <div class="container footer-inner">
-        <div>المحتوى مستخرج من ويكيبيديا العربية · مرخص تحت رخصة المشاع الإبداعي: النسبة-الترخيص بالمثل (CC BY-SA 4.0)</div>
+        <div>منظومة الفهرسة النصية واسترجاع المعلومات للغة العربية</div>
         <div class="tabular">PostgreSQL 16 Full-Text Search Benchmark · S0–S5 Configurations · 100k Documents</div>
       </div>
     </footer>
